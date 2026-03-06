@@ -13,15 +13,17 @@ import {
   XOctagon,
 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 export default function LandingPage() {
+  const { isSignedIn } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   // Universal redirect logic for all buttons
   const routeToDashboard = () => {
-    window.location.href = "/dashboard";
+    window.location.href = isSignedIn ? "/dashboard" : "/sign-up";
   };
 
   return (
@@ -73,7 +75,7 @@ export default function LandingPage() {
               onClick={routeToDashboard}
               className="bg-[#1A1A1A] text-white px-8 py-3 rounded-3xl text-sm font-bold hover:bg-[#FF6803] hover:shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer"
             >
-              Login / Register
+              {isSignedIn ? "Dashboard" : "Login / Register"}
             </button>
           </div>
 
@@ -108,7 +110,7 @@ export default function LandingPage() {
                 onClick={routeToDashboard}
                 className="bg-[#1A1A1A] text-white px-8 py-4 rounded-xl text-sm font-bold mt-4 hover:bg-[#FF6803] transition-colors w-full"
               >
-                Login / Register
+                {isSignedIn ? "Dashboard" : "Login / Register"}
               </button>
             </motion.div>
           )}
