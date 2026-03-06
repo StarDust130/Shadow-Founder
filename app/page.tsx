@@ -114,7 +114,7 @@ export default function LandingPage() {
           )}
         </AnimatePresence>
         {/* 1. HERO SECTION */}
-        <main className="relative w-full min-h-[85vh] flex overflow-hidden pt-8 md:pt-16">
+        <main className="relative w-full min-h-[auto] md:min-h-[85vh] flex overflow-hidden pt-6 md:pt-16">
           {/* MASSIVE BACKGROUND TEXT (Hidden on Mobile, Kinetic on PC) */}
           <div className="absolute inset-0 hidden lg:flex flex-col items-center justify-center pointer-events-none z-0">
             <motion.h1
@@ -134,14 +134,14 @@ export default function LandingPage() {
           </div>
 
           {/* FOREGROUND LAYOUT */}
-          <div className="absolute inset-0 z-20 px-6 md:px-12 lg:px-16 pt-8 pb-12 flex flex-col lg:flex-row justify-between pointer-events-none">
+          <div className="relative lg:absolute inset-0 z-20 px-6 md:px-12 lg:px-16 pt-4 md:pt-8 pb-8 md:pb-12 flex flex-col lg:flex-row justify-between pointer-events-none">
             {/* LEFT COLUMN: Staggered Typography */}
             <div className="w-full lg:w-1/3 flex flex-col justify-between h-full pointer-events-auto z-30">
               <div>
-                <span className="text-[#1A1A1A]/50 font-mono text-xs font-bold tracking-widest block mb-6">
+                <span className="text-[#1A1A1A]/50 font-mono text-xs font-bold tracking-widest block mb-3 md:mb-6">
                   AGENTIC AI FOUNDER 🧠
                 </span>
-                <div className="flex flex-col text-[3.5rem] md:text-6xl xl:text-7xl font-black text-[#1A1A1A] leading-[0.85] tracking-tighter uppercase">
+                <div className="flex flex-col text-[2.5rem] sm:text-[3.5rem] md:text-6xl xl:text-7xl font-black text-[#1A1A1A] leading-[0.85] tracking-tighter uppercase">
                   <span className="ml-0 md:ml-16">BUILDING</span>
                   <span>STARTUP</span>
                   <span className="ml-0 md:ml-12">PIPELINES</span>
@@ -151,15 +151,15 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div >
-                <p className="text-[#1A1A1A]/70 text-sm md:text-base font-medium max-w-sm leading-relaxed mb-8">
+              <div className="mt-6 lg:mt-0">
+                <p className="text-[#1A1A1A]/70 text-sm md:text-base font-medium max-w-sm leading-relaxed mb-4 md:mb-8">
                   We craft database architectures, agentic workflows, and
                   applications that drive conversions and long-term growth.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-3">
                   <button
                     onClick={routeToDashboard}
-                    className="bg-gradient-to-b from-[#FF8A3D] to-[#FF6803] text-white px-8 py-4 rounded-xl font-bold text-sm shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-1 transition-transform"
+                    className="bg-gradient-to-b from-[#FF8A3D] to-[#FF6803] text-white px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-sm shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-1 transition-transform w-full md:w-auto flex items-center justify-center gap-2"
                   >
                     Get Started
                   </button>
@@ -168,7 +168,7 @@ export default function LandingPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <button className="bg-white/60 backdrop-blur-sm text-[#1A1A1A] border border-white px-8 py-4 rounded-xl font-bold text-sm hover:bg-white transition-colors w-full sm:w-auto">
+                    <button className="bg-white/60 backdrop-blur-sm text-[#1A1A1A] border border-white px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-sm hover:bg-white transition-colors w-full md:w-auto flex items-center justify-center gap-2 w-full md:w-auto">
                       {" "}
                       Contact Us
                     </button>
@@ -205,7 +205,7 @@ export default function LandingPage() {
           </div>
 
           {/* Bottom Center Scroll Indicator */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-30">
+          <div className="absolute bottom-1 md:bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-30">
             <MousePointer2
               size={20}
               className="text-[#1A1A1A]/40 animate-bounce"
