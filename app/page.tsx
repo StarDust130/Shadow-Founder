@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   XOctagon,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,8 +26,7 @@ export default function LandingPage() {
 
   return (
     // Outer Canvas
-    <div className="min-h-screen bg-[#D1D1D1] p-2 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center">
-    
+    <div className="min-h-screen bg-[#D1D1D1] p-4 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center">
       {/* INNER FRAME - The Main App Window */}
       <div className="relative w-full max-w-[1800px] bg-[#E3E3E3] rounded-[2rem] md:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col border border-white/50">
         {/* STATIC PERSISTENT NAVIGATION */}
@@ -41,28 +41,28 @@ export default function LandingPage() {
             Shadow Founder
           </div>
 
-          <div className="hidden lg:flex items-center bg-[#C7C7C7]/40 backdrop-blur-md rounded-lg p-1 border border-white/40">
+          <div className="hidden lg:flex items-center bg-[#C7C7C7]/40 backdrop-blur-md rounded-3xl  p-1 border border-white/40">
             <a
               href="#mission"
-              className="px-5 py-2 rounded-md text-sm font-semibold text-[#1A1A1A] bg-white/60 shadow-sm hover:bg-white transition-colors"
+              className="px-5 py-2 rounded-3xl text-sm font-semibold text-[#1A1A1A] bg-white/60 shadow-sm hover:bg-white transition-colors"
             >
-              Home
+              Mission
             </a>
             <a
               href="#architecture"
-              className="px-5 py-2 rounded-md text-sm font-medium text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/40 transition-colors flex items-center gap-1"
+              className="px-5 py-2 rounded-3xl text-sm font-medium text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/40 transition-colors flex items-center gap-1"
             >
-              Architecture <ChevronDown size={14} />
+              Architecture
             </a>
             <a
               href="#features"
-              className="px-5 py-2 rounded-md text-sm font-medium text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/40 transition-colors"
+              className="px-5 py-2 rounded-3xl text-sm font-medium text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/40 transition-colors"
             >
               Features
             </a>
             <a
               href="#pricing"
-              className="px-5 py-2 rounded-md text-sm font-medium text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/40 transition-colors"
+              className="px-5 py-2 rounded-3xl text-sm font-medium text-[#1A1A1A]/70 hover:text-[#1A1A1A] hover:bg-white/40 transition-colors"
             >
               Pricing
             </a>
@@ -71,7 +71,7 @@ export default function LandingPage() {
           <div className="hidden lg:flex">
             <button
               onClick={routeToDashboard}
-              className="bg-[#1A1A1A] text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-[#FF6803] hover:shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-all"
+              className="bg-[#1A1A1A] text-white px-8 py-3 rounded-3xl text-sm font-bold hover:bg-[#FF6803] hover:shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-all cursor-pointer"
             >
               Login / Register
             </button>
@@ -151,7 +151,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-12 lg:mt-0">
+              <div >
                 <p className="text-[#1A1A1A]/70 text-sm md:text-base font-medium max-w-sm leading-relaxed mb-8">
                   We craft database architectures, agentic workflows, and
                   applications that drive conversions and long-term growth.
@@ -161,14 +161,18 @@ export default function LandingPage() {
                     onClick={routeToDashboard}
                     className="bg-gradient-to-b from-[#FF8A3D] to-[#FF6803] text-white px-8 py-4 rounded-xl font-bold text-sm shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-1 transition-transform"
                   >
-                    Deploy Engine
+                    Get Started
                   </button>
-                  <button
-                    onClick={routeToDashboard}
-                    className="bg-white/60 backdrop-blur-sm text-[#1A1A1A] border border-white px-8 py-4 rounded-xl font-bold text-sm hover:bg-white transition-colors"
+                  <Link
+                    href="mailto:csyadav0513@gmail.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    Contact Us
-                  </button>
+                    <button className="bg-white/60 backdrop-blur-sm text-[#1A1A1A] border border-white px-8 py-4 rounded-xl font-bold text-sm hover:bg-white transition-colors w-full sm:w-auto">
+                      {" "}
+                      Contact Us
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -342,17 +346,16 @@ export default function LandingPage() {
                 Founder
               </div>
               <h3 className="text-5xl font-black tracking-tighter text-white mb-4 relative z-10">
-                $49<span className="text-xl text-white/40">/mo</span>
+                ₹ 1,999<span className="text-xl text-white/40">/mo</span>
               </h3>
               <p className="text-white/60 font-medium mb-8 flex-grow relative z-10">
                 Unlimited validations and full Next.js generation pipelines.
               </p>
-              <button
-                onClick={routeToDashboard}
-                className="relative z-10 w-full bg-[#FF6803] text-white py-4 rounded-xl font-bold uppercase tracking-widest shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-transform"
-              >
-                Upgrade to Pro
-              </button>
+              <Link href="upi://pay?pa=9302903537-2@ybl&pn=ShadowFounder&tr=TEST123456789&am=1999&cu=INR">
+                <button className="relative z-10 w-full bg-[#FF6803] text-white py-4 rounded-xl font-bold uppercase tracking-widest shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-transform">
+                  Upgrade to Pro
+                </button>
+              </Link>
             </div>
           </div>
         </section>
