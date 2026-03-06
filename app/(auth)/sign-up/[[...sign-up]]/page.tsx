@@ -5,6 +5,7 @@ import type { OAuthStrategy } from "@clerk/shared/types";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { FaApple } from "react-icons/fa";
 
 export default function SignUpPage() {
   const { signUp, errors, fetchStatus } = useSignUp();
@@ -124,7 +125,7 @@ export default function SignUpPage() {
     <div className="w-[92%] sm:w-full max-w-md mx-auto shadow-2xl bg-[#E3E3E3]/80 backdrop-blur-xl border border-white/50 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8">
       <div className="text-center mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-[#1A1A1A]">
-          Sign Up
+          Create Account
         </h1>
         <p className="text-[#1A1A1A]/60 font-medium text-xs sm:text-sm mt-1 sm:mt-2">
           Become a founder. Step into the shadows.
@@ -143,9 +144,7 @@ export default function SignUpPage() {
           disabled={fetchStatus === "fetching"}
           className="w-full flex items-center justify-center gap-3 bg-white/60 border border-white hover:bg-white text-[#1A1A1A] font-bold rounded-xl py-2.5 sm:py-3.5 transition-all shadow-sm hover:shadow-md text-xs sm:text-sm uppercase tracking-widest disabled:opacity-50"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16.365 14.384c-.015-1.92 1.52-2.83 1.59-2.871-1.015-1.464-2.895-1.642-3.41-1.657-1.66-.17-3.23.97-4.08.97-.84 0-1.92-1.07-3.13-.96-1.57.17-3.05 1.06-3.85 2.45-1.61 2.8-.42 6.89 1.15 9.12.76 1.09 1.66 2.31 2.87 2.26 1.15-.05 1.6-.74 3.01-.74 1.41 0 1.83.74 3.03.72 1.25-.03 2.05-1.14 2.81-2.22 1.01-1.47 1.41-2.89 1.44-2.97-.04-.02-2.02-.78-2.02-3.06l-.01-.01zM14.65 6.09c.64-.78 1.06-1.85.94-2.91-1-.04-2.21.5-2.87 1.28-.53.62-1.05 1.76-.92 2.76 1.12.08 2.2-.49 2.85-1.13z" />
-          </svg>
+          <FaApple size={20} />
           Sign up with Apple
         </button>
         <button
@@ -255,7 +254,7 @@ export default function SignUpPage() {
           href="/sign-in"
           className="text-[#FF6803] font-bold hover:text-[#FF8A3D] hover:underline transition-colors uppercase tracking-wide"
         >
-          Sign In
+          Login
         </Link>
       </div>
     </div>
