@@ -73,18 +73,13 @@ export default function AuthLayout({
         transition={{ duration: 0.6, ease: [0.25, 0.1, 0, 1] }}
         className="relative z-20 w-full max-w-md flex flex-col items-center"
       >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-8 h-8 md:w-10 md:h-10 bg-[#FF6803] grid grid-cols-2 gap-[2px] p-[2px] md:p-[3px] rounded-lg md:rounded-xl shadow-[0_8px_24px_rgba(255,104,3,0.3)]">
-            <div className="bg-white rounded-sm md:rounded-md"></div>
-            <div className="bg-white rounded-sm md:rounded-md"></div>
-            <div className="bg-white rounded-sm md:rounded-md"></div>
-            <div className="bg-white rounded-sm md:rounded-md"></div>
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="font-black text-xl md:text-2xl tracking-tighter text-[#1A1A1A] uppercase">
+        <div className="flex items-center gap-3 mb-4">
+        
+          <div className="flex gap-1 leading-none">
+            <span className="font-bold text-xl md:text-2xl tracking-tighter text-[#1A1A1A] uppercase">
               Shadow
             </span>
-            <span className="font-black text-xl md:text-2xl tracking-tighter text-[#FF6803] uppercase">
+            <span className="font-bold animate-pulse text-xl md:text-2xl tracking-tighter text-[#FF6803] uppercase">
               Founder
             </span>
           </div>
