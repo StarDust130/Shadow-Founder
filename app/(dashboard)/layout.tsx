@@ -11,7 +11,6 @@ import {
   Code2,
   User,
   Zap,
-  Cpu,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -81,14 +80,14 @@ export default function DashboardLayout({
                     className="relative group"
                   >
                     <div
-                      className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 overflow-hidden ${
+                      className={`w-10 h-10 flex items-center justify-center transition-all duration-200 overflow-hidden ${
                         isActive && !isProfileAvatar
-                          ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
+                          ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] rounded-xl"
                           : isActive && isProfileAvatar
-                            ? "border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-white/40"
+                            ? "ring-2 ring-[#FF6803] ring-offset-2 ring-offset-transparent rounded-full shadow-[0_0_12px_rgba(255,104,3,0.25)]"
                             : isProfileAvatar
-                              ? "opacity-75 hover:opacity-100"
-                              : "text-[#1A1A1A]/30 hover:text-[#1A1A1A] hover:bg-white/50"
+                              ? "rounded-full opacity-75 hover:opacity-100 hover:ring-2 hover:ring-[#1A1A1A]/15 hover:ring-offset-1"
+                              : "text-[#1A1A1A]/30 hover:text-[#1A1A1A] hover:bg-white/50 rounded-xl"
                       }`}
                     >
                       {isProfileAvatar ? (
@@ -97,12 +96,24 @@ export default function DashboardLayout({
                           alt="Profile"
                           width={40}
                           height={40}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full rounded-full object-cover"
                         />
                       ) : (
                         <item.icon size={18} />
                       )}
                     </div>
+                    {/* Online indicator for profile avatar */}
+                    {isProfileAvatar && (
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          type: "tween",
+                        }}
+                        className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"
+                      />
+                    )}
                     {/* Tooltip - instant, no animation */}
                     <div className="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-100 whitespace-nowrap shadow-lg z-50">
                       {item.label}
@@ -131,7 +142,7 @@ export default function DashboardLayout({
               <div className="bg-white rounded-xs" />
             </motion.div>
             <span className="font-black text-sm tracking-tight text-[#1A1A1A] hidden sm:inline">
-              Shadow<span className="text-[#FF6803]">.</span>
+              Shadow Founder<span className="text-[#FF6803]">.</span>
             </span>
           </Link>
           <span className="text-[#1A1A1A]/10 text-xs hidden sm:inline">/</span>
@@ -141,51 +152,56 @@ export default function DashboardLayout({
         </div>
 
         <div className="flex items-center gap-2.5">
-          {/* AI Engine Status */}
-          <div className="hidden sm:flex items-center gap-2 bg-white/50 border border-[#1A1A1A]/8 rounded-lg px-3 py-1.5">
-            <Cpu size={10} className="text-[#FF6803]" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#1A1A1A]/40 font-mono">
-              AI Engine
+          {/* AI Engine Status — unified pill */}
+          <div className="hidden sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border  border-[#1A1A1A]/6 rounded-full px-3.5 py-1.5 shadow-sm">
+            😎
+            <span className="text-[9px] font-bold uppercase tracking-wider text-[#050505]/90 font-mono">
+              BE COOL
             </span>
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity, type: "tween" }}
-              className="w-1.5 h-1.5 bg-emerald-400 rounded-full"
-            />
+            <div className="w-px h-3 bg-[#1a1a1a]/8" />
+        
+            <span className="text-[9px] font-bold uppercase tracking-wider text-orange-600/90 font-mono">
+              STAY COOL
+            </span>
           </div>
 
-          {/* Status pill */}
-          <div className="flex items-center gap-1.5 bg-white border-2 border-[#1A1A1A]/10 rounded-full px-3 py-1">
+          {/* Mobile-only status dot */}
+          <div className="sm:hidden flex items-center gap-1.5 bg-white/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-[#1A1A1A]/6">
             <motion.div
               animate={{ scale: [1, 1.3, 1] }}
               transition={{ duration: 2, repeat: Infinity, type: "tween" }}
               className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
             />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#1A1A1A]/50 hidden sm:inline">
-              Online
-            </span>
-            <Zap size={10} className="text-[#FF6803] sm:hidden" />
+            <Zap size={10} className="text-[#FF6803]" />
           </div>
 
           {/* Mobile user avatar — click redirects to /profile */}
-          <div
-            className="lg:hidden cursor-pointer"
+          <motion.div
+            className="lg:hidden cursor-pointer relative"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => router.push("/profile")}
           >
             {user?.imageUrl ? (
               <Image
                 src={user.imageUrl}
                 alt="Profile"
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-lg border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] object-cover"
+                width={34}
+                height={34}
+                className="w-8.5 h-8.5 rounded-full object-cover ring-2 ring-[#1A1A1A]/10 ring-offset-1 ring-offset-[#E5E4E2] hover:ring-[#FF6803]/40 transition-all"
               />
             ) : (
-              <div className="w-8 h-8 rounded-lg border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-[#FF6803] flex items-center justify-center">
+              <div className="w-8.5 h-8.5 rounded-full bg-[#FF6803] flex items-center justify-center ring-2 ring-[#1A1A1A]/10 ring-offset-1 ring-offset-[#E5E4E2]">
                 <User size={14} className="text-white" />
               </div>
             )}
-          </div>
+            {/* Online dot */}
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity, type: "tween" }}
+              className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#E5E4E2]"
+            />
+          </motion.div>
         </div>
       </header>
 
@@ -237,23 +253,38 @@ export default function DashboardLayout({
                       isActive && !isProfileAvatar
                         ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
                         : isActive && isProfileAvatar
-                          ? "border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-[#1A1A1A]/5"
+                          ? "bg-white/80 border-2 border-[#FF6803]/30 shadow-[0_0_8px_rgba(255,104,3,0.15)]"
                           : "text-[#1A1A1A]/35"
                     }`}
                   >
-                    {isProfileAvatar ? (
-                      <Image
-                        src={user.imageUrl!}
-                        alt="Profile"
-                        width={22}
-                        height={22}
-                        className={`w-5.5 h-5.5 rounded-md object-cover ${
-                          isActive ? "" : "opacity-60"
-                        }`}
-                      />
-                    ) : (
-                      <item.icon size={18} />
-                    )}
+                    <div className="relative">
+                      {isProfileAvatar ? (
+                        <Image
+                          src={user.imageUrl!}
+                          alt="Profile"
+                          width={22}
+                          height={22}
+                          className={`w-5.5 h-5.5 rounded-full object-cover ring-1 ${
+                            isActive
+                              ? "ring-[#FF6803] ring-offset-1"
+                              : "ring-[#1A1A1A]/10 opacity-60"
+                          }`}
+                        />
+                      ) : (
+                        <item.icon size={18} />
+                      )}
+                      {isProfileAvatar && isActive && (
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            type: "tween",
+                          }}
+                          className="absolute -bottom-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border border-white"
+                        />
+                      )}
+                    </div>
                     <span className="text-[8px] font-bold uppercase tracking-wider">
                       {item.label}
                     </span>
