@@ -228,7 +228,9 @@ export default function HelpPage() {
               transition={{ delay: 0.08 + i * 0.04 }}
             >
               <button
-                onClick={() => setExpandedSection(expandedSection === i ? null : i)}
+                onClick={() =>
+                  setExpandedSection(expandedSection === i ? null : i)
+                }
                 className="w-full flex items-center gap-3 p-4 bg-white border-2 border-[#1A1A1A] rounded-xl shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#FF6803] transition-all cursor-pointer group text-left"
               >
                 <span className="text-xl">{section.emoji}</span>
@@ -239,7 +241,10 @@ export default function HelpPage() {
                   animate={{ rotate: expandedSection === i ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <ChevronDown size={16} className="text-[#1A1A1A]/30 group-hover:text-[#FF6803] transition-colors" />
+                  <ChevronDown
+                    size={16}
+                    className="text-[#1A1A1A]/30 group-hover:text-[#FF6803] transition-colors"
+                  />
                 </motion.div>
               </button>
               <AnimatePresence>
@@ -256,7 +261,10 @@ export default function HelpPage() {
                         <div className="text-xs text-[#1A1A1A]/60 font-bold leading-relaxed whitespace-pre-line">
                           {section.content.split("**").map((part, j) =>
                             j % 2 === 1 ? (
-                              <span key={j} className="text-[#1A1A1A] font-black">
+                              <span
+                                key={j}
+                                className="text-[#1A1A1A] font-black"
+                              >
                                 {part}
                               </span>
                             ) : (
@@ -272,11 +280,16 @@ export default function HelpPage() {
                               key={j}
                               className="flex items-start gap-2.5 text-xs text-[#1A1A1A]/60 font-bold"
                             >
-                              <span className="text-sm shrink-0">{step.emoji}</span>
+                              <span className="text-sm shrink-0">
+                                {step.emoji}
+                              </span>
                               <span className="leading-relaxed">
                                 {step.text.split("**").map((part, k) =>
                                   k % 2 === 1 ? (
-                                    <span key={k} className="text-[#1A1A1A] font-black">
+                                    <span
+                                      key={k}
+                                      className="text-[#1A1A1A] font-black"
+                                    >
                                       {part}
                                     </span>
                                   ) : (
@@ -296,72 +309,22 @@ export default function HelpPage() {
           ))}
         </div>
 
-        {/* AI Summary Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 mb-8"
-        >
-          <motion.button
-            onClick={() => setShowAiSummary(!showAiSummary)}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-linear-to-r from-[#FF8A3D] to-[#FF6803] text-white font-black text-xs uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-shadow cursor-pointer"
-          >
-            <Sparkles size={14} />
-            {showAiSummary ? "Hide" : "Show"} AI-Friendly Summary
-            <span className="text-white/60 text-[9px]">(for ChatGPT, Gemini, Claude)</span>
-          </motion.button>
-
-          <AnimatePresence>
-            {showAiSummary && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-3 bg-white border-2 border-[#1A1A1A] rounded-xl shadow-[3px_3px_0_#1A1A1A] p-5 relative">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/25 font-mono flex items-center gap-1.5">
-                      🤖 AI Context Summary
-                    </p>
-                    <motion.button
-                      onClick={handleCopySummary}
-                      whileTap={{ scale: 0.9 }}
-                      className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-[#1A1A1A]/30 hover:text-[#FF6803] transition-colors cursor-pointer"
-                    >
-                      {copied ? <Check size={10} className="text-emerald-500" /> : <Copy size={10} />}
-                      {copied ? "Copied!" : "Copy"}
-                    </motion.button>
-                  </div>
-                  <div className="text-xs text-[#1A1A1A]/60 font-bold leading-relaxed whitespace-pre-line">
-                    {AI_SUMMARY.split("**").map((part, i) =>
-                      i % 2 === 1 ? (
-                        <span key={i} className="text-[#1A1A1A] font-black">
-                          {part}
-                        </span>
-                      ) : (
-                        <span key={i}>{part}</span>
-                      ),
-                    )}
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-[9px] text-[#1A1A1A]/20 font-bold">
-                    <ExternalLink size={9} />
-                    Copy this and paste it into ChatGPT, Gemini, or Claude to give them context about Shadow Founder
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
         {/* Footer */}
         <div className="text-center py-8 border-t border-[#1A1A1A]/6">
-          <p className="text-[10px] font-bold text-[#1A1A1A]/20 uppercase tracking-widest">
-            Built with 🧡 by Shadow Founder Team
+          <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
+            Built with <span className="animate-pulse">💓</span> by Shadow
+            Founder Team
+          </p>
+          <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
+            Create by <Link href={"https://csyadav.vercel.app/"}
+            target="_blank"
+            rel="noopener noreferrer"
+
+            
+            className="text-[#FF6803] hover:underline">
+              ChandraShekhar
+            </Link>
+            ✌️
           </p>
         </div>
       </div>
