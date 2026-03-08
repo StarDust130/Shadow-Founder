@@ -18,6 +18,8 @@ import {
   Zap,
   Loader2,
   Eye,
+  Crown,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -298,6 +300,41 @@ export default function AssemblyPage() {
         </div>
       </motion.div>
 
+      {/* UPGRADE BANNER */}
+      <Link href="/profile">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03 }}
+          whileHover={{ y: -4, x: -2, transition: { duration: 0.2 } }}
+          whileTap={{ scale: 0.98 }}
+          className="mb-6 bg-linear-to-r from-[#FF6803] to-[#FF8A3D] border-2 border-[#1A1A1A] rounded-2xl p-4 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all cursor-pointer relative overflow-hidden group"
+        >
+          <motion.div
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          />
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] shrink-0">
+              <Crown size={18} className="text-[#FF6803]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-black text-white uppercase tracking-tight">
+                Want Real Production Code?
+              </h3>
+              <p className="text-[11px] text-white/70 font-bold mt-0.5">
+                Upgrade now for production-ready codebases, premium designs & priority AI generation
+              </p>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5 bg-white text-[#FF6803] px-3 py-2 rounded-xl border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] font-black text-[10px] uppercase tracking-wider shrink-0 group-hover:shadow-[3px_3px_0_#1A1A1A] transition-shadow">
+              <Crown size={12} /> Upgrade Now
+            </div>
+            <ArrowRight size={18} className="text-white/50 sm:hidden shrink-0 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </motion.div>
+      </Link>
+
       {/* STATS BAR */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -471,7 +508,7 @@ export default function AssemblyPage() {
                   srcDoc={previewFile.content}
                   title="Landing Page Preview"
                   className="w-full h-full min-h-[500px] border-0"
-                  sandbox="allow-scripts"
+                  sandbox="allow-scripts allow-same-origin"
                 />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center min-h-[500px] text-[#1A1A1A]/30 gap-4 p-8">
@@ -480,9 +517,17 @@ export default function AssemblyPage() {
                     Preview not available
                   </p>
                   <p className="text-xs text-center max-w-sm">
-                    This build was generated before live preview support.
-                    Rebuild your MVP to get a beautiful landing page preview.
+                    This build doesn&apos;t include a preview file. Try rebuilding your MVP from the Code Builder to generate a live landing page preview.
                   </p>
+                  <Link href="/builder">
+                    <motion.button
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-[#FF6803] text-white text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all cursor-pointer"
+                    >
+                      <Sparkles size={14} /> Rebuild MVP
+                    </motion.button>
+                  </Link>
                 </div>
               )}
             </div>
