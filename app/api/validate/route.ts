@@ -75,7 +75,7 @@ export async function POST(req: Request) {
     await User.findOneAndUpdate(
       { clerkId: userId },
       { $set: { clerkId: userId, ...updateFields } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
 
     const userPrompt = `Analyze this startup idea:
@@ -157,6 +157,13 @@ Provide your analysis as JSON.`;
       };
     }
 
+    // Sanitize trend values to valid enum
+    const validTrends = ["up", "down", "neutral"];
+    const sanitizedMetrics = (analysisData.metrics || []).map((m: { label?: string; value?: string; trend?: string; detail?: string }) => ({
+      ...m,
+      trend: validTrends.includes(m.trend || "") ? m.trend : "neutral",
+    }));
+
     const analysis = await Analysis.create({
       userId,
       idea,
@@ -169,7 +176,7 @@ Provide your analysis as JSON.`;
       verdict: analysisData.verdict,
       verdictColor: analysisData.verdictColor,
       summary: analysisData.summary,
-      metrics: analysisData.metrics,
+      metrics: sanitizedMetrics,
       strengths: analysisData.strengths,
       weaknesses: analysisData.weaknesses,
       recommendations: analysisData.recommendations,
