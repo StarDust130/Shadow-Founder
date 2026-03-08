@@ -247,7 +247,7 @@ export default function DashboardPage() {
                 </motion.span>
               </h3>
               <p className="text-[#1A1A1A]/40 text-xs font-bold mt-0.5">
-                Submit your startup pitch &bull; AI validates in ~15s
+                Submit your startup pitch &bull; AI validates in ~10s
               </p>
             </div>
             <div className="relative z-10 w-10 h-10 rounded-xl bg-[#FF6803]/10 border-2 border-[#FF6803]/20 flex items-center justify-center group-hover:bg-[#FF6803] group-hover:border-[#1A1A1A] transition-all shrink-0">
