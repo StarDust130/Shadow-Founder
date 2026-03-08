@@ -54,14 +54,23 @@ Use a bold, striking Neobrutalism design with modern touches:
 - Professional body text (14-16px), NOT oversized
 - Clean whitespace and good spacing
 
-PREVIEW SECTIONS (7 sections, all well-designed):
+PREVIEW SECTIONS (10 sections, all well-designed with Indian context):
 1. NAV: Sticky top bar with app name logo (bold uppercase) + "Get Started" CTA button with thick border
 2. HERO: Bold headline (not too big — max 3.5rem), subtitle (1 line), 2 CTA buttons, animated gradient background
 3. FEATURES: 3-4 cards in grid, each with emoji icon + title + short description, neobrutalism card style
-4. SOCIAL PROOF: 3 stat counters in a row (e.g. "10K+ Users", "99.9% Uptime", "4.9★ Rating")
-5. PRICING: 2-3 tier cards, popular one highlighted with accent border + scale, checkmark feature lists
-6. CTA: Sign-up section with email input + button, bold headline
-7. FOOTER: Clean minimal footer with copyright + links
+4. HOW IT WORKS: 3-4 numbered steps explaining the user journey. Simple icons, clean layout
+5. SOCIAL PROOF: 3 stat counters in a row (e.g. "10K+ Users", "99.9% Uptime", "4.9★ Rating")
+6. TESTIMONIALS: 2-3 quote cards with user names and roles. Make them feel real and Indian (use Indian names like Priya, Arjun, Sneha)
+7. PRICING: 3 tier cards with ₹ (Indian Rupee) values — e.g. Free/₹0, Pro/₹999/mo, Enterprise/₹4,999/mo. Popular one highlighted. Checkmark feature lists
+8. FAQ: 4-5 collapsible FAQ items with toggle arrows. Common questions about the product
+9. CTA: Sign-up section with email input + button, bold headline
+10. FOOTER: Clean minimal footer with copyright + links
+
+IMPORTANT — INDIAN CONTEXT:
+- ALL pricing MUST use Indian Rupees (₹) — e.g. ₹0, ₹999, ₹2,499, ₹4,999. Do NOT use $ dollar signs
+- Use Indian user names in testimonials (Priya Sharma, Arjun Mehta, Sneha Patel, etc.)
+- Reference Indian cities/context where relevant (Bangalore, Mumbai, Delhi)
+- Stats should feel realistic for Indian market (e.g. "50K+ Users across India", "Trusted by 500+ startups")
 
 TEXT CONTENT RULES:
 - Use the app name (not the raw idea description) as the brand
@@ -69,7 +78,7 @@ TEXT CONTENT RULES:
 - Headlines should be punchy, 3-7 words max
 - Descriptions should be 1-2 short sentences, clear and professional
 - NO filler text, NO lorem ipsum, NO "coming soon"
-- Pricing should be realistic ($0/Free, $29/mo, $99/mo)
+- Pricing should use Indian Rupees: ₹0/Free, ₹999/mo, ₹4,999/mo
 
 CSS RULES:
 - Use CSS custom properties for the color palette
@@ -108,22 +117,33 @@ nav .cta:hover{transform:translateY(-2px);box-shadow:6px 6px 0 var(--dark)}
 .hero .btns a:hover{transform:translateY(-3px);box-shadow:6px 6px 0 var(--dark)}
 section{padding:5rem 2rem}
 .features{background:#fff;border-top:3px solid var(--dark);border-bottom:3px solid var(--dark)}
-.features h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
+.features h2,.how-it-works h2,.stats h2,.testimonials h2,.pricing h2,.faq h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
 .features .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
 .features .card{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s,box-shadow 0.2s}
 .features .card:hover{transform:translateY(-4px);box-shadow:6px 6px 0 var(--primary)}
 .features .card .icon{font-size:1.8rem;margin-bottom:0.75rem}
 .features .card h3{font-size:1rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
 .features .card p{color:#64748b;line-height:1.5;font-size:0.875rem}
+.how-it-works{background:var(--light)}
+.how-it-works .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;max-width:900px;margin:0 auto}
+.how-it-works .step{text-align:center;padding:2rem 1.5rem;border-radius:18px;background:#fff;border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s}
+.how-it-works .step:hover{transform:translateY(-4px)}
+.how-it-works .step .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem;margin-bottom:1rem;border:2px solid var(--dark);box-shadow:2px 2px 0 var(--dark)}
+.how-it-works .step h3{font-size:0.95rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
+.how-it-works .step p{color:#64748b;font-size:0.8rem;line-height:1.5}
 .stats{background:var(--dark);color:#fff;text-align:center}
-.stats h2{font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase}
 .stats .row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
 .stats .stat .num{font-size:2.5rem;font-weight:900;color:var(--primary)}
 .stats .stat .label{margin-top:0.25rem;color:#94a3b8;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em}
-.pricing{background:#fff}
-.pricing h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase}
-.pricing .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:800px;margin:0 auto}
-.pricing .plan{padding:2rem;border-radius:18px;border:2px solid var(--dark);text-align:center;transition:transform 0.2s;box-shadow:var(--shadow);background:var(--light)}
+.testimonials{background:#fff;border-top:3px solid var(--dark)}
+.testimonials .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
+.testimonials .quote{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);position:relative}
+.testimonials .quote::before{content:'\\201C';font-size:3rem;color:var(--primary);opacity:0.3;position:absolute;top:10px;left:16px;font-family:Georgia,serif}
+.testimonials .quote p{font-size:0.875rem;color:#475569;line-height:1.6;margin-bottom:1rem;padding-top:1rem}
+.testimonials .quote .author{font-size:0.8rem;font-weight:800;color:var(--dark);text-transform:uppercase}.testimonials .quote .role{font-size:0.7rem;color:#94a3b8;font-weight:600}
+.pricing{background:var(--light)}
+.pricing .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:850px;margin:0 auto}
+.pricing .plan{padding:2rem;border-radius:18px;border:2px solid var(--dark);text-align:center;transition:transform 0.2s;box-shadow:var(--shadow);background:#fff}
 .pricing .plan:hover{transform:translateY(-4px)}
 .pricing .plan.popular{border-color:var(--primary);box-shadow:6px 6px 0 var(--primary);position:relative;transform:scale(1.03)}
 .pricing .plan.popular::before{content:"Popular";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.2rem 1rem;border-radius:99px;font-size:0.7rem;font-weight:800;border:2px solid var(--dark);text-transform:uppercase}
@@ -134,6 +154,13 @@ section{padding:5rem 2rem}
 .pricing .plan li::before{content:"\\2713 ";color:var(--primary);font-weight:700}
 .pricing .plan .btn{display:inline-block;padding:0.75rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s;background:var(--primary);color:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.8rem;text-transform:uppercase}
 .pricing .plan .btn:hover{transform:translateY(-2px);box-shadow:5px 5px 0 var(--dark)}
+.faq{background:#fff;border-top:3px solid var(--dark)}
+.faq .items{max-width:700px;margin:0 auto}
+.faq .item{border:2px solid var(--dark);border-radius:14px;margin-bottom:0.75rem;overflow:hidden;box-shadow:2px 2px 0 var(--dark)}
+.faq .item summary{padding:1rem 1.5rem;font-weight:800;font-size:0.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;background:var(--light);text-transform:uppercase;letter-spacing:0.02em}
+.faq .item summary::after{content:'+';font-size:1.2rem;font-weight:900;color:var(--primary);transition:transform 0.2s}
+.faq .item[open] summary::after{transform:rotate(45deg)}
+.faq .item .answer{padding:0 1.5rem 1rem;font-size:0.85rem;color:#64748b;line-height:1.6}
 .cta-section{background:var(--dark);color:#fff;text-align:center;padding:5rem 2rem;border-top:3px solid var(--primary)}
 .cta-section h2{font-size:1.8rem;font-weight:900;margin-bottom:0.75rem;text-transform:uppercase}
 .cta-section p{font-size:0.95rem;opacity:0.7;margin-bottom:2rem}
@@ -146,16 +173,28 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700}
 .fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
 .fade-in.visible{opacity:1;transform:translateY(0)}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
-@media(max-width:640px){.hero h1{font-size:2rem}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}}
+@media(max-width:640px){.hero h1{font-size:2rem}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}.how-it-works .steps{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <nav><div class="logo">${appName}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
+
 <section class="hero"><h1>${appName}</h1><p>${summary || "The next-generation platform built for the future."}</p><div class="btns"><a href="#features" class="primary">Explore Features</a><a href="#pricing" class="secondary">View Pricing</a></div></section>
+
 <section class="features" id="features"><h2>Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">\u26A1</div><h3>Lightning Fast</h3><p>Built for speed and performance from the ground up.</p></div><div class="card fade-in"><div class="icon">\u{1F6E1}\uFE0F</div><h3>Secure by Default</h3><p>Enterprise-grade security built into every layer.</p></div><div class="card fade-in"><div class="icon">\u{1F680}</div><h3>Scale Effortlessly</h3><p>Grows with your business without breaking a sweat.</p></div></div></section>
-<section class="stats"><h2>Trusted by Thousands</h2><div class="row"><div class="stat fade-in"><div class="num">10,000+</div><div class="label">Active Users</div></div><div class="stat fade-in"><div class="num">99.9%</div><div class="label">Uptime</div></div><div class="stat fade-in"><div class="num">4.9\u2605</div><div class="label">Rating</div></div></div></section>
-<section class="pricing" id="pricing"><h2>Simple Pricing</h2><div class="grid"><div class="plan fade-in"><h3>Starter</h3><div class="price">Free</div><ul><li>Up to 3 projects</li><li>Basic analytics</li><li>Community support</li></ul><a href="#" class="btn">Get Started</a></div><div class="plan popular fade-in"><h3>Pro</h3><div class="price">$29<span>/mo</span></div><ul><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li><li>Custom integrations</li></ul><a href="#" class="btn">Upgrade</a></div><div class="plan fade-in"><h3>Enterprise</h3><div class="price">$99<span>/mo</span></div><ul><li>Everything in Pro</li><li>Dedicated manager</li><li>SLA guarantee</li><li>Custom deployment</li></ul><a href="#" class="btn">Contact Us</a></div></div></section>
-<section class="cta-section"><h2>Ready to Get Started?</h2><p>Join thousands building with ${appName}.</p><form onsubmit="event.preventDefault();alert('Thanks for signing up!')"><input type="email" placeholder="Enter your email" required><button type="submit">Sign Up Free</button></form></section>
+
+<section class="how-it-works" id="how-it-works"><h2>How It Works</h2><div class="steps"><div class="step fade-in"><div class="num">1</div><h3>Sign Up</h3><p>Create your free account in under 30 seconds.</p></div><div class="step fade-in"><div class="num">2</div><h3>Setup</h3><p>Configure your workspace with our guided onboarding.</p></div><div class="step fade-in"><div class="num">3</div><h3>Launch</h3><p>Go live and start seeing results from day one.</p></div></div></section>
+
+<section class="stats"><h2>Trusted Across India</h2><div class="row"><div class="stat fade-in"><div class="num">50K+</div><div class="label">Users Across India</div></div><div class="stat fade-in"><div class="num">99.9%</div><div class="label">Uptime</div></div><div class="stat fade-in"><div class="num">4.9\u2605</div><div class="label">Rating</div></div></div></section>
+
+<section class="testimonials"><h2>What Our Users Say</h2><div class="grid"><div class="quote fade-in"><p>This platform completely transformed how we operate. We saved over \u20B920L in the first year alone.</p><div class="author">Priya Sharma</div><div class="role">Founder, TechVentures Mumbai</div></div><div class="quote fade-in"><p>The best tool I\u2019ve used for my startup. Clean UI, fast performance, and incredible support.</p><div class="author">Arjun Mehta</div><div class="role">CTO, DataSync Bangalore</div></div><div class="quote fade-in"><p>We went from idea to launch in weeks. Highly recommend for any Indian startup founder.</p><div class="author">Sneha Patel</div><div class="role">CEO, GrowthPilot Delhi</div></div></div></section>
+
+<section class="pricing" id="pricing"><h2>Simple Pricing</h2><div class="grid"><div class="plan fade-in"><h3>Starter</h3><div class="price">\u20B90</div><ul><li>Up to 3 projects</li><li>Basic analytics</li><li>Community support</li></ul><a href="#" class="btn">Get Started</a></div><div class="plan popular fade-in"><h3>Pro</h3><div class="price">\u20B9999<span>/mo</span></div><ul><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li><li>Custom integrations</li></ul><a href="#" class="btn">Upgrade</a></div><div class="plan fade-in"><h3>Enterprise</h3><div class="price">\u20B94,999<span>/mo</span></div><ul><li>Everything in Pro</li><li>Dedicated manager</li><li>SLA guarantee</li><li>Custom deployment</li></ul><a href="#" class="btn">Contact Us</a></div></div></section>
+
+<section class="faq" id="faq"><h2>Got Questions?</h2><div class="items"><details class="item"><summary>How do I get started?</summary><div class="answer">Simply create a free account and follow our guided onboarding. You\u2019ll be up and running in minutes.</div></details><details class="item"><summary>Can I upgrade or downgrade anytime?</summary><div class="answer">Yes! You can switch plans at any time. Changes take effect immediately with prorated billing.</div></details><details class="item"><summary>Is my data secure?</summary><div class="answer">Absolutely. We use bank-grade encryption and comply with all Indian data protection regulations.</div></details><details class="item"><summary>Do you offer refunds?</summary><div class="answer">We offer a 14-day money-back guarantee. No questions asked.</div></details></div></section>
+
+<section class="cta-section"><h2>Ready to Get Started?</h2><p>Join 50,000+ founders building with ${appName}.</p><form onsubmit="event.preventDefault();alert('Thanks for signing up!')"><input type="email" placeholder="Enter your email" required><button type="submit">Sign Up Free</button></form></section>
+
 <footer><p>&copy; 2026 ${appName}. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p></footer>
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
