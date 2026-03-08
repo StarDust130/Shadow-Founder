@@ -20,6 +20,7 @@ import {
   Eye,
   Crown,
   ArrowRight,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -113,6 +114,7 @@ export default function AssemblyPage() {
   const [currentGif, setCurrentGif] = useState(0);
   const [currentWaitText, setCurrentWaitText] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [showEditPopup, setShowEditPopup] = useState(false);
 
   useEffect(() => {
     const fetchBuild = async () => {
@@ -468,6 +470,13 @@ export default function AssemblyPage() {
             <span className="text-[11px] font-mono font-bold text-white/30 uppercase tracking-wider">
               shadow-vault
             </span>
+            <div className="h-4 w-px bg-white/10" />
+            <button
+              onClick={() => setShowEditPopup(true)}
+              className="flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border border-[#FF6803]/40 text-[#FF6803] bg-[#FF6803]/10 rounded hover:bg-[#FF6803]/20 transition-all cursor-pointer"
+            >
+              <Pencil size={11} /> Edit Code
+            </button>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -665,6 +674,57 @@ export default function AssemblyPage() {
           </motion.button>
         </Link>
       </motion.div>
+
+      {/* EDIT CODE UPGRADE POPUP */}
+      <AnimatePresence>
+        {showEditPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={() => setShowEditPopup(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-white border-2 border-[#1A1A1A] shadow-[6px_6px_0_#FF6803] rounded-2xl p-8 max-w-md w-full text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-16 h-16 bg-[#FF6803]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-[#FF6803]/30">
+                <Crown size={28} className="text-[#FF6803]" />
+              </div>
+              <h2 className="text-xl font-black text-[#1A1A1A] uppercase tracking-tight mb-2">
+                Pro Feature
+              </h2>
+              <p className="text-sm text-[#1A1A1A]/60 font-bold mb-6 leading-relaxed">
+                Code editing is a Pro feature. Upgrade to unlock inline code editing, real-time preview updates, and make your MVP even better.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/profile">
+                  <motion.button
+                    whileHover={{ y: -2, boxShadow: "5px 5px 0 #1A1A1A" }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-center gap-2 bg-[#FF6803] text-white py-3 px-6 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:bg-[#FF8A3D] transition-colors cursor-pointer"
+                  >
+                    <Crown size={14} /> Upgrade to Pro
+                  </motion.button>
+                </Link>
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setShowEditPopup(false)}
+                  className="py-3 px-6 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A]/20 text-[#1A1A1A]/50 hover:text-[#1A1A1A] hover:border-[#1A1A1A]/40 transition-colors cursor-pointer"
+                >
+                  Maybe Later
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
