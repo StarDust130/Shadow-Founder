@@ -24,6 +24,7 @@ import {
   Rocket,
   RefreshCw,
   Pencil,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -215,6 +216,7 @@ export default function AnalysisPage() {
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [buildElapsed, setBuildElapsed] = useState(0);
   const [currentGif, setCurrentGif] = useState(
     () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
   );
@@ -276,6 +278,13 @@ export default function AnalysisPage() {
     }, 4000);
     return () => clearInterval(rotator);
   }, [loading]);
+
+  // Timer for build loading
+  useEffect(() => {
+    if (!building) { setBuildElapsed(0); return; }
+    const timer = setInterval(() => setBuildElapsed((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, [building]);
 
   // GIF & text rotation for build loading
   useEffect(() => {
@@ -1127,9 +1136,15 @@ export default function AnalysisPage() {
                 <h2 className="text-2xl font-black text-[#1A1A1A] uppercase tracking-tight mb-2">
                   Building Your MVP
                 </h2>
-                <p className="text-sm text-[#1A1A1A]/40 font-bold">
+                <p className="text-sm text-[#1A1A1A]/40 font-bold mb-3">
                   {buildWaitText}
                 </p>
+                <div className="inline-flex items-center gap-2 bg-[#FAFAFA] rounded-full px-4 py-1.5 border border-[#1A1A1A]/8">
+                  <Clock size={12} className="text-[#FF6803]" />
+                  <span className="text-[11px] font-black text-[#1A1A1A]/50 font-mono tracking-wider">
+                    {buildElapsed >= 60 ? `${Math.floor(buildElapsed / 60)}m ${buildElapsed % 60}s` : `${buildElapsed}s`}
+                  </span>
+                </div>
               </div>
 
               {/* Progress steps */}
