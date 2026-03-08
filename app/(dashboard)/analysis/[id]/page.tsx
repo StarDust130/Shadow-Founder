@@ -72,7 +72,7 @@ const verdictEmoji = (verdict: string) => {
   switch (verdict) {
     case "VIABLE":
       return "\u2705";
-    case "PASS":
+    case "CONDITIONAL PASS":
       return "\u{1F7E1}";
     case "RISKY":
       return "\u{1F7E0}";
@@ -181,6 +181,21 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+const LOADING_GIFS = [
+  "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
+  "https://media.tenor.com/hYkRcm80JFwAAAAj/foxy-foxplushy.gif",
+  "https://media.tenor.com/KOQYL00kmYEAAAAm/happy-holidays.webp",
+  "https://media.tenor.com/v-eI1P9681IAAAAm/goose-dance.webp",
+];
+
+const waitTexts = [
+  "Crunching the data...",
+  "Analyzing market signals...",
+  "Consulting the startup gods...",
+  "Almost there, hang tight!",
+  "Loading your analysis...",
+];
+
 export default function AnalysisPage() {
   const params = useParams();
   const router = useRouter();
@@ -195,6 +210,19 @@ export default function AnalysisPage() {
   const [buildStep, setBuildStep] = useState(0);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [currentGif, setCurrentGif] = useState(
+    () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
+  );
+  const [currentWaitText, setCurrentWaitText] = useState(
+    () => waitTexts[Math.floor(Math.random() * waitTexts.length)],
+  );
+  const [buildGif, setBuildGif] = useState(
+    () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
+  );
+  const [buildWaitText, setBuildWaitText] = useState(
+    () => waitTexts[Math.floor(Math.random() * waitTexts.length)],
+  );
 
   const {
     messages: chatMessages,
@@ -227,6 +255,33 @@ export default function AnalysisPage() {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  // Timer for loading screen
+  useEffect(() => {
+    if (!loading) return;
+    const timer = setInterval(() => setElapsedTime((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, [loading]);
+
+  // GIF & text rotation for loading screen
+  useEffect(() => {
+    if (!loading) return;
+    const rotator = setInterval(() => {
+      setCurrentGif(LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
+      setCurrentWaitText(waitTexts[Math.floor(Math.random() * waitTexts.length)]);
+    }, 4000);
+    return () => clearInterval(rotator);
+  }, [loading]);
+
+  // GIF & text rotation for build loading
+  useEffect(() => {
+    if (!building) return;
+    const rotator = setInterval(() => {
+      setBuildGif(LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
+      setBuildWaitText(waitTexts[Math.floor(Math.random() * waitTexts.length)]);
+    }, 5000);
+    return () => clearInterval(rotator);
+  }, [building]);
 
   useEffect(() => {
     const fetchAnalysis = async () => {
@@ -314,34 +369,40 @@ export default function AnalysisPage() {
   const isIllegal = data && data.score === 0;
 
   if (loading) {
+    const mins = Math.floor(elapsedTime / 60);
+    const secs = elapsedTime % 60;
+    const timeStr = mins > 0 ? `${mins}m ${secs.toString().padStart(2, "0")}s` : `${secs}s`;
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-6 p-8 max-w-sm text-center">
           <motion.div
-            animate={{ scale: [1, 1.08, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="w-12 h-12 bg-[#FF6803] rounded-2xl grid grid-cols-2 gap-[3px] p-[5px] border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
+            key={currentGif}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="w-32 h-32 flex items-center justify-center"
           >
-            {[0, 1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{
-                  duration: 1.4,
-                  repeat: Infinity,
-                  delay: i * 0.12,
-                }}
-                className="bg-white rounded-sm"
-              />
-            ))}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={currentGif}
+              alt="Loading"
+              className="w-28 h-28 object-contain rounded-2xl"
+            />
           </motion.div>
-          <motion.p
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-[11px] font-black text-[#1A1A1A]/40 uppercase tracking-widest font-mono"
-          >
-            Loading analysis
-          </motion.p>
+          <div>
+            <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-wide mb-1">
+              {currentWaitText}
+            </p>
+            <p className="text-xs text-[#1A1A1A]/40 font-mono font-bold">
+              {timeStr}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Loader2 size={14} className="animate-spin text-[#FF6803]" />
+            <span className="text-[11px] font-bold text-[#1A1A1A]/50">
+              Loading analysis
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -998,34 +1059,21 @@ export default function AnalysisPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-100 bg-[#E5E4E2] flex items-center justify-center"
+            className="fixed inset-0 z-100 bg-white flex items-center justify-center"
           >
             <div className="flex flex-col items-center gap-8 px-6 max-w-md w-full">
-              {/* Animated build icon */}
+              {/* GIF */}
               <motion.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="relative"
+                key={buildGif}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
               >
-                <motion.div
-                  animate={{ scale: [1, 1.04, 1] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="w-20 h-20 bg-[#FF6803] rounded-2xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A]"
-                >
-                  <Rocket size={36} className="text-white" />
-                </motion.div>
-                <motion.div
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.08, 0.2] }}
-                  transition={{ duration: 2.5, repeat: Infinity }}
-                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-16 h-3 bg-[#1A1A1A]/10 rounded-full blur-sm"
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={buildGif}
+                  alt="Building..."
+                  className="w-24 h-24 object-contain rounded-2xl"
                 />
               </motion.div>
 
@@ -1034,7 +1082,7 @@ export default function AnalysisPage() {
                   Building Your MVP
                 </h2>
                 <p className="text-sm text-[#1A1A1A]/40 font-bold">
-                  AI is generating production-ready code
+                  {buildWaitText}
                 </p>
               </div>
 
