@@ -44,7 +44,7 @@ export default function DashboardLayout({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col gap-1.5 p-2.5 bg-white/15 backdrop-blur-2xl border border-white/30 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col gap-1.5 p-2.5 bg-white/15 backdrop-blur-2xl border border-white/30 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
           >
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
@@ -63,7 +63,7 @@ export default function DashboardLayout({
                     className="relative group"
                   >
                     <div
-                      className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-200 overflow-hidden ${
+                      className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-200 overflow-hidden ${
                         isActive && !isProfileAvatar
                           ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
                           : isActive && isProfileAvatar
