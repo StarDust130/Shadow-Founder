@@ -377,7 +377,7 @@ export default function DashboardPage() {
             <motion.button
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#FF6803] hover:text-[#1A1A1A] transition-colors"
+              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#FF6803] hover:text-[#1A1A1A] transition-colors cursor-pointer"
             >
               New Idea <ArrowRight size={12} />
             </motion.button>
@@ -400,7 +400,7 @@ export default function DashboardPage() {
             <Link href="/validator">
               <motion.button
                 whileHover={{ y: -2 }}
-                className="mt-4 px-6 py-2.5 bg-[#FF6803] text-white rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
+                className="mt-4 px-6 py-2.5 bg-[#FF6803] text-white rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] cursor-pointer"
               >
                 Validate an Idea
               </motion.button>
