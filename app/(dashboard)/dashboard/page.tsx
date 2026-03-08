@@ -78,7 +78,7 @@ function ScoreBadge({ score }: { score: number }) {
 }
 
 function StatusBadge({ verdict }: { verdict: string }) {
-  const isViable = verdict === "VIABLE" || verdict === "CONDITIONAL PASS";
+  const isViable = verdict === "VIABLE" || verdict === "PASS";
   return (
     <span
       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-2 ${
@@ -132,7 +132,7 @@ export default function DashboardPage() {
 
   const totalProjects = analyses.length;
   const viableCount = analyses.filter(
-    (a) => a.verdict === "VIABLE" || a.verdict === "CONDITIONAL PASS",
+    (a) => a.verdict === "VIABLE" || a.verdict === "PASS",
   ).length;
   const avgScore =
     totalProjects > 0
@@ -481,8 +481,8 @@ export default function DashboardPage() {
             "MongoDB",
             "Clerk Auth",
             "Framer Motion",
-            "Groq AI",
-            "Gemini",
+            "Shadow AI",
+            "AI Engine",
             "JSZip",
             "React 19",
             "Next.js 16",
@@ -491,8 +491,8 @@ export default function DashboardPage() {
             "MongoDB",
             "Clerk Auth",
             "Framer Motion",
-            "Groq AI",
-            "Gemini",
+            "Shadow AI",
+            "AI Engine",
             "JSZip",
             "React 19",
           ].map((tech, i) => (
