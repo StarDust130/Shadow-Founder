@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Activity, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -29,6 +29,7 @@ import {
   Package,
   XOctagon,
   Crown,
+  ActivityIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/lib/toast-context";
@@ -36,6 +37,7 @@ import { useToast } from "@/lib/toast-context";
 interface AnalysisSummary {
   _id: string;
   idea: string;
+  appName?: string;
   category: string;
   score: number;
   verdict: string;
@@ -626,10 +628,17 @@ export default function BuilderPage() {
                         <ScoreBadge score={idea.score} />
                         <div className="flex-1 min-w-0">
                           <h3 className="text-sm font-black text-[#1A1A1A] tracking-tight truncate">
-                            {idea.idea.length > 60
-                              ? idea.idea.slice(0, 60) + "..."
-                              : idea.idea}
+                            {(idea.appName || idea.idea).length > 60
+                              ? (idea.appName || idea.idea).slice(0, 60) + "..."
+                              : idea.appName || idea.idea}
                           </h3>
+                          {idea.appName && (
+                            <p className="text-[9px] text-[#1A1A1A]/25 font-mono truncate">
+                              {idea.idea.length > 50
+                                ? idea.idea.slice(0, 50) + "..."
+                                : idea.idea}
+                            </p>
+                          )}
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
                               {idea.category}
@@ -744,6 +753,25 @@ export default function BuilderPage() {
           </motion.div>
         )}
 
+        {/* Separator */}
+        <div className="relative flex items-center justify-center py-6">
+          {/* left line */}
+          <div className="h-[2px] w-40 bg-gradient-to-r from-transparent via-[#FF6803] to-[#FF6803]/20 blur-[0.3px]" />
+
+          {/* center icon */}
+          <div className="mx-6 relative">
+            <span className="text-[#FF6803] text-2xl animate-pulse">
+              <ActivityIcon />
+            </span>
+
+            {/* glow */}
+            <div className="absolute inset-0 blur-xl bg-[#FF6803]/40 rounded-full"></div>
+          </div>
+
+          {/* right line */}
+          <div className="h-[2px] w-40 bg-gradient-to-l from-transparent via-[#FF6803] to-[#FF6803]/20 blur-[0.3px]" />
+        </div>
+
         {/* HOW IT WORKS */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -847,7 +875,7 @@ export default function BuilderPage() {
                   }
                   onMouseEnter={() => setHoveredStage(stage.id)}
                   onMouseLeave={() => setHoveredStage(null)}
-                  className={`relative border-2 rounded-2xl p-5 transition-all overflow-hidden ${isComing ? "bg-[#D9D9D9]/50 border-[#1A1A1A]/10 border-dashed opacity-60 cursor-default" : "bg-white border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] cursor-pointer"}`}
+                  className={`relative border-2 rounded-2xl p-5 transition-all overflow-hidden ${isComing ? "bg-[#D9D9D9]/50 border-[#1A1A1A]/10 border-dashed opacity-60 cursor-default" : "bg-white border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803]"}`}
                 >
                   {!isComing && hoveredStage === stage.id && (
                     <motion.div
