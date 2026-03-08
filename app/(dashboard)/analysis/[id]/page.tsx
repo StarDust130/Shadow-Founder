@@ -72,7 +72,7 @@ const verdictEmoji = (verdict: string) => {
   switch (verdict) {
     case "VIABLE":
       return "\u2705";
-    case "CONDITIONAL PASS":
+    case "PASS":
       return "\u{1F7E1}";
     case "RISKY":
       return "\u{1F7E0}";
@@ -836,7 +836,7 @@ export default function AnalysisPage() {
                     <div className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       <p className="text-[10px] text-[#1A1A1A]/30 font-medium">
-                        Streaming · Groq LLM
+                        Streaming · Shadow AI
                       </p>
                     </div>
                   </div>
