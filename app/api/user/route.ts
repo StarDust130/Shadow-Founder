@@ -23,7 +23,7 @@ export async function GET() {
     const user = await User.findOneAndUpdate(
       { clerkId: userId },
       { $set: { clerkId: userId, ...updateFields } },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
 
     return NextResponse.json({
@@ -62,9 +62,9 @@ export async function PATCH(req: Request) {
       { clerkId: userId },
       {
         plan,
-        maxBuilds: plan === "pro" ? 999 : 1,
+        maxBuilds: plan === "pro" ? 10 : 1,
       },
-      { new: true },
+      { returnDocument: "after" },
     );
 
     if (!user) {
