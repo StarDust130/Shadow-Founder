@@ -425,6 +425,23 @@ export default function LandingPage() {
             </div>
             <span className="mt-4 md:mt-0">ALL LOGIC. NO FEELINGS.</span>
           </div>
+             <div className="text-center py-8 border-t border-[#1A1A1A]/6">
+                    <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
+                      Built with <span className="animate-pulse">💓</span> by Shadow
+                      Founder Team
+                    </p>
+                    <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
+                      Create by <Link href={"https://csyadav.vercel.app/"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+          
+                      
+                      className="text-[#FF6803] hover:underline">
+                        ChandraShekhar
+                      </Link>
+                      ✌️
+                    </p>
+                  </div>
         </footer>
       </div>
     </div>
