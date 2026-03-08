@@ -7,21 +7,33 @@ import { User } from "@/lib/models/User";
 
 const groq = new Groq({ apiKey: process.env.QROQ_API_KEY });
 
-const SYSTEM_PROMPT = `You are Shadow Founder AI — a brutally honest startup analyst. You evaluate startup ideas like a seasoned VC partner with 20+ years experience. You must be direct, data-driven, and provide actionable insights.
+const SYSTEM_PROMPT = `You are Shadow Founder AI — a brutally honest startup analyst with deep expertise in the Indian startup ecosystem and global markets. You evaluate startup ideas like a seasoned VC partner (Sequoia India, Peak XV, Accel) with 20+ years experience. You must be direct, data-driven, and provide actionable insights.
+
+IMPORTANT: Use Indian Rupees (₹) for ALL monetary values. Show both Indian and global market context.
 
 When given a startup idea, analyze it and respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
 {
   "score": <number 0-100>,
-  "appName": "<REQUIRED — invent a short, catchy, memorable product name for this idea. 1-2 words max. Think like a real startup: Notion, Stripe, Figma, Canva, Loom, Arc, Linear, Vercel, Clerk. Be creative and unique. Do NOT just repeat the idea description.>",
+  "appName": "<REQUIRED — invent a short, catchy, memorable product name for this idea. 1-2 words max. Think like a real startup: Notion, Stripe, Figma, Canva, Loom, Arc, Linear, Vercel, Clerk, Zerodha, Razorpay, Cred, Meesho, PhonePe. Be creative and unique. Do NOT just repeat the idea description. If user provides an appName, use that instead.>",
   "verdict": "<one of: VIABLE, CONDITIONAL PASS, RISKY, NOT VIABLE>",
   "verdictColor": "<hex color: #22C55E for VIABLE, #FF8A3D for CONDITIONAL PASS, #FF6803 for RISKY, #EF4444 for NOT VIABLE>",
-  "summary": "<2-3 sentence executive summary of the idea's potential>",
+  "summary": "<2-3 sentence executive summary of the idea's potential with Indian market context>",
   "metrics": [
-    {"label": "Market Size (TAM)", "value": "<e.g. $4.2B>", "trend": "<up or down>", "detail": "<1 sentence explanation>"},
-    {"label": "Competition", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence>"},
-    {"label": "Revenue Potential", "value": "<e.g. $500K ARR>", "trend": "<up or down>", "detail": "<1 sentence>"},
-    {"label": "Feasibility", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence>"}
+    {"label": "Market Size (TAM)", "value": "<e.g. ₹35,000 Cr ($4.2B)>", "trend": "<up or down>", "detail": "<1 sentence with India + global size>"},
+    {"label": "Competition", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence about competitive landscape>"},
+    {"label": "Revenue Potential", "value": "<e.g. ₹40L ARR>", "trend": "<up or down>", "detail": "<1 sentence in Indian context>"},
+    {"label": "Feasibility", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence>"},
+    {"label": "India Market Fit", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence about India-specific opportunity>"},
+    {"label": "Time to MVP", "value": "<e.g. 3-4 months>", "trend": "<up or down>", "detail": "<1 sentence about dev timeline>"}
   ],
+  "bigPlayers": [
+    {"name": "<competitor name>", "strength": "<what they do well>", "weakness": "<their gap you can exploit>"},
+    {"name": "<competitor 2>", "strength": "<...>", "weakness": "<...>"},
+    {"name": "<competitor 3>", "strength": "<...>", "weakness": "<...>"}
+  ],
+  "failureRisks": ["<specific reason this idea could fail #1>", "<reason #2>", "<reason #3>", "<reason #4>"],
+  "founderChecklist": ["<thing founder MUST do before building #1>", "<#2>", "<#3>", "<#4>", "<#5>"],
+  "monetization": ["<specific monetization strategy #1>", "<strategy #2>", "<strategy #3>"],
   "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
   "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
   "recommendations": ["<actionable recommendation 1>", "<recommendation 2>", "<recommendation 3>"]
@@ -43,8 +55,9 @@ If the idea is illegal, unethical, promotes harm, involves fraud, scams, exploit
 - Strengths should all say "None — this idea is flagged as harmful"
 - Weaknesses should list the legal/ethical issues
 - Recommendations should encourage the user to pursue a legitimate, ethical business idea instead
+- bigPlayers, failureRisks, founderChecklist, monetization arrays should have relevant entries about why this is harmful
 
-Be realistic. Most ideas score 40-70. Only truly exceptional ideas get 80+. Be specific with market data and numbers.`;
+Be realistic. Most ideas score 40-70. Only truly exceptional ideas get 80+. Be specific with market data and numbers. Always include Indian market perspective with ₹ values.`;
 
 export async function POST(req: Request) {
   try {
@@ -54,7 +67,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { idea, target, problem, revenue, competitors, category } = body;
+    const { idea, appName: userAppName, target, problem, revenue, competitors, category } = body;
 
     if (!idea || !target || !problem) {
       return NextResponse.json(
@@ -82,13 +95,14 @@ export async function POST(req: Request) {
     const userPrompt = `Analyze this startup idea:
 
 **Idea:** ${idea}
+${userAppName ? `**Preferred App Name:** ${userAppName}` : ""}
 **Target Audience:** ${target}
 **Problem it Solves:** ${problem}
 ${revenue ? `**Revenue Model:** ${revenue}` : ""}
 ${competitors ? `**Known Competitors:** ${competitors}` : ""}
 ${category ? `**Category:** ${category}` : ""}
 
-Provide your analysis as JSON.`;
+Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Include bigPlayers, failureRisks, founderChecklist, and monetization sections.`;
 
     const completion = await groq.chat.completions.create({
       messages: [
@@ -97,7 +111,7 @@ Provide your analysis as JSON.`;
       ],
       model: "llama-3.3-70b-versatile",
       temperature: 0.7,
-      max_completion_tokens: 2048,
+      max_completion_tokens: 4096,
     });
 
     const rawContent = completion.choices[0]?.message?.content || "";
@@ -110,52 +124,28 @@ Provide your analysis as JSON.`;
     } catch {
       analysisData = {
         score: 50,
-        appName: idea.split(" ").slice(0, 2).join(""),
+        appName: userAppName || idea.split(" ").slice(0, 2).join(""),
         verdict: "RISKY",
         verdictColor: "#FF6803",
         summary:
           "Analysis could not be fully parsed. The idea shows some potential but requires further evaluation.",
         metrics: [
-          {
-            label: "Market Size (TAM)",
-            value: "Unknown",
-            trend: "up",
-            detail: "Insufficient data for estimation",
-          },
-          {
-            label: "Competition",
-            value: "Medium",
-            trend: "down",
-            detail: "Market assessment pending",
-          },
-          {
-            label: "Revenue Potential",
-            value: "TBD",
-            trend: "up",
-            detail: "Requires detailed analysis",
-          },
-          {
-            label: "Feasibility",
-            value: "Medium",
-            trend: "up",
-            detail: "Technical feasibility undetermined",
-          },
+          { label: "Market Size (TAM)", value: "Unknown", trend: "up", detail: "Insufficient data for estimation" },
+          { label: "Competition", value: "Medium", trend: "down", detail: "Market assessment pending" },
+          { label: "Revenue Potential", value: "TBD", trend: "up", detail: "Requires detailed analysis" },
+          { label: "Feasibility", value: "Medium", trend: "up", detail: "Technical feasibility undetermined" },
+          { label: "India Market Fit", value: "Medium", trend: "up", detail: "Indian market potential unclear" },
+          { label: "Time to MVP", value: "3-6 months", trend: "up", detail: "Standard development timeline" },
         ],
-        strengths: [
-          "Addresses a stated problem",
-          "Has a defined target audience",
-          "Feasible concept",
+        bigPlayers: [
+          { name: "Unknown", strength: "Established presence", weakness: "To be researched" },
         ],
-        weaknesses: [
-          "Needs more market validation",
-          "Competition level unclear",
-          "Revenue model needs refinement",
-        ],
-        recommendations: [
-          "Conduct deeper market research",
-          "Interview potential customers",
-          "Build a lean prototype",
-        ],
+        failureRisks: ["Market validation needed", "Competition level unclear", "Revenue model unproven", "Team capability unknown"],
+        founderChecklist: ["Conduct customer interviews", "Build a landing page to test demand", "Research competitors deeply", "Define unit economics", "Find a co-founder or advisor"],
+        monetization: ["Freemium model", "Subscription tiers", "Transaction-based fees"],
+        strengths: ["Addresses a stated problem", "Has a defined target audience", "Feasible concept"],
+        weaknesses: ["Needs more market validation", "Competition level unclear", "Revenue model needs refinement"],
+        recommendations: ["Conduct deeper market research", "Interview potential customers", "Build a lean prototype"],
       };
     }
 
@@ -182,7 +172,7 @@ Provide your analysis as JSON.`;
     const analysis = await Analysis.create({
       userId,
       idea,
-      appName: analysisData.appName || idea.split(" ").slice(0, 3).join(" "),
+      appName: userAppName || analysisData.appName || idea.split(" ").slice(0, 3).join(" "),
       target,
       problem,
       revenue: revenue || "",
@@ -193,6 +183,10 @@ Provide your analysis as JSON.`;
       verdictColor: analysisData.verdictColor,
       summary: analysisData.summary,
       metrics: sanitizedMetrics,
+      bigPlayers: analysisData.bigPlayers || [],
+      failureRisks: analysisData.failureRisks || [],
+      founderChecklist: analysisData.founderChecklist || [],
+      monetization: analysisData.monetization || [],
       strengths: analysisData.strengths,
       weaknesses: analysisData.weaknesses,
       recommendations: analysisData.recommendations,
