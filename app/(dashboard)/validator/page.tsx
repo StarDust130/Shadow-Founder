@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import {
-  Crosshair,
   Send,
   AlertTriangle,
   Target,
@@ -163,23 +162,16 @@ export default function ValidatorPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <div className="flex items-center gap-3 mb-4">
-          <motion.div
-            whileHover={{ rotate: -8 }}
-            className="w-11 h-11 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
-          >
-            <Crosshair size={20} className="text-white" />
-          </motion.div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
-              The Interrogation
-            </h1>
-            <p className="text-[10px] text-[#1A1A1A]/40 font-bold uppercase tracking-[0.2em] font-mono">
-              Pitch your idea. We break it down.
-            </p>
-          </div>
-        </div>
-        <div className="h-0.75 bg-[#1A1A1A] rounded-full" />
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF6803] mb-2 flex items-center gap-1.5 font-mono">
+          <Zap size={10} />
+          Validator
+        </p>
+        <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase leading-[0.9]">
+          The Interrogation<span className="text-[#FF6803]">.</span>
+        </h1>
+        <p className="text-sm text-[#1A1A1A]/40 font-bold mt-2">
+          Pitch your idea. We break it down.
+        </p>
       </motion.div>
 
       {/* ═══ WARNING BANNER ═══ */}
@@ -187,16 +179,16 @@ export default function ValidatorPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex items-start gap-3 bg-[#1A1A1A] rounded-xl p-4 mb-8 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803]"
+        className="flex items-start gap-3 bg-white rounded-xl p-4 mb-8 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
       >
-        <div className="w-8 h-8 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-white/20">
+        <div className="w-8 h-8 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
           <Shield size={14} className="text-white" />
         </div>
         <div>
-          <p className="text-xs font-black text-white uppercase tracking-wide">
+          <p className="text-xs font-black text-[#1A1A1A] uppercase tracking-wide">
             The Shadow Founder is brutally honest.
           </p>
-          <p className="text-[11px] text-white/40 font-bold mt-0.5">
+          <p className="text-[11px] text-[#1A1A1A]/40 font-bold mt-0.5">
             Market viability, competition & unit economics — zero sugar-coating.
           </p>
         </div>
@@ -397,29 +389,29 @@ export default function ValidatorPage() {
         transition={{ delay: 0.7 }}
         className="mt-8 mb-4"
       >
-        <div className="bg-[#0D0D0D] rounded-2xl border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A] overflow-hidden">
+        <div className="bg-white rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] overflow-hidden">
           {/* Terminal Header */}
-          <div className="flex items-center gap-2 px-4 py-3 bg-[#111] border-b border-white/5">
+          <div className="flex items-center gap-2 px-4 py-3 bg-[#FAFAFA] border-b-2 border-[#1A1A1A]/5">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-              <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-              <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+              <div className="w-3 h-3 rounded-full bg-[#FF5F57] border border-[#1A1A1A]/10" />
+              <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#1A1A1A]/10" />
+              <div className="w-3 h-3 rounded-full bg-[#28C840] border border-[#1A1A1A]/10" />
             </div>
             <div className="flex-1 text-center">
-              <span className="text-[10px] font-black text-white/20 font-mono uppercase tracking-widest">
+              <span className="text-[10px] font-black text-[#1A1A1A]/20 font-mono uppercase tracking-widest">
                 Shadow Agent Terminal
               </span>
             </div>
-            <Terminal size={12} className="text-[#FF6803]/40" />
+            <Terminal size={12} className="text-[#FF6803]/30" />
           </div>
 
           {/* Terminal Body */}
           <div
             ref={terminalRef}
-            className="p-4 font-mono text-sm min-h-45 max-h-70 overflow-y-auto"
+            className="p-4 font-mono text-sm min-h-45 max-h-70 overflow-y-auto bg-[#FAFAFA]/50"
           >
             {terminalLines.length === 0 && !terminalActive && (
-              <div className="flex items-center gap-2 text-white/15">
+              <div className="flex items-center gap-2 text-[#1A1A1A]/20">
                 <span className="text-[#FF6803] font-bold">$</span>
                 <span className="font-bold">
                   Waiting for pitch submission...
@@ -431,7 +423,7 @@ export default function ValidatorPage() {
                     repeat: Infinity,
                     type: "tween",
                   }}
-                  className="inline-block w-2 h-4 bg-[#FF6803]/40"
+                  className="inline-block w-2 h-4 bg-[#FF6803]/20 rounded-sm"
                 />
               </div>
             )}
@@ -446,13 +438,13 @@ export default function ValidatorPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.2 }}
                   className={`flex items-start gap-2 py-1 ${
-                    isDone ? "text-emerald-400" : "text-white/60"
+                    isDone ? "text-emerald-600" : "text-[#1A1A1A]/50"
                   }`}
                 >
                   {isDone ? (
                     <CheckCircle2
                       size={14}
-                      className="text-emerald-400 mt-0.5 shrink-0"
+                      className="text-emerald-600 mt-0.5 shrink-0"
                     />
                   ) : isLast && terminalActive ? (
                     <Loader2
@@ -462,7 +454,7 @@ export default function ValidatorPage() {
                   ) : (
                     <Circle
                       size={14}
-                      className="text-white/15 mt-0.5 shrink-0"
+                      className="text-[#1A1A1A]/15 mt-0.5 shrink-0"
                     />
                   )}
                   <span className="font-bold">{line}</span>
@@ -472,10 +464,10 @@ export default function ValidatorPage() {
           </div>
 
           {/* Terminal Footer */}
-          <div className="px-4 py-2 bg-[#111] border-t border-white/5 flex items-center justify-between">
+          <div className="px-4 py-2 bg-[#FAFAFA] border-t-2 border-[#1A1A1A]/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap size={10} className="text-[#FF6803]/40" />
-              <span className="text-[9px] font-black text-white/15 uppercase tracking-widest font-mono">
+              <span className="text-[9px] font-black text-[#1A1A1A]/20 uppercase tracking-widest font-mono">
                 Shadow Engine v3.0
               </span>
             </div>
@@ -483,9 +475,9 @@ export default function ValidatorPage() {
               <motion.div
                 animate={{ scale: [1, 1.3, 1] }}
                 transition={{ duration: 2, repeat: Infinity, type: "tween" }}
-                className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full"
+                className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
               />
-              <span className="text-[9px] font-black text-white/15 uppercase tracking-widest font-mono">
+              <span className="text-[9px] font-black text-[#1A1A1A]/20 uppercase tracking-widest font-mono">
                 Ready
               </span>
             </div>

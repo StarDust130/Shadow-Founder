@@ -217,27 +217,32 @@ export default function DashboardPage() {
         </p>
       </motion.div>
 
-      {/* ═══ LIVE PULSE BAR ═══ */}
+      {/* ═══ LIVE STATUS ═══ */}
       <motion.div
-        initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ delay: 0.15, duration: 0.5 }}
-        className="mb-8 origin-left"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        className="mb-8"
       >
-        <div className="flex items-center gap-3 bg-[#1A1A1A] rounded-xl px-4 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803]">
-          <motion.div
-            animate={{ scale: [1, 1.3, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
-            className="w-2 h-2 bg-emerald-400 rounded-full shrink-0"
-          />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 font-mono">
+        <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
+          <div className="flex items-center gap-2 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+            <motion.div
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
+              className="w-2 h-2 bg-emerald-500 rounded-full shrink-0"
+            />
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 font-mono">
+              Live
+            </span>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/40 font-mono">
             All Systems Operational
           </span>
           <div className="flex-1" />
-          <div className="flex items-center gap-2">
-            <Activity size={12} className="text-emerald-400" />
-            <span className="text-[10px] font-bold text-emerald-400 font-mono hidden sm:inline">
-              99.9% uptime
+          <div className="flex items-center gap-2 bg-[#FF6803]/8 px-2.5 py-1 rounded-lg border border-[#FF6803]/15">
+            <Activity size={11} className="text-[#FF6803]" />
+            <span className="text-[10px] font-black text-[#FF6803] font-mono hidden sm:inline">
+              99.9%
             </span>
           </div>
         </div>
@@ -253,20 +258,20 @@ export default function DashboardPage() {
         <Link href="/validator">
           <motion.div
             whileHover={{
-              y: -4,
+              y: -6,
+              x: -3,
               transition: { type: "spring", stiffness: 400, damping: 15 },
             }}
             whileTap={{ scale: 0.98 }}
-            className="relative flex items-center gap-4 p-5 bg-[#1A1A1A] rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] hover:shadow-[6px_6px_0_#FF6803] transition-all cursor-pointer group overflow-hidden"
+            className="relative flex items-center gap-4 p-5 bg-white rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[8px_8px_0_#FF6803] transition-all cursor-pointer group overflow-hidden"
           >
-            <div className="absolute inset-0 bg-linear-to-r from-[#1A1A1A] via-[#2A2A2A] to-[#1A1A1A]" />
             <motion.div
-              className="absolute inset-0 bg-linear-to-r from-transparent via-white/[0.03] to-transparent"
-              animate={{ x: ["-100%", "100%"] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 bg-linear-to-r from-[#FF6803]/5 via-transparent to-[#FF6803]/5"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 3, repeat: Infinity, type: "tween" }}
             />
 
-            <div className="relative z-10 w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center shrink-0 border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.3)]">
+            <div className="relative z-10 w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
@@ -275,7 +280,7 @@ export default function DashboardPage() {
               </motion.div>
             </div>
             <div className="relative z-10 flex-1">
-              <h3 className="text-white font-black uppercase tracking-tight flex items-center gap-2">
+              <h3 className="text-[#1A1A1A] font-black uppercase tracking-tight flex items-center gap-2">
                 Start New Project
                 <motion.span
                   animate={{ opacity: [0.5, 1, 0.5] }}
@@ -284,14 +289,16 @@ export default function DashboardPage() {
                   <Sparkles size={14} className="text-[#FF6803]" />
                 </motion.span>
               </h3>
-              <p className="text-white/40 text-xs font-medium mt-0.5">
+              <p className="text-[#1A1A1A]/40 text-xs font-bold mt-0.5">
                 Submit your startup pitch &bull; AI validates in ~15s
               </p>
             </div>
-            <ArrowRight
-              size={20}
-              className="relative z-10 text-white/20 group-hover:text-[#FF6803] group-hover:translate-x-1 transition-all shrink-0"
-            />
+            <div className="relative z-10 w-10 h-10 rounded-xl bg-[#FF6803]/10 border-2 border-[#FF6803]/20 flex items-center justify-center group-hover:bg-[#FF6803] group-hover:border-[#1A1A1A] transition-all shrink-0">
+              <ArrowRight
+                size={18}
+                className="text-[#FF6803] group-hover:text-white group-hover:translate-x-0.5 transition-all"
+              />
+            </div>
           </motion.div>
         </Link>
       </motion.div>
@@ -460,15 +467,9 @@ export default function DashboardPage() {
                   <h3 className="text-base font-black text-[#1A1A1A] tracking-tight truncate group-hover:text-[#FF6803] transition-colors">
                     {idea.title}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono">
-                      {idea.category}
-                    </span>
-                    <span className="text-[#1A1A1A]/10">•</span>
-                    <span className="text-[9px] font-medium text-[#1A1A1A]/25">
-                      {idea.date}
-                    </span>
-                  </div>
+                  <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
+                    {idea.category}
+                  </span>
                 </div>
                 <ScoreBadge score={idea.score} />
               </div>

@@ -88,23 +88,16 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <div className="flex items-center gap-3 mb-4">
-          <motion.div
-            whileHover={{ rotate: -8 }}
-            className="w-11 h-11 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
-          >
-            <User size={20} className="text-white" />
-          </motion.div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
-              Profile
-            </h1>
-            <p className="text-[10px] text-[#1A1A1A]/40 font-bold uppercase tracking-[0.2em] font-mono">
-              Account settings & subscription
-            </p>
-          </div>
-        </div>
-        <div className="h-0.75 bg-[#1A1A1A] rounded-full" />
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF6803] mb-2 flex items-center gap-1.5 font-mono">
+          <Zap size={10} />
+          Account
+        </p>
+        <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase leading-[0.9]">
+          Profile<span className="text-[#FF6803]">.</span>
+        </h1>
+        <p className="text-sm text-[#1A1A1A]/40 font-bold mt-2">
+          Account settings & subscription management.
+        </p>
       </motion.div>
 
       {/* ═══ WELCOME CARD ═══ */}
@@ -114,28 +107,32 @@ export default function ProfilePage() {
         transition={{ delay: 0.05 }}
         className="mb-8"
       >
-        <div className="bg-[#1A1A1A] rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] p-5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-[#FF6803]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="bg-white rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5 relative overflow-hidden">
+          <motion.div
+            className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[#FF6803]/8"
+            animate={{ scale: [1, 1.15, 1] }}
+            transition={{ duration: 4, repeat: Infinity, type: "tween" }}
+          />
           <div className="relative z-10 flex items-center gap-4">
-            <div className="w-14 h-14 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.3)]">
+            <div className="w-14 h-14 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
               <span className="text-2xl font-black text-white">
                 {firstName.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+              <h2 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight">
                 Hey, {firstName}
                 <span className="text-[#FF6803]">!</span>
               </h2>
-              <p className="text-xs font-bold text-white/30">
+              <p className="text-xs font-bold text-[#1A1A1A]/35">
                 {user?.primaryEmailAddress?.emailAddress ||
                   "Manage your account below"}
               </p>
             </div>
             <div className="flex-1" />
-            <div className="hidden sm:flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5 border border-white/10">
-              <Shield size={12} className="text-emerald-400" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/30 font-mono">
+            <div className="hidden sm:flex items-center gap-2 bg-emerald-500/8 rounded-lg px-3 py-1.5 border border-emerald-500/15">
+              <Shield size={12} className="text-emerald-600" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60 font-mono">
                 Free Plan
               </span>
             </div>
@@ -190,24 +187,28 @@ export default function ProfilePage() {
         <motion.div
           whileHover={{ y: -4, x: -2 }}
           whileTap={{ scale: 0.99 }}
-          className="bg-[#1A1A1A] border-2 border-[#1A1A1A] rounded-2xl p-6 shadow-[6px_6px_0_#FF6803] relative overflow-hidden"
+          className="bg-[#FF6803] border-2 border-[#1A1A1A] rounded-2xl p-6 shadow-[6px_6px_0_#1A1A1A] hover:shadow-[8px_8px_0_#1A1A1A] transition-all relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6803]/10 rounded-full blur-3xl pointer-events-none" />
+          <motion.div
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          />
 
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-white/20 shadow-[0_0_15px_rgba(255,104,3,0.3)]">
-                <Crown size={16} className="text-white" />
+              <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                <Crown size={16} className="text-[#FF6803]" />
               </div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 font-mono">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 font-mono">
                 Upgrade Plan
               </h2>
             </div>
 
             <h3 className="text-xl font-black text-white tracking-tight mb-1">
-              Go <span className="text-[#FF6803]">Pro</span>
+              Go <span className="text-[#1A1A1A]">Pro</span>
             </h3>
-            <p className="text-[11px] text-white/30 font-bold mb-5">
+            <p className="text-[11px] text-white/60 font-bold mb-5">
               Unlimited validations, priority AI analysis, and advanced code
               generation.
             </p>
@@ -219,15 +220,15 @@ export default function ProfilePage() {
                 transition: { type: "spring", stiffness: 400 },
               }}
               whileTap={{ scale: 0.97 }}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-[#FF6803] text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.25)] hover:shadow-[0_0_30px_rgba(255,104,3,0.4)] transition-shadow"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-white text-[#1A1A1A] font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-shadow"
             >
-              <Sparkles size={14} />
+              <Sparkles size={14} className="text-[#FF6803]" />
               Upgrade Now
               <ArrowRight size={14} />
             </motion.button>
 
             <div className="mt-4 flex items-center justify-center gap-1">
-              <span className="text-[9px] font-black text-white/15 uppercase tracking-widest font-mono">
+              <span className="text-[9px] font-black text-white/40 uppercase tracking-widest font-mono">
                 Starting at $9/mo
               </span>
             </div>

@@ -11,7 +11,6 @@ import {
   Code2,
   User,
   Zap,
-  Activity,
   Cpu,
 } from "lucide-react";
 import Image from "next/image";
@@ -156,9 +155,13 @@ export default function DashboardLayout({
           </div>
 
           {/* Status pill */}
-          <div className="flex items-center gap-1.5 bg-[#1A1A1A] border-2 border-[#1A1A1A] rounded-full px-3 py-1 shadow-[2px_2px_0_#FF6803]">
-            <Activity size={10} className="text-emerald-400" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-white/70 hidden sm:inline">
+          <div className="flex items-center gap-1.5 bg-white border-2 border-[#1A1A1A]/10 rounded-full px-3 py-1">
+            <motion.div
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 2, repeat: Infinity, type: "tween" }}
+              className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
+            />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-[#1A1A1A]/50 hidden sm:inline">
               Online
             </span>
             <Zap size={10} className="text-[#FF6803] sm:hidden" />
