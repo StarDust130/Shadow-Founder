@@ -157,11 +157,11 @@ Provide your analysis as JSON.`;
       };
     }
 
-    // Sanitize trend values to valid enum
-    const validTrends = ["up", "down", "neutral"];
+    // Sanitize trend values
+    const validTrends = ["up", "down"];
     const sanitizedMetrics = (analysisData.metrics || []).map((m: { label?: string; value?: string; trend?: string; detail?: string }) => ({
       ...m,
-      trend: validTrends.includes(m.trend || "") ? m.trend : "neutral",
+      trend: validTrends.includes(m.trend || "") ? m.trend : "up",
     }));
 
     const analysis = await Analysis.create({
