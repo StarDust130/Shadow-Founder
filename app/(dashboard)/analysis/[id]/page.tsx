@@ -311,19 +311,37 @@ export default function AnalysisPage() {
     }
   };
 
+  const isIllegal = data && data.score === 0;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="w-12 h-12 bg-[#FF6803] rounded-2xl grid grid-cols-2 gap-[3px] p-[5px] border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
           >
-            <Loader2 size={32} className="text-[#FF6803]" />
+            {[0, 1, 2, 3].map((i) => (
+              <motion.div
+                key={i}
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{
+                  duration: 1.4,
+                  repeat: Infinity,
+                  delay: i * 0.12,
+                }}
+                className="bg-white rounded-sm"
+              />
+            ))}
           </motion.div>
-          <p className="text-sm font-bold text-[#1A1A1A]/40">
-            Loading analysis...
-          </p>
+          <motion.p
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-[11px] font-black text-[#1A1A1A]/40 uppercase tracking-widest font-mono"
+          >
+            Loading analysis
+          </motion.p>
         </div>
       </div>
     );
@@ -344,6 +362,82 @@ export default function AnalysisPage() {
   }
 
   const color = scoreColor(data.score);
+
+  // Illegal / unethical idea — show warning-only UI
+  if (isIllegal) {
+    return (
+      <div className="max-w-2xl mx-auto py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/35 hover:text-[#FF6803] transition-colors mb-4 font-mono"
+          >
+            <ArrowLeft size={12} /> Back to Hub
+          </Link>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          className="bg-red-50 border-2 border-red-400 rounded-2xl p-8 md:p-10 shadow-[6px_6px_0_#EF4444] text-center"
+        >
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-6xl mb-5"
+          >
+            {"\u{1F6A8}"}
+          </motion.div>
+          <h1 className="text-2xl md:text-3xl font-black text-red-600 uppercase tracking-tight mb-3">
+            Idea Rejected
+          </h1>
+          <div className="w-20 h-1 bg-red-400 rounded-full mx-auto mb-5" />
+          <p className="text-sm md:text-base text-red-700/80 font-bold leading-relaxed mb-2">
+            This idea has been flagged as{" "}
+            <span className="text-red-600 font-black">
+              illegal, unethical, or harmful
+            </span>
+            .
+          </p>
+          <p className="text-sm text-red-500/70 font-medium leading-relaxed mb-6">
+            Shadow Founder AI does not support ideas that involve illegal
+            activities, fraud, exploitation, or anything that could cause harm
+            to people. Your idea scored{" "}
+            <span className="font-black">0/100</span>.
+          </p>
+          <div className="bg-red-100 border border-red-300 rounded-xl p-4 mb-8 text-left">
+            <p className="text-xs font-black text-red-600 uppercase tracking-wider mb-2">
+              Why was this rejected?
+            </p>
+            <p className="text-sm text-red-600/80 font-medium">
+              {data.summary}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/validator">
+              <motion.button
+                whileHover={{ y: -3, boxShadow: "5px 5px 0 #1A1A1A" }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 px-8 rounded-xl font-black text-sm uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:bg-[#FF6803] transition-colors cursor-pointer"
+              >
+                <RefreshCw size={16} /> Try a Different Idea
+              </motion.button>
+            </Link>
+          </div>
+
+          <p className="text-[10px] text-red-400 font-bold mt-6 uppercase tracking-widest">
+            Build MVP is disabled for flagged ideas
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -839,42 +933,31 @@ export default function AnalysisPage() {
                 {chatWaiting &&
                   chatMessages[chatMessages.length - 1]?.role !==
                     "assistant" && (
-                    <div className="flex gap-2.5">
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex gap-2.5"
+                    >
                       <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
                         <Bot size={13} className="text-white" />
                       </div>
                       <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-2">
                           <motion.div
-                            animate={{ scale: [1, 1.3, 1] }}
-                            transition={{
-                              duration: 0.6,
-                              repeat: Infinity,
-                              delay: 0,
-                            }}
-                            className="w-2 h-2 bg-[#FF6803] rounded-full"
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="w-1.5 h-1.5 bg-[#FF6803] rounded-full"
                           />
-                          <motion.div
-                            animate={{ scale: [1, 1.3, 1] }}
-                            transition={{
-                              duration: 0.6,
-                              repeat: Infinity,
-                              delay: 0.2,
-                            }}
-                            className="w-2 h-2 bg-[#FF6803] rounded-full"
-                          />
-                          <motion.div
-                            animate={{ scale: [1, 1.3, 1] }}
-                            transition={{
-                              duration: 0.6,
-                              repeat: Infinity,
-                              delay: 0.4,
-                            }}
-                            className="w-2 h-2 bg-[#FF6803] rounded-full"
-                          />
+                          <motion.span
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="text-xs font-bold text-[#1A1A1A]/40"
+                          >
+                            Thinking...
+                          </motion.span>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                 <div ref={chatEndRef} />
               </div>
@@ -918,32 +1001,31 @@ export default function AnalysisPage() {
             className="fixed inset-0 z-100 bg-[#E5E4E2] flex items-center justify-center"
           >
             <div className="flex flex-col items-center gap-8 px-6 max-w-md w-full">
-              {/* Animated rocket */}
+              {/* Animated build icon */}
               <motion.div
-                animate={{ y: [0, -20, 0] }}
+                animate={{ y: [0, -12, 0] }}
                 transition={{
-                  duration: 2,
+                  duration: 2.5,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
                 className="relative"
               >
-                <div className="w-24 h-24 bg-[#FF6803] rounded-2xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A]">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  >
-                    <Rocket size={40} className="text-white" />
-                  </motion.div>
-                </div>
                 <motion.div
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.1, 0.3] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-[#1A1A1A]/10 rounded-full blur-sm"
+                  animate={{ scale: [1, 1.04, 1] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="w-20 h-20 bg-[#FF6803] rounded-2xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A]"
+                >
+                  <Rocket size={36} className="text-white" />
+                </motion.div>
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.08, 0.2] }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
+                  className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-16 h-3 bg-[#1A1A1A]/10 rounded-full blur-sm"
                 />
               </motion.div>
 
