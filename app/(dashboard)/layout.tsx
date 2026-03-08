@@ -14,6 +14,7 @@ import {
   Package,
   Coins,
   Crown,
+  HelpCircle,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -209,12 +210,17 @@ export default function DashboardLayout({
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6803] font-mono">
                       Pro
                     </span>
+                    <div className="w-px h-3 bg-[#1A1A1A]/8" />
+                    <Code2 size={10} className="text-[#FF6803]/60" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#1A1A1A]/40 font-mono">
+                      {Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)} builds
+                    </span>
                   </>
                 ) : (
                   <>
                     <Coins size={11} className="text-[#FF6803]" />
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#1A1A1A]/60 font-mono">
-                      {Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)} credit{Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed) !== 1 ? "s" : ""}
+                      {Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)} build{Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed) !== 1 ? "s" : ""}
                     </span>
                     {userCredits.buildsUsed >= userCredits.maxBuilds && (
                       <>
@@ -229,6 +235,17 @@ export default function DashboardLayout({
               </motion.div>
             </Link>
           )}
+
+          {/* Help Button */}
+          <Link href="/help">
+            <motion.div
+              whileHover={{ y: -1, rotate: 10 }}
+              whileTap={{ scale: 0.9 }}
+              className="w-8 h-8 flex items-center justify-center bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/6 rounded-full shadow-sm cursor-pointer hover:border-[#FF6803]/30 transition-all"
+            >
+              <HelpCircle size={14} className="text-[#1A1A1A]/40 hover:text-[#FF6803]" />
+            </motion.div>
+          </Link>
 
           {/* AI Engine Status — unified pill */}
           <div className="hidden sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border  border-[#1A1A1A]/6 rounded-full px-3.5 py-1.5 shadow-sm">
