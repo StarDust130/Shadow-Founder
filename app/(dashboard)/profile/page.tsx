@@ -789,7 +789,7 @@ export default function ProfilePage() {
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        "Unlimited MVP Builds",
+                        "10 MVP Build Credits",
                         "Priority AI Analysis",
                         "Advanced Code Gen",
                         "Premium Landing Pages",
