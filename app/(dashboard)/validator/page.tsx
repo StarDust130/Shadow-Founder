@@ -37,7 +37,8 @@ const pitchFields = [
   {
     id: "idea",
     label: "What's your startup idea?",
-    placeholder: "An AI-powered resume builder that creates ATS-optimized resumes in 30 seconds...",
+    placeholder:
+      "An AI-powered resume builder that creates ATS-optimized resumes in 30 seconds...",
     icon: Lightbulb,
     type: "textarea" as const,
     required: true,
@@ -53,7 +54,8 @@ const pitchFields = [
   {
     id: "problem",
     label: "What problem does it solve?",
-    placeholder: "75% of resumes get rejected by ATS before a human ever reads them...",
+    placeholder:
+      "75% of resumes get rejected by ATS before a human ever reads them...",
     icon: AlertTriangle,
     type: "textarea" as const,
     required: true,
@@ -80,10 +82,18 @@ const analysisSteps = [
   { text: "Initializing Shadow Agent", emoji: "\u{1F916}", delay: 600 },
   { text: "Parsing your pitch", emoji: "\u{1F4DD}", delay: 800 },
   { text: "Scanning competitor landscape", emoji: "\u{1F50D}", delay: 1200 },
-  { text: "Calculating market size (TAM/SAM/SOM)", emoji: "\u{1F4CA}", delay: 1000 },
+  {
+    text: "Calculating market size (TAM/SAM/SOM)",
+    emoji: "\u{1F4CA}",
+    delay: 1000,
+  },
   { text: "Analyzing unit economics", emoji: "\u{1F4B0}", delay: 900 },
   { text: "Evaluating market fit", emoji: "\u{1F3AF}", delay: 800 },
-  { text: "Assessing defensibility & moat", emoji: "\u{1F6E1}\uFE0F", delay: 700 },
+  {
+    text: "Assessing defensibility & moat",
+    emoji: "\u{1F6E1}\uFE0F",
+    delay: 700,
+  },
   { text: "Generating viability verdict", emoji: "\u26A1", delay: 1000 },
 ];
 
@@ -122,7 +132,10 @@ export default function ValidatorPage() {
 
     const step = analysisSteps[analysisPhase];
     if (step.delay > 0) {
-      const timer = setTimeout(() => setAnalysisPhase((s) => s + 1), step.delay);
+      const timer = setTimeout(
+        () => setAnalysisPhase((s) => s + 1),
+        step.delay,
+      );
       return () => clearTimeout(timer);
     }
   }, [showFullScreenLoader, analysisPhase]);
@@ -162,7 +175,9 @@ export default function ValidatorPage() {
         router.push(`/analysis/${data.id}`);
       }, 800);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Something went wrong");
+      setSubmitError(
+        err instanceof Error ? err.message : "Something went wrong",
+      );
       setIsSubmitting(false);
       setShowFullScreenLoader(false);
       setAnalysisPhase(-1);
@@ -188,11 +203,22 @@ export default function ValidatorPage() {
             className="flex flex-col items-center mb-10"
           >
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="w-16 h-16 bg-linear-to-br from-[#FF6803] to-[#FF8A3D] rounded-2xl flex items-center justify-center shadow-xl mb-4"
+              animate={{ scale: [1, 1.06, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-16 h-16 bg-linear-to-br from-[#FF6803] to-[#FF8A3D] rounded-2xl grid grid-cols-2 gap-[3px] p-[7px] shadow-xl border-2 border-[#1A1A1A] mb-4"
             >
-              <Sparkles size={28} className="text-white" />
+              {[0, 1, 2, 3].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{
+                    duration: 1.4,
+                    repeat: Infinity,
+                    delay: i * 0.15,
+                  }}
+                  className="bg-white rounded-sm"
+                />
+              ))}
             </motion.div>
             <h2 className="text-2xl font-black text-[#1A1A1A] uppercase tracking-tight text-center">
               Analyzing Your Idea
@@ -219,26 +245,46 @@ export default function ValidatorPage() {
                   }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive ? "bg-white shadow-md border border-[#FF6803]/20" :
-                    isComplete ? "bg-white/50" : "bg-transparent"
+                    isActive
+                      ? "bg-white shadow-md border border-[#FF6803]/20"
+                      : isComplete
+                        ? "bg-white/50"
+                        : "bg-transparent"
                   }`}
                 >
                   <div className="w-8 h-8 flex items-center justify-center shrink-0">
                     {isComplete ? (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring" }}
+                      >
                         <CheckCircle2 size={20} className="text-emerald-500" />
                       </motion.div>
                     ) : isActive ? (
-                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      >
                         <Loader2 size={20} className="text-[#FF6803]" />
                       </motion.div>
                     ) : (
                       <span className="text-lg">{step.emoji}</span>
                     )}
                   </div>
-                  <span className={`text-sm font-bold ${
-                    isActive ? "text-[#1A1A1A]" : isComplete ? "text-[#1A1A1A]/50" : "text-[#1A1A1A]/25"
-                  }`}>
+                  <span
+                    className={`text-sm font-bold ${
+                      isActive
+                        ? "text-[#1A1A1A]"
+                        : isComplete
+                          ? "text-[#1A1A1A]/50"
+                          : "text-[#1A1A1A]/25"
+                    }`}
+                  >
                     {step.text}
                   </span>
                   {isActive && (
@@ -273,8 +319,12 @@ export default function ValidatorPage() {
               >
                 {"\u{1F389}"}
               </motion.div>
-              <p className="text-sm font-black text-emerald-600 uppercase tracking-wide">Analysis Complete!</p>
-              <p className="text-xs text-[#1A1A1A]/40 mt-1">Redirecting to your results...</p>
+              <p className="text-sm font-black text-emerald-600 uppercase tracking-wide">
+                Analysis Complete!
+              </p>
+              <p className="text-xs text-[#1A1A1A]/40 mt-1">
+                Redirecting to your results...
+              </p>
             </motion.div>
           )}
 
@@ -283,7 +333,9 @@ export default function ValidatorPage() {
             <motion.div
               className="h-full bg-linear-to-r from-[#FF6803] to-[#FF8A3D] rounded-full"
               initial={{ width: "0%" }}
-              animate={{ width: `${Math.min(((analysisPhase + 1) / analysisSteps.length) * 100, 100)}%` }}
+              animate={{
+                width: `${Math.min(((analysisPhase + 1) / analysisSteps.length) * 100, 100)}%`,
+              }}
               transition={{ duration: 0.5 }}
             />
           </div>
@@ -295,7 +347,11 @@ export default function ValidatorPage() {
   return (
     <div className="max-w-3xl mx-auto" ref={formRef}>
       {/* HEADER */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF6803] mb-2 flex items-center gap-1.5 font-mono">
           <Zap size={10} /> Validator
         </p>
@@ -318,38 +374,65 @@ export default function ValidatorPage() {
           <Shield size={14} className="text-[#FF6803]" />
         </div>
         <div>
-          <p className="text-xs font-black text-[#1A1A1A] uppercase tracking-wide">Brutally honest AI analysis</p>
+          <p className="text-xs font-black text-[#1A1A1A] uppercase tracking-wide">
+            Brutally honest AI analysis
+          </p>
           <p className="text-[11px] text-[#1A1A1A]/35 font-bold mt-0.5">
-            Market viability, competition & unit economics {"\u2014"} no sugar-coating.
+            Market viability, competition & unit economics {"\u2014"} no
+            sugar-coating.
           </p>
         </div>
       </motion.div>
 
       {/* PROGRESS BAR */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }} className="mb-6 flex items-center gap-3">
-        <span className="text-[9px] font-black uppercase tracking-widest text-[#1A1A1A]/30 font-mono">Fields</span>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.12 }}
+        className="mb-6 flex items-center gap-3"
+      >
+        <span className="text-[9px] font-black uppercase tracking-widest text-[#1A1A1A]/30 font-mono">
+          Fields
+        </span>
         <div className="flex-1 h-2.5 bg-[#1A1A1A]/5 rounded-full overflow-hidden">
-          <motion.div className="h-full bg-[#FF6803] rounded-full"
+          <motion.div
+            className="h-full bg-[#FF6803] rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${(filledCount / pitchFields.length) * 100}%` }}
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </div>
-        <span className="text-[10px] font-black text-[#1A1A1A]/40 font-mono">{filledCount}/{pitchFields.length}</span>
+        <span className="text-[10px] font-black text-[#1A1A1A]/40 font-mono">
+          {filledCount}/{pitchFields.length}
+        </span>
       </motion.div>
 
       {/* CATEGORY */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="mb-6"
+      >
         <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]/40 mb-2 font-mono">
           <Hash size={10} /> Category
         </label>
         <div className="relative">
-          <button onClick={() => setCategoryOpen(!categoryOpen)}
-            className="w-full flex items-center justify-between bg-white/70 backdrop-blur-sm border border-[#1A1A1A]/10 hover:border-[#1A1A1A]/30 rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] transition-all">
-            <span className={selectedCategory ? "font-bold" : "text-[#1A1A1A]/30 font-bold"}>
+          <button
+            onClick={() => setCategoryOpen(!categoryOpen)}
+            className="w-full flex items-center justify-between bg-white/70 backdrop-blur-sm border border-[#1A1A1A]/10 hover:border-[#1A1A1A]/30 rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] transition-all"
+          >
+            <span
+              className={
+                selectedCategory ? "font-bold" : "text-[#1A1A1A]/30 font-bold"
+              }
+            >
               {selectedCategory || "Select a category..."}
             </span>
-            <ChevronDown size={16} className={`text-[#1A1A1A]/30 transition-transform ${categoryOpen ? "rotate-180" : ""}`} />
+            <ChevronDown
+              size={16}
+              className={`text-[#1A1A1A]/30 transition-transform ${categoryOpen ? "rotate-180" : ""}`}
+            />
           </button>
           <AnimatePresence>
             {categoryOpen && (
@@ -361,10 +444,16 @@ export default function ValidatorPage() {
                 className="absolute top-full left-0 right-0 mt-2 bg-white border border-[#1A1A1A]/15 rounded-xl shadow-xl z-20 overflow-hidden"
               >
                 {categories.map((cat) => (
-                  <button key={cat}
-                    onClick={() => { setSelectedCategory(cat); setCategoryOpen(false); }}
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setCategoryOpen(false);
+                    }}
                     className={`w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-[#FF6803]/5 transition-colors ${
-                      selectedCategory === cat ? "text-[#FF6803] bg-[#FF6803]/5" : "text-[#1A1A1A]/70"
+                      selectedCategory === cat
+                        ? "text-[#FF6803] bg-[#FF6803]/5"
+                        : "text-[#1A1A1A]/70"
                     }`}
                   >
                     {cat}
@@ -380,17 +469,32 @@ export default function ValidatorPage() {
       <motion.div
         initial="hidden"
         animate="show"
-        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } } }}
+        variants={{
+          hidden: {},
+          show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } },
+        }}
         className="space-y-5"
       >
         {pitchFields.map((field, idx) => (
-          <motion.div key={field.id} variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}>
+          <motion.div
+            key={field.id}
+            variants={{
+              hidden: { opacity: 0, y: 16 },
+              show: { opacity: 1, y: 0 },
+            }}
+          >
             <label className="flex items-center gap-2 mb-2">
               <span className="w-7 h-7 bg-[#FF6803]/10 rounded-lg flex items-center justify-center border border-[#FF6803]/20">
-                <span className="text-[10px] font-black text-[#FF6803] font-mono">{String(idx + 1).padStart(2, "0")}</span>
+                <span className="text-[10px] font-black text-[#FF6803] font-mono">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
               </span>
-              <span className="text-[11px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/50 font-mono">{field.label}</span>
-              {field.required && <span className="text-[#FF6803] text-xs font-black">*</span>}
+              <span className="text-[11px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/50 font-mono">
+                {field.label}
+              </span>
+              {field.required && (
+                <span className="text-[#FF6803] text-xs font-black">*</span>
+              )}
             </label>
             {field.type === "textarea" ? (
               <textarea
@@ -426,9 +530,18 @@ export default function ValidatorPage() {
       </motion.div>
 
       {/* SUBMIT */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-8 mb-8">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="mt-8 mb-8"
+      >
         <motion.button
-          whileHover={filledRequired && !isSubmitting ? { y: -3, transition: { type: "spring", stiffness: 400 } } : {}}
+          whileHover={
+            filledRequired && !isSubmitting
+              ? { y: -3, transition: { type: "spring", stiffness: 400 } }
+              : {}
+          }
           whileTap={filledRequired && !isSubmitting ? { scale: 0.97 } : {}}
           onClick={handleSubmit}
           disabled={!filledRequired || isSubmitting}
@@ -446,8 +559,11 @@ export default function ValidatorPage() {
 
       {/* ERROR */}
       {submitError && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="mt-4 mb-8 px-4 py-3 bg-red-50 border border-red-300 rounded-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-4 mb-8 px-4 py-3 bg-red-50 border border-red-300 rounded-xl"
+        >
           <p className="text-sm font-bold text-red-600 flex items-center gap-2">
             <AlertTriangle size={14} /> {submitError}
           </p>
