@@ -23,6 +23,7 @@ import {
   X,
   Rocket,
   RefreshCw,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -42,6 +43,7 @@ interface ChatMessage {
 interface AnalysisData {
   _id: string;
   idea: string;
+  appName?: string;
   target: string;
   problem: string;
   verdict: string;
@@ -210,6 +212,8 @@ export default function AnalysisPage() {
   const [buildStep, setBuildStep] = useState(0);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [renaming, setRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
   const [currentGif, setCurrentGif] = useState(
     () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
@@ -523,9 +527,51 @@ export default function AnalysisPage() {
                 <BarChart3 size={22} className="text-white" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
-                  {verdictEmoji(data.verdict)} VC Verdict
-                </h1>
+                <div className="flex items-center gap-2">
+                  {renaming ? (
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!renameValue.trim()) return;
+                        try {
+                          const res = await fetch(`/api/analyses/${id}`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ appName: renameValue.trim() }),
+                          });
+                          if (res.ok) {
+                            setData((prev) => prev ? { ...prev, appName: renameValue.trim() } : prev);
+                          }
+                        } catch { /* silent */ }
+                        setRenaming(false);
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <input
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        maxLength={50}
+                        autoFocus
+                        className="text-lg md:text-xl font-black tracking-tighter text-[#1A1A1A] uppercase bg-white border-2 border-[#FF6803] rounded-lg px-2 py-1 w-48 outline-none"
+                      />
+                      <button type="submit" className="text-[#FF6803] hover:text-[#1A1A1A] cursor-pointer"><CheckCircle2 size={16} /></button>
+                      <button type="button" onClick={() => setRenaming(false)} className="text-[#1A1A1A]/30 hover:text-[#1A1A1A] cursor-pointer"><X size={16} /></button>
+                    </form>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
+                        {data.appName || verdictEmoji(data.verdict) + " VC Verdict"}
+                      </h1>
+                      <button
+                        onClick={() => { setRenameValue(data.appName || ""); setRenaming(true); }}
+                        className="text-[#1A1A1A]/20 hover:text-[#FF6803] transition-colors cursor-pointer"
+                        title="Rename app"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                    </>
+                  )}
+                </div>
                 <p className="text-[10px] text-[#1A1A1A]/35 font-bold font-mono uppercase tracking-[0.2em] truncate max-w-70">
                   {data.idea}
                 </p>
