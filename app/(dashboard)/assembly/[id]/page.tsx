@@ -80,6 +80,21 @@ function buildFileTree(files: BuildFile[]): (FolderNode | FileNode)[] {
   return root;
 }
 
+const LOADING_GIFS = [
+  "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
+  "https://media.tenor.com/hYkRcm80JFwAAAAj/foxy-foxplushy.gif",
+  "https://media.tenor.com/KOQYL00kmYEAAAAm/happy-holidays.webp",
+  "https://media.tenor.com/v-eI1P9681IAAAAm/goose-dance.webp",
+];
+
+const waitTexts = [
+  "Unpacking your vault...",
+  "Polishing the code...",
+  "Assembling the pieces...",
+  "Almost there, hang tight!",
+  "Loading your masterpiece...",
+];
+
 export default function AssemblyPage() {
   const params = useParams();
   const id = params.id as string;
@@ -94,6 +109,9 @@ export default function AssemblyPage() {
   );
   const [downloading, setDownloading] = useState(false);
   const [viewMode, setViewMode] = useState<"code" | "preview">("code");
+  const [currentGif, setCurrentGif] = useState(0);
+  const [currentWaitText, setCurrentWaitText] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
     const fetchBuild = async () => {
@@ -103,7 +121,13 @@ export default function AssemblyPage() {
         const data = await res.json();
         setBuild(data);
         if (data.files?.length > 0) {
-          setSelectedFile(data.files[0]);
+          const preview = data.files.find((f: BuildFile) => f.path === "preview.html");
+          if (preview) {
+            setSelectedFile(preview);
+            setViewMode("preview");
+          } else {
+            setSelectedFile(data.files[0]);
+          }
         }
         // Expand all top-level folders
         const tree = buildFileTree(data.files || []);
@@ -118,6 +142,21 @@ export default function AssemblyPage() {
     };
     fetchBuild();
   }, [id]);
+
+  useEffect(() => {
+    if (!loading) return;
+    const timer = setInterval(() => setElapsedTime((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, [loading]);
+
+  useEffect(() => {
+    if (!loading) return;
+    const gifInterval = setInterval(() => {
+      setCurrentGif((g) => (g + 1) % LOADING_GIFS.length);
+      setCurrentWaitText((t) => (t + 1) % waitTexts.length);
+    }, 3000);
+    return () => clearInterval(gifInterval);
+  }, [loading]);
 
   const toggleFolder = (name: string) => {
     setExpandedFolders((prev) => {
@@ -165,9 +204,36 @@ export default function AssemblyPage() {
   }, [build]);
 
   if (loading) {
+    const mins = Math.floor(elapsedTime / 60);
+    const secs = elapsedTime % 60;
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 size={32} className="animate-spin text-[#FF6803]" />
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-6 p-8 max-w-sm text-center">
+          <div className="w-32 h-32 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={LOADING_GIFS[currentGif]}
+              alt="Loading"
+              className="w-28 h-28 object-contain"
+            />
+          </div>
+          <div>
+            <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-wide mb-1">
+              {waitTexts[currentWaitText]}
+            </p>
+            <p className="text-xs text-[#1A1A1A]/40 font-mono font-bold">
+              {mins > 0
+                ? `${mins}m ${secs.toString().padStart(2, "0")}s`
+                : `${secs}s`}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Loader2 size={14} className="animate-spin text-[#FF6803]" />
+            <span className="text-[11px] font-bold text-[#1A1A1A]/50">
+              Opening the vault...
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
