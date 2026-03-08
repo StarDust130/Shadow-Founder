@@ -12,6 +12,7 @@ const SYSTEM_PROMPT = `You are Shadow Founder AI — a brutally honest startup a
 When given a startup idea, analyze it and respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
 {
   "score": <number 0-100>,
+  "appName": "<a short, catchy, creative product/app name for this idea — 1-3 words max, like real startups: e.g. Notion, Stripe, Figma, Canva, Loom, Arc, Linear, Cal.com>",
   "verdict": "<one of: VIABLE, CONDITIONAL PASS, RISKY, NOT VIABLE>",
   "verdictColor": "<hex color: #22C55E for VIABLE, #FF8A3D for CONDITIONAL PASS, #FF6803 for RISKY, #EF4444 for NOT VIABLE>",
   "summary": "<2-3 sentence executive summary of the idea's potential>",
@@ -180,6 +181,7 @@ Provide your analysis as JSON.`;
     const analysis = await Analysis.create({
       userId,
       idea,
+      appName: analysisData.appName || idea.split(" ").slice(0, 3).join(" "),
       target,
       problem,
       revenue: revenue || "",
@@ -198,6 +200,7 @@ Provide your analysis as JSON.`;
 
     return NextResponse.json({
       id: analysis._id.toString(),
+      appName: analysis.appName,
       ...analysisData,
     });
   } catch (error) {
