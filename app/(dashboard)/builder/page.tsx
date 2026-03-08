@@ -140,6 +140,7 @@ function ScoreBadge({ score }: { score: number }) {
 
 export default function BuilderPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [hoveredStage, setHoveredStage] = useState<string | null>(null);
   const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
   const [builds, setBuilds] = useState<BuildSummary[]>([]);
@@ -200,11 +201,12 @@ export default function BuilderPage() {
       const data = await res.json();
       clearInterval(stepInterval);
       if (!res.ok) {
-        setBuildError(
+        const errorMsg =
           data.error === "BUILD_LIMIT_REACHED"
             ? data.message || "Free plan allows only 1 build."
-            : data.error || "Build failed",
-        );
+            : data.error || "Build failed";
+        setBuildError(errorMsg);
+        showToast(errorMsg, "error");
         setBuildingId(null);
         return;
       }
@@ -212,7 +214,9 @@ export default function BuilderPage() {
       setTimeout(() => router.push(`/assembly/${data.id}`), 800);
     } catch {
       clearInterval(stepInterval);
-      setBuildError("Network error. Please try again.");
+      const errorMsg = "Network error. Please try again.";
+      setBuildError(errorMsg);
+      showToast(errorMsg, "error");
       setBuildingId(null);
     }
   };
