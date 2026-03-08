@@ -9,7 +9,7 @@ export interface IAnalysis extends Document {
   competitors: string;
   category: string;
   score: number;
-  verdict: "VIABLE" | "RISKY" | "NOT VIABLE" | "CONDITIONAL PASS";
+  verdict: "VIABLE" | "RISKY" | "NOT VIABLE" | "PASS";
   verdictColor: string;
   summary: string;
   metrics: {
@@ -42,7 +42,7 @@ const AnalysisSchema = new Schema<IAnalysis>(
     score: { type: Number, default: 0 },
     verdict: {
       type: String,
-      enum: ["VIABLE", "RISKY", "NOT VIABLE", "CONDITIONAL PASS"],
+      enum: ["VIABLE", "RISKY", "NOT VIABLE", "PASS"],
       default: "RISKY",
     },
     verdictColor: { type: String, default: "#FF8A3D" },
