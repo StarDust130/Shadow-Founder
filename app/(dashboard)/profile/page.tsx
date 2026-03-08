@@ -160,7 +160,9 @@ export default function ProfilePage() {
   const [viableCount, setViableCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [selectedUpgradePlan, setSelectedUpgradePlan] = useState<"pro" | "enterprise">("pro");
+  const [selectedUpgradePlan, setSelectedUpgradePlan] = useState<
+    "pro" | "enterprise"
+  >("pro");
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
   const [upgraded, setUpgraded] = useState(false);
@@ -182,7 +184,7 @@ export default function ProfilePage() {
           setViableCount(
             analyses.filter(
               (a: { verdict: string }) =>
-                a.verdict === "VIABLE" || a.verdict === "CONDITIONAL PASS",
+                a.verdict === "VIABLE" || a.verdict === "PASS",
             ).length,
           );
         }
@@ -195,24 +197,27 @@ export default function ProfilePage() {
     load();
   }, []);
 
-  const handleUpgradeClick = useCallback(async (planType: "pro" | "enterprise" = "pro") => {
-    setSelectedUpgradePlan(planType);
-    setShowUpgradeModal(true);
-    setUpgraded(false);
-    const amount = planType === "enterprise" ? "50000" : "1999";
-    try {
-      const QRCode = (await import("qrcode")).default;
-      const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=ShadowFounder+${planType === "enterprise" ? "Enterprise" : "Pro"}+Upgrade`;
-      const dataUrl = await QRCode.toDataURL(upiUri, {
-        width: 280,
-        margin: 2,
-        color: { dark: "#1A1A1A", light: "#FFFFFF" },
-      });
-      setQrDataUrl(dataUrl);
-    } catch {
-      // QR generation failed
-    }
-  }, []);
+  const handleUpgradeClick = useCallback(
+    async (planType: "pro" | "enterprise" = "pro") => {
+      setSelectedUpgradePlan(planType);
+      setShowUpgradeModal(true);
+      setUpgraded(false);
+      const amount = planType === "enterprise" ? "50000" : "1999";
+      try {
+        const QRCode = (await import("qrcode")).default;
+        const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=ShadowFounder+${planType === "enterprise" ? "Enterprise" : "Pro"}+Upgrade`;
+        const dataUrl = await QRCode.toDataURL(upiUri, {
+          width: 280,
+          margin: 2,
+          color: { dark: "#1A1A1A", light: "#FFFFFF" },
+        });
+        setQrDataUrl(dataUrl);
+      } catch {
+        // QR generation failed
+      }
+    },
+    [],
+  );
 
   const handleConfirmPayment = useCallback(async () => {
     setUpgrading(true);
@@ -248,7 +253,7 @@ export default function ProfilePage() {
   const upgradeAmount = selectedUpgradePlan === "enterprise" ? "50000" : "1999";
   const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${upgradeAmount}&cu=INR&tn=ShadowFounder+${selectedUpgradePlan === "enterprise" ? "Enterprise" : "Pro"}+Upgrade`;
 
-  const creditRequestEmail = `mailto:chandanbsd9@gmail.com?subject=${encodeURIComponent("Free Build Credit Request — Shadow Founder")}&body=${encodeURIComponent(`Hi Shadow Founder Team,\n\nI'd like to request a free build credit for my account.\n\nName: ${user?.fullName || firstName}\nEmail: ${user?.primaryEmailAddress?.emailAddress || ""}\nUser ID: ${user?.id || ""}\n\nThank you!`)}`;
+  const creditRequestEmail = `mailto:csyadav0513@9@gmail.com?subject=${encodeURIComponent("Free Build Credit Request — Shadow Founder ✌️")}&body=${encodeURIComponent(`Hi Shadow Founder Team,\n\nI'd like to request a free build credit for my account.\n\nName: ${user?.fullName || firstName}\nEmail: ${user?.primaryEmailAddress?.emailAddress || ""}\nUser ID: ${user?.id || ""}\n\nThank you!`)}`;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -270,7 +275,11 @@ export default function ProfilePage() {
               Account settings & subscription management.
             </p>
           </div>
-          <a href={creditRequestEmail}>
+          <a
+            href={creditRequestEmail}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <motion.button
               whileHover={{ y: -2, x: -1 }}
               whileTap={{ scale: 0.97 }}
@@ -498,8 +507,8 @@ export default function ProfilePage() {
                       Go Pro
                     </h3>
                     <p className="text-[11px] text-white/60 font-bold mb-5">
-                      10 MVP builds, priority AI analysis, and advanced
-                      code generation.
+                      10 MVP builds, priority AI analysis, and advanced code
+                      generation.
                     </p>
                     <motion.button
                       onClick={() => handleUpgradeClick("pro")}
@@ -644,9 +653,7 @@ export default function ProfilePage() {
                   Free Plan
                 </h3>
                 <div className="flex items-baseline gap-1 mt-1 mb-4">
-                  <span className="text-3xl font-black text-[#1A1A1A]">
-                    ₹0
-                  </span>
+                  <span className="text-3xl font-black text-[#1A1A1A]">₹0</span>
                   <span className="text-sm font-bold text-[#1A1A1A]/25">
                     forever
                   </span>
@@ -657,10 +664,7 @@ export default function ProfilePage() {
                       key={feature}
                       className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A]/50"
                     >
-                      <Check
-                        size={14}
-                        className="text-emerald-500 shrink-0"
-                      />
+                      <Check size={14} className="text-emerald-500 shrink-0" />
                       {feature}
                     </div>
                   ))}
@@ -718,10 +722,7 @@ export default function ProfilePage() {
                         key={feature}
                         className="flex items-center gap-2 text-xs font-bold text-white/70"
                       >
-                        <Check
-                          size={14}
-                          className="text-white shrink-0"
-                        />
+                        <Check size={14} className="text-white shrink-0" />
                         {feature}
                       </div>
                     ))}
@@ -751,7 +752,12 @@ export default function ProfilePage() {
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-                      <Zap size={16} className={isEnterprise ? "text-emerald-500" : "text-[#1A1A1A]"} />
+                      <Zap
+                        size={16}
+                        className={
+                          isEnterprise ? "text-emerald-500" : "text-[#1A1A1A]"
+                        }
+                      />
                     </div>
                     {isEnterprise && (
                       <span className="text-[8px] font-black uppercase tracking-widest text-white/80 bg-white/20 px-2 py-0.5 rounded-md font-mono">
@@ -776,10 +782,7 @@ export default function ProfilePage() {
                         key={feature}
                         className="flex items-center gap-2 text-xs font-bold text-white/70"
                       >
-                        <Check
-                          size={14}
-                          className="text-white shrink-0"
-                        />
+                        <Check size={14} className="text-white shrink-0" />
                         {feature}
                       </div>
                     ))}
@@ -806,8 +809,9 @@ export default function ProfilePage() {
               </h3>
               <p className="text-xs text-[#1A1A1A]/35 font-bold">
                 All payments are processed via UPI (Unified Payments Interface).
-                Monthly subscription — Pro at ₹1,999/month, Enterprise at ₹50,000/month.
-                Your access is activated instantly after payment confirmation.
+                Monthly subscription — Pro at ₹1,999/month, Enterprise at
+                ₹50,000/month. Your access is activated instantly after payment
+                confirmation.
               </p>
             </div>
           </motion.div>
@@ -892,7 +896,11 @@ export default function ProfilePage() {
                     <CheckCircle2 size={28} className="text-white" />
                   </motion.div>
                   <h3 className="text-2xl font-black text-[#1A1A1A] uppercase tracking-tight mb-2">
-                    You&apos;re {selectedUpgradePlan === "enterprise" ? "Enterprise" : "Pro"} Now!
+                    You&apos;re{" "}
+                    {selectedUpgradePlan === "enterprise"
+                      ? "Enterprise"
+                      : "Pro"}{" "}
+                    Now!
                   </h3>
                   <p className="text-sm text-[#1A1A1A]/40 font-bold mb-6">
                     {selectedUpgradePlan === "enterprise"
@@ -915,7 +923,10 @@ export default function ProfilePage() {
                       <Crown size={22} className="text-white" />
                     </div>
                     <h3 className="text-xl font-black text-[#1A1A1A] uppercase tracking-tight">
-                      Upgrade to {selectedUpgradePlan === "enterprise" ? "Enterprise" : "Pro"}
+                      Upgrade to{" "}
+                      {selectedUpgradePlan === "enterprise"
+                        ? "Enterprise"
+                        : "Pro"}
                     </h3>
                     <p className="text-xs text-[#1A1A1A]/40 font-bold mt-1">
                       Pay via UPI &bull; Activate instantly
@@ -925,18 +936,36 @@ export default function ProfilePage() {
                   {/* What You Get */}
                   <div className="bg-[#FAFAFA] rounded-xl border-2 border-[#1A1A1A]/8 p-4 mb-4">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/30 font-mono mb-3 flex items-center gap-1.5">
-                      <Star size={10} className="text-[#FF6803]" /> What you unlock
+                      <Star size={10} className="text-[#FF6803]" /> What you
+                      unlock
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {(selectedUpgradePlan === "enterprise"
-                        ? ["Unlimited MVP Builds", "Dedicated AI Pipeline", "Custom Code Templates", "White-label Exports", "1-on-1 Onboarding", "Slack Support"]
-                        : ["10 MVP Build Credits", "Priority AI Analysis", "Advanced Code Gen", "Premium Landing Pages", "Priority Support", "Early Feature Access"]
+                        ? [
+                            "Unlimited MVP Builds",
+                            "Dedicated AI Pipeline",
+                            "Custom Code Templates",
+                            "White-label Exports",
+                            "1-on-1 Onboarding",
+                            "Slack Support",
+                          ]
+                        : [
+                            "10 MVP Build Credits",
+                            "Priority AI Analysis",
+                            "Advanced Code Gen",
+                            "Premium Landing Pages",
+                            "Priority Support",
+                            "Early Feature Access",
+                          ]
                       ).map((item) => (
                         <div
                           key={item}
                           className="flex items-center gap-1.5 text-[11px] font-bold text-[#1A1A1A]/50"
                         >
-                          <Check size={12} className="text-emerald-500 shrink-0" />
+                          <Check
+                            size={12}
+                            className="text-emerald-500 shrink-0"
+                          />
                           {item}
                         </div>
                       ))}
@@ -947,7 +976,10 @@ export default function ProfilePage() {
                   <div className="text-center mb-4">
                     <div className="inline-flex items-baseline gap-1 bg-[#FF6803]/5 rounded-xl px-5 py-2.5 border border-[#FF6803]/15">
                       <span className="text-3xl font-black text-[#FF6803]">
-                        ₹{selectedUpgradePlan === "enterprise" ? "50,000" : "1,999"}
+                        ₹
+                        {selectedUpgradePlan === "enterprise"
+                          ? "50,000"
+                          : "1,999"}
                       </span>
                       <span className="text-sm font-bold text-[#1A1A1A]/25">
                         /month
@@ -992,7 +1024,11 @@ export default function ProfilePage() {
                       href={upiUri}
                       className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#FF6803] text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] cursor-pointer"
                     >
-                      <Smartphone size={16} /> Pay ₹{selectedUpgradePlan === "enterprise" ? "50,000" : "1,999"} with UPI
+                      <Smartphone size={16} /> Pay ₹
+                      {selectedUpgradePlan === "enterprise"
+                        ? "50,000"
+                        : "1,999"}{" "}
+                      with UPI
                     </a>
                     <p className="text-center text-[9px] text-[#1A1A1A]/25 font-mono mt-2">
                       Opens your UPI app directly
@@ -1001,26 +1037,8 @@ export default function ProfilePage() {
 
                   <div className="border-t-2 border-[#1A1A1A]/5 pt-4">
                     <p className="text-[10px] text-[#1A1A1A]/30 font-bold text-center mb-3">
-                      After completing payment, click below to activate your plan
+                      After completing payment, we will activate your plan
                     </p>
-                    <motion.button
-                      onClick={handleConfirmPayment}
-                      disabled={upgrading}
-                      whileHover={!upgrading ? { y: -2 } : {}}
-                      whileTap={!upgrading ? { scale: 0.97 } : {}}
-                      className={`w-full flex items-center justify-center gap-2 py-3 font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow cursor-pointer ${
-                        upgrading
-                          ? "bg-[#1A1A1A]/10 text-[#1A1A1A]/30"
-                          : "bg-emerald-500 text-white"
-                      }`}
-                    >
-                      {upgrading ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <CheckCircle2 size={16} />
-                      )}
-                      {upgrading ? "Activating..." : "I've Paid — Activate Plan"}
-                    </motion.button>
                   </div>
                 </>
               )}
