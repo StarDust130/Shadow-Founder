@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import Groq from "groq-sdk";
 import { connectDB } from "@/lib/mongodb";
 import { Analysis } from "@/lib/models/Analysis";
 import { Build } from "@/lib/models/Build";
 import { User } from "@/lib/models/User";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const groq = new Groq({ apiKey: process.env.QROQ_API_KEY! });
 
-const SYSTEM_PROMPT = `You are an elite full-stack developer and UI/UX designer. Given a startup idea and its analysis, generate a complete, visually stunning MVP codebase.
+const SYSTEM_PROMPT = `You are a world-class full-stack developer and award-winning UI/UX designer in 2026. You build breathtaking, modern web applications that look like they belong in a design portfolio.
 
-Generate a working Next.js 14 project with TypeScript and Tailwind CSS. The code must be production-quality, clean, well-structured, and visually impressive.
+Given a startup idea and its analysis, generate a STUNNING MVP codebase that would impress any investor or user at first glance.
 
-You MUST respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
+Generate a working Next.js 14 project with TypeScript and Tailwind CSS. The code must be production-quality, clean, well-structured, and VISUALLY BREATHTAKING.
+
+You MUST respond with ONLY valid JSON (no markdown, no code blocks, no explanations) in this exact format:
 {
   "files": [
     {
@@ -31,43 +31,74 @@ Requirements:
 - Use modern React patterns (Server Components, Client Components where needed)
 - Include package.json with all dependencies
 - Include tailwind.config.ts and tsconfig.json
-- Use EXCEPTIONAL UI design with Tailwind CSS:
-  * Modern color palette with gradients (not plain gray/white)
-  * Smooth hover effects, focus rings, and micro-interactions
-  * Beautiful card layouts with shadows and rounded corners
-  * Professional typography hierarchy (font sizes, weights, spacing)
-  * Responsive design that looks great on mobile and desktop
-  * Use backdrop-blur, glass-morphism, or neumorphism where appropriate
-  * Include subtle animations with CSS transitions
-  * Well-designed buttons with hover/active states
-  * Proper spacing system (consistent padding/margins)
-- Include proper TypeScript types
-- Include at least one API route
-- Make it functional and demonstrable
+- Code MUST compile — no syntax errors, no missing imports
 
-IMPORTANT — LANDING PAGE PREVIEW:
-You MUST also include a file with path "preview.html" — a single standalone HTML file (with all CSS and JS inlined) that serves as a stunning, world-class landing page for the startup. This preview.html must:
-- Be a complete self-contained HTML document with inline <style> and <script> tags
-- NOT use any external CDN links, imports, or dependencies
-- Have a VISUALLY STUNNING modern design that looks like a real SaaS landing page:
-  * Rich gradient backgrounds (e.g. from-purple-600 via-blue-500 to-cyan-400 style)
-  * Floating shapes, subtle SVG patterns, or animated background elements
-  * Glass-morphism cards with backdrop-blur effects
-  * Smooth CSS animations (fade-in, slide-up on scroll, hover transforms)
-  * Professional shadow system (multiple shadow layers for depth)
-  * Modern typography with large bold headlines and clean body text
-  * Consistent color scheme using CSS custom properties
-  * Well-designed CTA buttons with gradient backgrounds and hover effects
-- Include these well-designed sections:
-  * Navigation bar with logo and smooth-scroll links
-  * Hero: bold headline, compelling subtitle, CTA button, optional hero illustration/graphic using CSS shapes
-  * Features/Benefits: 3-6 feature cards with icons (use Unicode/emoji icons) and descriptions
-  * Social proof: stats counters (e.g. "10K+ users", "99.9% uptime") or testimonial quotes
-  * Pricing: at least 2 tiers with highlighted recommended plan, feature comparison
-  * CTA section with email signup form
-  * Footer with links and branding
-- Use CSS smooth scroll, intersection observer for scroll animations, and responsive breakpoints
-- Must look like a REAL professional product page, not a template
+UI DESIGN — THIS IS CRITICAL. Make it look like a top-tier 2026 SaaS product:
+  * Use a bold, modern color system — NOT boring gray/white. Use vibrant accent colors, rich gradients (mesh gradients, radial gradients, multi-stop linear gradients)
+  * Glassmorphism: backdrop-blur-xl, bg-white/10, border-white/20 transparent cards
+  * Depth & layering: multi-level box shadows (shadow-xl shadow-2xl), overlapping elements, z-index layers
+  * Micro-interactions: hover:scale-105, hover:-translate-y-1, hover:shadow-2xl, group-hover transitions
+  * Typography: Large bold hero text (text-5xl md:text-7xl font-black), clean body text, proper hierarchy
+  * Spacing: Generous whitespace, consistent padding (p-8, p-12), gap-6 gap-8
+  * Modern patterns: Bento grid layouts, floating elements, pill-shaped badges, gradient text (bg-clip-text text-transparent)
+  * Animated gradient backgrounds using CSS @keyframes
+  * Use decorative SVG blobs or circles as background accents
+  * Responsive: mobile-first, looks incredible on all screen sizes
+  * Professional button styles: rounded-full/rounded-2xl, px-8 py-4, gradient backgrounds, hover transforms
+  * Subtle grid/dot patterns as backgrounds for sections
+  * Use emoji or Unicode symbols for icons (💡 🚀 ⚡ 🎯 ✨ 🔥 📊 🛡️)
+
+CRITICAL — LANDING PAGE PREVIEW FILE:
+You MUST include a file with the exact path "preview.html". This is the MOST IMPORTANT file. This is shown to the user as a live preview of their startup landing page.
+
+The preview.html MUST be:
+- A COMPLETE standalone HTML document with ALL CSS and JS inlined in <style> and <script> tags
+- ZERO external dependencies — no CDN links, no imports, no external fonts, no external scripts
+- A WORLD-CLASS landing page that looks like it was built by a top design agency
+- Must be fully functional and responsive
+
+The preview.html MUST include these sections with STUNNING design:
+1. NAVIGATION: Fixed/sticky navbar with logo text, smooth-scroll links, gradient CTA button
+2. HERO SECTION: 
+   - Massive bold headline (80px+) with gradient text effect
+   - Compelling subtitle that sells the product
+   - Two CTA buttons (primary gradient + secondary outline)
+   - Animated background with CSS gradient animation or floating shapes
+   - Optional: Mockup/illustration using pure CSS shapes
+3. FEATURES SECTION:
+   - 3-6 feature cards in a grid layout
+   - Each card: icon (emoji/unicode), title, description
+   - Cards with glassmorphism or elevated shadow effect
+   - Hover animations (transform, shadow change)
+4. SOCIAL PROOF:
+   - Stats counters (e.g. "10,000+ Users", "99.9% Uptime", "4.9★ Rating")
+   - Optionally: short testimonial quotes
+5. PRICING SECTION:
+   - 2-3 tier pricing cards
+   - Most popular tier highlighted with badge + border + scale
+   - Feature lists with checkmarks (✓)
+   - CTA buttons on each card
+6. CTA / NEWSLETTER:
+   - Bold headline asking user to sign up
+   - Email input + submit button styled beautifully
+   - Background with gradient or pattern
+7. FOOTER:
+   - Links, branding, copyright
+   - Clean minimal design
+
+CSS techniques to use in preview.html:
+- @keyframes for animated gradient backgrounds
+- CSS custom properties (--primary, --accent, etc.)
+- backdrop-filter: blur() for glass effect
+- Intersection Observer for scroll-triggered fade-in animations
+- CSS Grid and Flexbox for layouts
+- @media queries for responsive design
+- Smooth scrolling (scroll-behavior: smooth)
+- CSS transitions on hover states (transform, box-shadow, opacity)
+- Linear-gradient, radial-gradient for backgrounds
+- Multiple box-shadows for depth (0 4px 6px rgba(), 0 20px 50px rgba())
+
+The preview.html should make users say "WOW" when they see it. It should look like a real, polished SaaS landing page, NOT a template or homework project.
 
 DO NOT include any text outside the JSON. Only output the JSON object.`;
 
@@ -143,14 +174,22 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
 
     let rawContent: string;
 
-    // Try Gemini first, fall back to Groq if it fails
+    // Try openai/gpt-oss-120b via Groq first, fall back to llama if it fails
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      const result = await model.generateContent([SYSTEM_PROMPT, userPrompt]);
-      rawContent = result.response.text();
-    } catch (geminiError) {
-      console.warn("Gemini failed, falling back to Groq:", geminiError);
-      const groqResult = await groq.chat.completions.create({
+      const result = await groq.chat.completions.create({
+        model: "openai/gpt-oss-120b",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 1,
+        max_completion_tokens: 8192,
+        top_p: 1,
+      });
+      rawContent = result.choices[0]?.message?.content || "";
+    } catch (primaryError) {
+      console.warn("gpt-oss-120b failed, falling back to llama:", primaryError);
+      const fallbackResult = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
@@ -159,7 +198,7 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
         temperature: 0.7,
         max_tokens: 8000,
       });
-      rawContent = groqResult.choices[0]?.message?.content || "";
+      rawContent = fallbackResult.choices[0]?.message?.content || "";
     }
 
     let generatedFiles;
@@ -247,8 +286,9 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
     });
   } catch (error) {
     console.error("Generation error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to generate MVP. Please try again." },
+      { error: `Failed to generate MVP: ${message}` },
       { status: 500 },
     );
   }
