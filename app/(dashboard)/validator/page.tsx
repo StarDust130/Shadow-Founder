@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Send,
   AlertTriangle,
@@ -93,6 +93,7 @@ const terminalSteps = [
 
 export default function ValidatorPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Read URL params for auto-fill (from dashboard idea click)
   const initialIdea = searchParams.get("idea") || "";
@@ -143,12 +144,44 @@ export default function ValidatorPage() {
     }
   }, [terminalActive, currentStep]);
 
-  const handleSubmit = () => {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
     if (!formData.idea || !formData.target || !formData.problem) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     setTerminalActive(true);
     setTerminalLines([]);
     setCurrentStep(0);
+
+    try {
+      const res = await fetch("/api/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          idea: formData.idea,
+          target: formData.target,
+          problem: formData.problem,
+          revenue: formData.revenue || "",
+          competitors: formData.competitors || "",
+          category: selectedCategory || "Other",
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Validation failed");
+      }
+
+      const data = await res.json();
+      router.push(`/analysis/${data.id}`);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Something went wrong",
+      );
+      setIsSubmitting(false);
+      setTerminalActive(false);
+    }
   };
 
   const filledRequired = formData.idea && formData.target && formData.problem;
@@ -381,6 +414,20 @@ export default function ValidatorPage() {
           )}
         </motion.button>
       </motion.div>
+
+      {/* ═══ ERROR DISPLAY ═══ */}
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-4 px-4 py-3 bg-red-50 border-2 border-red-300 rounded-xl"
+        >
+          <p className="text-sm font-bold text-red-600 flex items-center gap-2">
+            <AlertTriangle size={14} />
+            {submitError}
+          </p>
+        </motion.div>
+      )}
 
       {/* ═══ TERMINAL MOCK ═══ */}
       <motion.div

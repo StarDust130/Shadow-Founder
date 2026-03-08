@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
 import {
@@ -21,88 +22,20 @@ import {
   Cpu,
   Layers,
   MousePointerClick,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-const pastIdeas = [
-  {
-    id: 1,
-    title: "AI Resume Builder",
-    pitch:
-      "An AI-powered resume builder that creates ATS-optimized resumes in 30 seconds for job seekers.",
-    target: "Fresh graduates & job-switching professionals aged 22-35",
-    problem:
-      "75% of resumes get rejected by ATS before a human ever reads them.",
-    score: 82,
-    status: "Viable" as const,
-    category: "SaaS",
-    date: "2 days ago",
-  },
-  {
-    id: 2,
-    title: "Crypto Pet Insurance",
-    pitch:
-      "Blockchain-based pet insurance platform that uses smart contracts for instant claim payouts.",
-    target: "Crypto-savvy pet owners in the US",
-    problem: "Pet insurance claims take 4-6 weeks to process.",
-    score: 23,
-    status: "Saturated" as const,
-    category: "FinTech",
-    date: "5 days ago",
-  },
-  {
-    id: 3,
-    title: "Developer Meme Generator",
-    pitch:
-      "AI that generates context-aware programming memes from your GitHub commit messages.",
-    target: "Software developers on social media",
-    problem: "Developers waste time making memes manually for Twitter/X.",
-    score: 61,
-    status: "Viable" as const,
-    category: "Developer Tools",
-    date: "1 week ago",
-  },
-  {
-    id: 4,
-    title: "Smart Grocery List",
-    pitch:
-      "ML-powered meal planner that auto-generates optimized grocery lists based on dietary needs.",
-    target: "Health-conscious families and meal-preppers",
-    problem:
-      "People waste 30% of groceries due to poor planning and impulse buying.",
-    score: 45,
-    status: "Saturated" as const,
-    category: "HealthTech",
-    date: "2 weeks ago",
-  },
-  {
-    id: 5,
-    title: "Code Review Copilot",
-    pitch:
-      "AI agent that performs deep code reviews with security analysis and performance suggestions.",
-    target: "Engineering teams at startups and mid-size companies",
-    problem:
-      "Code reviews are bottlenecks — senior devs spend 40% of their time reviewing.",
-    score: 91,
-    status: "Viable" as const,
-    category: "AI / ML",
-    date: "3 weeks ago",
-  },
-  {
-    id: 6,
-    title: "Freelancer CRM Lite",
-    pitch:
-      "Minimalist CRM for solo freelancers to manage invoices, contracts, and client comms in one place.",
-    target: "Solo freelancers earning $50k-$200k annually",
-    problem:
-      "Freelancers juggle 5+ tools for invoicing, contracts, and client management.",
-    score: 73,
-    status: "Viable" as const,
-    category: "SaaS",
-    date: "1 month ago",
-  },
-];
+interface AnalysisSummary {
+  _id: string;
+  idea: string;
+  category: string;
+  score: number;
+  verdict: string;
+  verdictColor: string;
+  summary: string;
+  createdAt: string;
+}
 
 const comingSoon = [
   {
@@ -120,13 +53,6 @@ const comingSoon = [
     desc: "Auto-provision Supabase or PlanetScale databases for your MVP",
     icon: Cloud,
   },
-];
-
-const stats = [
-  { label: "Projects", value: "6", icon: Code2, color: "#FF6803" },
-  { label: "Validated", value: "6", icon: Crosshair, color: "#1A1A1A" },
-  { label: "Viable", value: "4", icon: TrendingUp, color: "#22C55E" },
-  { label: "Avg Score", value: "62", icon: Zap, color: "#FF8A3D" },
 ];
 
 const stagger = {
@@ -151,8 +77,8 @@ function ScoreBadge({ score }: { score: number }) {
   );
 }
 
-function StatusBadge({ status }: { status: "Viable" | "Saturated" }) {
-  const isViable = status === "Viable";
+function StatusBadge({ verdict }: { verdict: string }) {
+  const isViable = verdict === "VIABLE" || verdict === "CONDITIONAL PASS";
   return (
     <span
       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-2 ${
@@ -162,29 +88,89 @@ function StatusBadge({ status }: { status: "Viable" | "Saturated" }) {
       }`}
     >
       {isViable ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
-      {status}
+      {verdict}
     </span>
   );
 }
 
+function timeAgo(dateStr: string) {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks}w ago`;
+}
+
 export default function DashboardPage() {
   const { user } = useUser();
-  const router = useRouter();
   const firstName = user?.firstName || "Builder";
 
-  const handleIdeaClick = (idea: (typeof pastIdeas)[0]) => {
-    const params = new URLSearchParams({
-      idea: idea.pitch,
-      target: idea.target,
-      problem: idea.problem,
-      category: idea.category,
-    });
-    router.push(`/validator?${params.toString()}`);
-  };
+  const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/analyses");
+        if (res.ok) {
+          const data = await res.json();
+          setAnalyses(data);
+        }
+      } catch {
+        // Silently fail — show empty state
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const totalProjects = analyses.length;
+  const viableCount = analyses.filter(
+    (a) => a.verdict === "VIABLE" || a.verdict === "CONDITIONAL PASS",
+  ).length;
+  const avgScore =
+    totalProjects > 0
+      ? Math.round(
+          analyses.reduce((sum, a) => sum + a.score, 0) / totalProjects,
+        )
+      : 0;
+
+  const stats = [
+    {
+      label: "Projects",
+      value: String(totalProjects),
+      icon: Code2,
+      color: "#FF6803",
+    },
+    {
+      label: "Validated",
+      value: String(totalProjects),
+      icon: Crosshair,
+      color: "#1A1A1A",
+    },
+    {
+      label: "Viable",
+      value: String(viableCount),
+      icon: TrendingUp,
+      color: "#22C55E",
+    },
+    {
+      label: "Avg Score",
+      value: String(avgScore),
+      icon: Zap,
+      color: "#FF8A3D",
+    },
+  ];
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* ═══ HERO ═══ */}
+      {/* HERO */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,7 +203,7 @@ export default function DashboardPage() {
         </p>
       </motion.div>
 
-      {/* ═══ START CTA ═══ */}
+      {/* START CTA */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -239,7 +225,6 @@ export default function DashboardPage() {
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 3, repeat: Infinity, type: "tween" }}
             />
-
             <div className="relative z-10 w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
               <motion.div
                 animate={{ rotate: 360 }}
@@ -272,7 +257,7 @@ export default function DashboardPage() {
         </Link>
       </motion.div>
 
-      {/* ═══ STATS ═══ */}
+      {/* STATS */}
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -314,7 +299,7 @@ export default function DashboardPage() {
         ))}
       </motion.div>
 
-      {/* ═══ QUICK ACTIONS ═══ */}
+      {/* QUICK ACTIONS */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -332,7 +317,7 @@ export default function DashboardPage() {
           {
             label: "Build Code",
             desc: "Generate MVP codebase",
-            href: "/builder",
+            href: "/validator",
             icon: Code2,
             accent: "#8B5CF6",
           },
@@ -376,7 +361,7 @@ export default function DashboardPage() {
         ))}
       </motion.div>
 
-      {/* ═══ PROJECT IDEAS — BENTO GRID ═══ */}
+      {/* PROJECT IDEAS */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -386,7 +371,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-mono flex items-center gap-2">
             <Flame size={12} className="text-[#FF6803]" />
-            Project Ideas
+            Your Validated Ideas
           </h2>
           <Link href="/validator">
             <motion.button
@@ -399,69 +384,85 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          {pastIdeas.map((idea) => (
-            <motion.div
-              key={idea.id}
-              variants={fadeUp}
-              whileHover={{
-                y: -6,
-                x: -3,
-                transition: { type: "spring", stiffness: 400, damping: 25 },
-              }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => handleIdeaClick(idea)}
-              className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[6px_6px_0_#1A1A1A] hover:shadow-[8px_8px_0_#FF6803] transition-shadow cursor-pointer group relative overflow-hidden"
-            >
-              <motion.div
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                animate={{ y: [0, -2, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={28} className="animate-spin text-[#FF6803]" />
+          </div>
+        ) : analyses.length === 0 ? (
+          <div className="text-center py-16 border-2 border-dashed border-[#1A1A1A]/10 rounded-2xl">
+            <Sparkles size={32} className="mx-auto text-[#1A1A1A]/15 mb-3" />
+            <p className="text-sm font-bold text-[#1A1A1A]/30">
+              No ideas validated yet
+            </p>
+            <p className="text-xs text-[#1A1A1A]/20 mt-1">
+              Submit your first pitch to get started
+            </p>
+            <Link href="/validator">
+              <motion.button
+                whileHover={{ y: -2 }}
+                className="mt-4 px-6 py-2.5 bg-[#FF6803] text-white rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
               >
-                <div className="flex items-center gap-1 bg-[#FF6803]/10 rounded-lg px-2 py-1">
-                  <MousePointerClick size={10} className="text-[#FF6803]" />
-                  <span className="text-[8px] font-bold text-[#FF6803] uppercase">
-                    Auto-fill
-                  </span>
-                </div>
-              </motion.div>
-
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-black text-[#1A1A1A] tracking-tight truncate group-hover:text-[#FF6803] transition-colors">
-                    {idea.title}
-                  </h3>
-                  <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
-                    {idea.category}
-                  </span>
-                </div>
-                <ScoreBadge score={idea.score} />
-              </div>
-
-              <p className="text-[12px] text-[#1A1A1A]/45 font-medium leading-relaxed line-clamp-2 mb-4">
-                {idea.pitch}
-              </p>
-
-              <div className="flex items-center justify-between">
-                <StatusBadge status={idea.status} />
+                Validate an Idea
+              </motion.button>
+            </Link>
+          </div>
+        ) : (
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            {analyses.map((idea) => (
+              <Link key={idea._id} href={`/analysis/${idea._id}`}>
                 <motion.div
-                  className="text-[#1A1A1A]/15 group-hover:text-[#FF6803] transition-colors"
-                  whileHover={{ x: 3 }}
+                  variants={fadeUp}
+                  whileHover={{
+                    y: -6,
+                    x: -3,
+                    transition: { type: "spring", stiffness: 400, damping: 25 },
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[6px_6px_0_#1A1A1A] hover:shadow-[8px_8px_0_#FF6803] transition-shadow cursor-pointer group relative overflow-hidden"
                 >
-                  <ArrowRight size={16} />
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-black text-[#1A1A1A] tracking-tight truncate group-hover:text-[#FF6803] transition-colors">
+                        {idea.idea.length > 40
+                          ? idea.idea.slice(0, 40) + "..."
+                          : idea.idea}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
+                          {idea.category}
+                        </span>
+                        <span className="text-[9px] text-[#1A1A1A]/20 font-mono">
+                          {timeAgo(idea.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                    <ScoreBadge score={idea.score} />
+                  </div>
+                  <p className="text-[12px] text-[#1A1A1A]/45 font-medium leading-relaxed line-clamp-2 mb-4">
+                    {idea.summary}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <StatusBadge verdict={idea.verdict} />
+                    <motion.div
+                      className="text-[#1A1A1A]/15 group-hover:text-[#FF6803] transition-colors"
+                      whileHover={{ x: 3 }}
+                    >
+                      <ArrowRight size={16} />
+                    </motion.div>
+                  </div>
                 </motion.div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              </Link>
+            ))}
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* ═══ TECH STACK MARQUEE ═══ */}
+      {/* TECH STACK MARQUEE */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -477,23 +478,23 @@ export default function DashboardPage() {
             "Next.js 16",
             "TypeScript",
             "Tailwind CSS",
-            "Prisma ORM",
+            "MongoDB",
             "Clerk Auth",
             "Framer Motion",
-            "Vercel",
-            "OpenAI",
-            "Supabase",
-            "Stripe",
+            "Groq AI",
+            "Gemini",
+            "JSZip",
+            "React 19",
             "Next.js 16",
             "TypeScript",
             "Tailwind CSS",
-            "Prisma ORM",
+            "MongoDB",
             "Clerk Auth",
             "Framer Motion",
-            "Vercel",
-            "OpenAI",
-            "Supabase",
-            "Stripe",
+            "Groq AI",
+            "Gemini",
+            "JSZip",
+            "React 19",
           ].map((tech, i) => (
             <span
               key={i}
@@ -506,7 +507,7 @@ export default function DashboardPage() {
         </motion.div>
       </motion.div>
 
-      {/* ═══ LIVE STATUS ═══ */}
+      {/* LIVE STATUS */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -537,7 +538,7 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* ═══ COMING SOON ═══ */}
+      {/* COMING SOON */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

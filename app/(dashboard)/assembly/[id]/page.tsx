@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Code2,
@@ -12,174 +12,108 @@ import {
   ArrowLeft,
   ChevronRight,
   Terminal,
-  Database,
-  Layout,
-  Server,
   Sparkles,
   Package,
   Layers,
   Zap,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-const mockFiles = [
-  {
-    name: "app/",
-    type: "folder" as const,
-    children: [
-      {
-        name: "layout.tsx",
-        type: "file" as const,
-        lang: "TypeScript",
-        icon: Layout,
-        lines: 45,
-        code: `import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "ResumeAI — ATS-Optimized Resumes",
-  description: "Build perfect resumes in 30 seconds",
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
-}`,
-      },
-      {
-        name: "page.tsx",
-        type: "file" as const,
-        lang: "TypeScript",
-        icon: FileCode,
-        lines: 82,
-        code: `export default function Home() {
-  return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-5xl font-bold mb-4">
-        ResumeAI
-      </h1>
-      <p className="text-xl text-gray-600 mb-8">
-        ATS-optimized resumes in 30 seconds
-      </p>
-      <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700">
-        Get Started Free
-      </button>
-    </main>
-  );
-}`,
-      },
-    ],
-  },
-  {
-    name: "prisma/",
-    type: "folder" as const,
-    children: [
-      {
-        name: "schema.prisma",
-        type: "file" as const,
-        lang: "Prisma",
-        icon: Database,
-        lines: 38,
-        code: `generator client {
-  provider = "prisma-client-js"
+interface BuildFile {
+  path: string;
+  content: string;
+  lang: string;
+  lines: number;
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+interface BuildData {
+  _id: string;
+  ideaTitle: string;
+  techStack: string[];
+  files: BuildFile[];
+  status: string;
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  resumes   Resume[]
-  createdAt DateTime @default(now())
-}
-
-model Resume {
-  id        String   @id @default(cuid())
-  title     String
-  content   Json
-  score     Int?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-}`,
-      },
-    ],
-  },
-  {
-    name: "api/",
-    type: "folder" as const,
-    children: [
-      {
-        name: "generate/route.ts",
-        type: "file" as const,
-        lang: "TypeScript",
-        icon: Server,
-        lines: 24,
-        code: `import { NextResponse } from "next/server";
-
-export async function POST(req: Request) {
-  const { jobDescription, experience } = await req.json();
-
-  // TODO: Call LLM API for resume generation
-  const resume = {
-    sections: {
-      summary: "Generated summary...",
-      experience: [],
-      skills: [],
-    },
-    atsScore: 85,
-  };
-
-  return NextResponse.json(resume);
-}`,
-      },
-    ],
-  },
-];
-
-type FileItem = {
+interface FolderNode {
   name: string;
-  type: "file" | "folder";
-  lang?: string;
-  icon?: React.ComponentType<{ size?: number; className?: string }>;
-  lines?: number;
-  code?: string;
-  children?: FileItem[];
-};
+  type: "folder";
+  children: (FolderNode | FileNode)[];
+}
 
-const techStack = [
-  { name: "Next.js 14", color: "border-[#1A1A1A]" },
-  { name: "TypeScript", color: "border-blue-500" },
-  { name: "Prisma", color: "border-emerald-500" },
-  { name: "Tailwind CSS", color: "border-cyan-500" },
-  { name: "PostgreSQL", color: "border-indigo-500" },
-];
+interface FileNode {
+  name: string;
+  type: "file";
+  file: BuildFile;
+}
+
+function buildFileTree(files: BuildFile[]): (FolderNode | FileNode)[] {
+  const root: (FolderNode | FileNode)[] = [];
+
+  for (const file of files) {
+    const parts = file.path.split("/");
+    let current = root;
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLast = i === parts.length - 1;
+
+      if (isLast) {
+        current.push({ name: part, type: "file", file });
+      } else {
+        let folder = current.find(
+          (n) => n.type === "folder" && n.name === part,
+        ) as FolderNode | undefined;
+        if (!folder) {
+          folder = { name: part, type: "folder", children: [] };
+          current.push(folder);
+        }
+        current = folder.children;
+      }
+    }
+  }
+
+  return root;
+}
 
 export default function AssemblyPage() {
   const params = useParams();
   const id = params.id as string;
-  const [selectedFile, setSelectedFile] = useState<FileItem | null>(
-    mockFiles[0].children![0],
-  );
+
+  const [build, setBuild] = useState<BuildData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<BuildFile | null>(null);
   const [copiedFile, setCopiedFile] = useState<string | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-    new Set(mockFiles.map((f) => f.name)),
+    new Set(),
   );
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    const fetchBuild = async () => {
+      try {
+        const res = await fetch(`/api/builds/${id}`);
+        if (!res.ok) throw new Error("Build not found");
+        const data = await res.json();
+        setBuild(data);
+        if (data.files?.length > 0) {
+          setSelectedFile(data.files[0]);
+        }
+        // Expand all top-level folders
+        const tree = buildFileTree(data.files || []);
+        setExpandedFolders(
+          new Set(tree.filter((n) => n.type === "folder").map((n) => n.name)),
+        );
+      } catch {
+        setError("Could not load build. It may have been deleted.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBuild();
+  }, [id]);
 
   const toggleFolder = (name: string) => {
     setExpandedFolders((prev) => {
@@ -196,19 +130,120 @@ export default function AssemblyPage() {
     setTimeout(() => setCopiedFile(null), 2000);
   };
 
-  const allFiles = mockFiles.reduce((acc, folder) => {
-    return acc + (folder.children?.length || 0);
-  }, 0);
+  const downloadZip = useCallback(async () => {
+    if (!build) return;
+    setDownloading(true);
+    try {
+      const JSZip = (await import("jszip")).default;
+      const zip = new JSZip();
+      for (const file of build.files) {
+        zip.file(file.path, file.content);
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${
+        build.ideaTitle
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .slice(0, 30) || "mvp"
+      }-project.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Failed to create zip. Try copying files individually.");
+    } finally {
+      setDownloading(false);
+    }
+  }, [build]);
 
-  const totalLines = mockFiles.reduce((acc, folder) => {
+  if (loading) {
     return (
-      acc + (folder.children?.reduce((sum, f) => sum + (f.lines || 0), 0) || 0)
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 size={32} className="animate-spin text-[#FF6803]" />
+      </div>
     );
-  }, 0);
+  }
+
+  if (error || !build) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <p className="text-lg font-bold text-[#1A1A1A]/50">{error}</p>
+        <Link
+          href="/dashboard"
+          className="text-[#FF6803] font-bold hover:underline"
+        >
+          Back to Dashboard
+        </Link>
+      </div>
+    );
+  }
+
+  const fileTree = buildFileTree(build.files);
+  const allFiles = build.files.length;
+  const totalLines = build.files.reduce((sum, f) => sum + (f.lines || 0), 0);
+
+  const renderTreeNode = (node: FolderNode | FileNode, depth = 0) => {
+    if (node.type === "folder") {
+      return (
+        <div key={node.name}>
+          <button
+            onClick={() => toggleFolder(node.name)}
+            className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-colors text-white/50 hover:text-white/70 group"
+            style={{ paddingLeft: `${8 + depth * 16}px` }}
+          >
+            <ChevronRight
+              size={12}
+              className={`transition-transform ${expandedFolders.has(node.name) ? "rotate-90" : ""}`}
+            />
+            <FolderTree
+              size={14}
+              className="text-[#FF6803] group-hover:text-[#FF8A3D]"
+            />
+            <span className="text-xs font-mono font-bold">{node.name}/</span>
+          </button>
+          <AnimatePresence>
+            {expandedFolders.has(node.name) && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                {node.children.map((child) => renderTreeNode(child, depth + 1))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        key={node.file.path}
+        onClick={() => setSelectedFile(node.file)}
+        className={`w-full flex items-center gap-1.5 pr-2 py-1.5 transition-all text-xs font-mono ${
+          selectedFile?.path === node.file.path
+            ? "bg-[#FF6803]/15 text-[#FF6803] border-l-2 border-[#FF6803]"
+            : "text-white/40 hover:bg-white/5 hover:text-white/60"
+        }`}
+        style={{ paddingLeft: `${24 + depth * 16}px` }}
+      >
+        <FileCode size={13} className="shrink-0" />
+        <span className="truncate">{node.name}</span>
+        <span className="ml-auto text-[9px] text-white/15">
+          {node.file.lines}L
+        </span>
+      </button>
+    );
+  };
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* ===== HEADER ===== */}
+      {/* HEADER */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -221,7 +256,6 @@ export default function AssemblyPage() {
           <ArrowLeft size={14} />
           Back to HQ
         </Link>
-
         <div className="flex flex-col sm:flex-row sm:items-start gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
@@ -236,25 +270,30 @@ export default function AssemblyPage() {
                 <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase">
                   The Vault
                 </h1>
-                <p className="text-xs text-[#1A1A1A]/40 font-mono">
-                  PROJECT #{id} — GENERATED MVP
+                <p className="text-xs text-[#1A1A1A]/40 font-mono truncate max-w-[300px]">
+                  {build.ideaTitle}
                 </p>
               </div>
             </div>
           </div>
-
           <motion.button
             whileHover={{ y: -2, boxShadow: "6px 6px 0 #1A1A1A" }}
             whileTap={{ y: 0, boxShadow: "2px 2px 0 #1A1A1A" }}
-            className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] text-sm font-black uppercase tracking-wide hover:bg-[#FF6803] transition-colors"
+            onClick={downloadZip}
+            disabled={downloading}
+            className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] text-sm font-black uppercase tracking-wide hover:bg-[#FF6803] transition-colors disabled:opacity-60"
           >
-            <Download size={16} />
-            Export All
+            {downloading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Download size={16} />
+            )}
+            {downloading ? "Zipping..." : "Download ZIP"}
           </motion.button>
         </div>
       </motion.div>
 
-      {/* ===== STATS BAR ===== */}
+      {/* STATS BAR */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -264,7 +303,7 @@ export default function AssemblyPage() {
         {[
           { label: "Files", value: allFiles, icon: Layers },
           { label: "Lines", value: totalLines, icon: Code2 },
-          { label: "Modules", value: mockFiles.length, icon: Package },
+          { label: "Modules", value: build.techStack.length, icon: Package },
         ].map((stat) => (
           <motion.div
             key={stat.label}
@@ -282,34 +321,33 @@ export default function AssemblyPage() {
         ))}
       </motion.div>
 
-      {/* ===== TECH STACK ===== */}
+      {/* TECH STACK */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="flex flex-wrap gap-2 mb-6"
       >
-        {techStack.map((tech, i) => (
+        {build.techStack.map((tech, i) => (
           <motion.span
-            key={tech.name}
+            key={tech}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 + i * 0.05 }}
-            className={`px-3 py-1.5 bg-white border-2 ${tech.color} text-xs font-black uppercase tracking-wider text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:-translate-y-0.5 transition-all cursor-default`}
+            className="px-3 py-1.5 bg-white border-2 border-[#1A1A1A] text-xs font-black uppercase tracking-wider text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:-translate-y-0.5 transition-all cursor-default"
           >
-            {tech.name}
+            {tech}
           </motion.span>
         ))}
       </motion.div>
 
-      {/* ===== IDE LAYOUT ===== */}
+      {/* IDE LAYOUT */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
         className="bg-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[6px_6px_0_#FF6803] overflow-hidden"
       >
-        {/* IDE Top Bar */}
         <div className="flex items-center justify-between px-4 py-3 bg-[#111] border-b-2 border-[#2A2A2A]">
           <div className="flex items-center gap-3">
             <div className="flex gap-2">
@@ -322,11 +360,9 @@ export default function AssemblyPage() {
               shadow-vault
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-[#FF6803]/60 bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
-              AI Generated
-            </span>
-          </div>
+          <span className="text-[10px] font-mono text-[#FF6803]/60 bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
+            AI Generated
+          </span>
         </div>
 
         <div className="flex flex-col md:flex-row min-h-[500px] max-h-[70vh]">
@@ -335,70 +371,18 @@ export default function AssemblyPage() {
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF6803]/40 px-2 mb-3 block">
               Explorer
             </span>
-            {mockFiles.map((folder) => (
-              <div key={folder.name} className="mb-1">
-                <button
-                  onClick={() => toggleFolder(folder.name)}
-                  className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-colors text-white/50 hover:text-white/70 group"
-                >
-                  <ChevronRight
-                    size={12}
-                    className={`transition-transform ${
-                      expandedFolders.has(folder.name) ? "rotate-90" : ""
-                    }`}
-                  />
-                  <FolderTree
-                    size={14}
-                    className="text-[#FF6803] group-hover:text-[#FF8A3D]"
-                  />
-                  <span className="text-xs font-mono font-bold">
-                    {folder.name}
-                  </span>
-                </button>
-                <AnimatePresence>
-                  {expandedFolders.has(folder.name) && folder.children && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      {folder.children.map((file) => (
-                        <button
-                          key={file.name}
-                          onClick={() => setSelectedFile(file)}
-                          className={`w-full flex items-center gap-1.5 pl-8 pr-2 py-1.5 transition-all text-xs font-mono ${
-                            selectedFile?.name === file.name
-                              ? "bg-[#FF6803]/15 text-[#FF6803] border-l-2 border-[#FF6803]"
-                              : "text-white/40 hover:bg-white/5 hover:text-white/60"
-                          }`}
-                        >
-                          {file.icon && (
-                            <file.icon size={13} className="shrink-0" />
-                          )}
-                          <span className="truncate">{file.name}</span>
-                          <span className="ml-auto text-[9px] text-white/15">
-                            {file.lines}L
-                          </span>
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+            {fileTree.map((node) => renderTreeNode(node))}
           </div>
 
           {/* Code Viewer */}
           <div className="flex-1 flex flex-col overflow-hidden">
             {selectedFile ? (
               <>
-                {/* File Tab */}
                 <div className="flex items-center justify-between px-4 py-2.5 bg-[#1E1E1E] border-b-2 border-[#2A2A2A]">
                   <div className="flex items-center gap-2">
                     <FileCode size={14} className="text-[#FF6803]" />
                     <span className="text-xs font-mono font-bold text-white/70">
-                      {selectedFile.name}
+                      {selectedFile.path}
                     </span>
                     <span className="text-[10px] font-mono font-bold text-[#FF6803] bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
                       {selectedFile.lang}
@@ -408,31 +392,28 @@ export default function AssemblyPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() =>
-                      copyCode(selectedFile.code || "", selectedFile.name)
+                      copyCode(selectedFile.content, selectedFile.path)
                     }
                     className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1.5 border transition-all ${
-                      copiedFile === selectedFile.name
+                      copiedFile === selectedFile.path
                         ? "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
                         : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20 hover:bg-white/5"
                     }`}
                   >
-                    {copiedFile === selectedFile.name ? (
+                    {copiedFile === selectedFile.path ? (
                       <>
-                        <Check size={12} />
-                        Copied!
+                        <Check size={12} /> Copied!
                       </>
                     ) : (
                       <>
-                        <Copy size={12} />
-                        Copy
+                        <Copy size={12} /> Copy
                       </>
                     )}
                   </motion.button>
                 </div>
-                {/* Code Block */}
                 <div className="flex-1 overflow-auto p-4">
                   <pre className="text-sm font-mono text-white/80 leading-relaxed whitespace-pre">
-                    {selectedFile.code?.split("\n").map((line, i) => (
+                    {selectedFile.content?.split("\n").map((line, i) => (
                       <div
                         key={i}
                         className="flex hover:bg-[#FF6803]/5 transition-colors"
@@ -458,7 +439,7 @@ export default function AssemblyPage() {
         </div>
       </motion.div>
 
-      {/* ===== SETUP TERMINAL ===== */}
+      {/* SETUP TERMINAL */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -477,7 +458,7 @@ export default function AssemblyPage() {
         <div className="bg-[#1A1A1A] border-2 border-[#1A1A1A] p-4 font-mono text-sm space-y-2 overflow-x-auto">
           {[
             "npx create-next-app@latest my-mvp --typescript --tailwind",
-            "cd my-mvp && npx prisma init",
+            "# Copy generated files into your project",
             "npm run dev",
           ].map((cmd, i) => (
             <motion.p
@@ -494,11 +475,11 @@ export default function AssemblyPage() {
         </div>
         <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-[#1A1A1A]/30 uppercase tracking-wider">
           <Sparkles size={12} className="text-[#FF6803]/50" />
-          <span>Paste files into your project to launch</span>
+          <span>Download the ZIP and extract into your project</span>
         </div>
       </motion.div>
 
-      {/* ===== CTA ===== */}
+      {/* CTA */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
