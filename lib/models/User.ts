@@ -4,6 +4,7 @@ export interface IUser extends Document {
   clerkId: string;
   email: string;
   firstName: string;
+  lastName: string;
   plan: "free" | "pro";
   buildsUsed: number;
   maxBuilds: number;
@@ -14,8 +15,9 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>(
   {
     clerkId: { type: String, required: true, unique: true, index: true },
-    email: { type: String, required: true },
+    email: { type: String, default: "" },
     firstName: { type: String, default: "Builder" },
+    lastName: { type: String, default: "" },
     plan: { type: String, enum: ["free", "pro"], default: "free" },
     buildsUsed: { type: Number, default: 0 },
     maxBuilds: { type: Number, default: 1 },
