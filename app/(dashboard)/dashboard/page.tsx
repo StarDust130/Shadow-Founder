@@ -29,6 +29,7 @@ import Link from "next/link";
 interface AnalysisSummary {
   _id: string;
   idea: string;
+  appName?: string;
   category: string;
   score: number;
   verdict: string;
@@ -430,10 +431,17 @@ export default function DashboardPage() {
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-black text-[#1A1A1A] tracking-tight truncate group-hover:text-[#FF6803] transition-colors">
-                        {idea.idea.length > 40
-                          ? idea.idea.slice(0, 40) + "..."
-                          : idea.idea}
+                        {(idea.appName || idea.idea).length > 40
+                          ? (idea.appName || idea.idea).slice(0, 40) + "..."
+                          : idea.appName || idea.idea}
                       </h3>
+                      {idea.appName && (
+                        <p className="text-[10px] text-[#1A1A1A]/30 font-mono truncate mt-0.5">
+                          {idea.idea.length > 50
+                            ? idea.idea.slice(0, 50) + "..."
+                            : idea.idea}
+                        </p>
+                      )}
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
                           {idea.category}
