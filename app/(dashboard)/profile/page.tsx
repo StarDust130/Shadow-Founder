@@ -132,7 +132,7 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   "Everything in Free",
-  "Unlimited MVP builds",
+  "10 MVP build credits",
   "Priority AI analysis",
   "Advanced code generation",
   "Premium landing pages",
@@ -367,19 +367,19 @@ export default function ProfilePage() {
                         {buildsRemaining}
                       </span>
                       <span className="text-2xl font-black text-[#1A1A1A]/20 tracking-tighter">
-                        / {isPro ? "∞" : maxBuilds}
+                        / {maxBuilds}
                       </span>
                     </div>
                     <p className="text-[11px] text-[#1A1A1A]/35 font-bold">
                       {isPro
-                        ? "Unlimited builds on Pro plan"
+                        ? `${buildsRemaining} of ${maxBuilds} builds remaining on Pro`
                         : `${buildsUsed} of ${maxBuilds} build credits used`}
                     </p>
                     <div className="mt-4 flex items-center gap-2 bg-[#FF6803]/5 rounded-lg px-3 py-2 border border-[#FF6803]/15">
                       <Zap size={12} className="text-[#FF6803]" />
                       <span className="text-[10px] font-black text-[#FF6803]/70 font-mono">
                         {isPro
-                          ? "Unlimited validations + builds"
+                          ? "Unlimited validations • 10 MVP builds"
                           : "Unlimited validations • 1 MVP build"}
                       </span>
                     </div>
@@ -443,7 +443,7 @@ export default function ProfilePage() {
                       Go Pro
                     </h3>
                     <p className="text-[11px] text-white/60 font-bold mb-5">
-                      Unlimited MVP builds, priority AI analysis, and advanced
+                      10 MVP builds, priority AI analysis, and advanced
                       code generation.
                     </p>
                     <motion.button
