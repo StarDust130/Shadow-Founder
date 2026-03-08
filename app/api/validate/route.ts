@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { Groq } from "groq-sdk";
 import { connectDB } from "@/lib/mongodb";
 import { Analysis } from "@/lib/models/Analysis";
@@ -30,7 +30,18 @@ Scoring guide:
 - 80-100: VIABLE — Strong market fit, clear differentiation, solid economics
 - 60-79: CONDITIONAL PASS — Has potential but needs pivots or better execution
 - 40-59: RISKY — Significant challenges, crowded market, or weak economics
-- 0-39: NOT VIABLE — Fatal flaws, no market, or impossible economics
+- 1-39: NOT VIABLE — Fatal flaws, no market, or impossible economics
+- 0: ILLEGAL/UNETHICAL — The idea is illegal, unethical, harmful, promotes fraud, violence, exploitation, drug dealing, scams, weapons, child exploitation, hacking, phishing, or anything that violates law or basic ethics
+
+CRITICAL RULE FOR SCORE 0:
+If the idea is illegal, unethical, promotes harm, involves fraud, scams, exploitation, or any harmful/illegal activity:
+- Set score to EXACTLY 0
+- Set verdict to "NOT VIABLE"
+- Set verdictColor to "#EF4444"
+- In summary, clearly explain WHY this idea is illegal/unethical/harmful
+- Strengths should all say "None — this idea is flagged as harmful"
+- Weaknesses should list the legal/ethical issues
+- Recommendations should encourage the user to pursue a legitimate, ethical business idea instead
 
 Be realistic. Most ideas score 40-70. Only truly exceptional ideas get 80+. Be specific with market data and numbers.`;
 
@@ -53,10 +64,17 @@ export async function POST(req: Request) {
 
     await connectDB();
 
-    // Ensure user exists in DB
+    // Ensure user exists in DB with Clerk name
+    const clerkUser = await currentUser();
+    const updateFields: Record<string, string> = {};
+    if (clerkUser?.firstName) updateFields.firstName = clerkUser.firstName;
+    if (clerkUser?.lastName) updateFields.lastName = clerkUser.lastName;
+    if (clerkUser?.emailAddresses?.[0]?.emailAddress)
+      updateFields.email = clerkUser.emailAddresses[0].emailAddress;
+
     await User.findOneAndUpdate(
       { clerkId: userId },
-      { clerkId: userId },
+      { $set: { clerkId: userId, ...updateFields } },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     );
 
