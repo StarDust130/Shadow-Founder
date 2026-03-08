@@ -52,7 +52,7 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     const { plan } = body;
 
-    if (!plan || !["free", "pro"].includes(plan)) {
+    if (!plan || !["free", "pro", "enterprise"].includes(plan)) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
@@ -62,7 +62,7 @@ export async function PATCH(req: Request) {
       { clerkId: userId },
       {
         plan,
-        maxBuilds: plan === "pro" ? 10 : 1,
+        maxBuilds: plan === "enterprise" ? 9999 : plan === "pro" ? 10 : 1,
       },
       { returnDocument: "after" },
     );
