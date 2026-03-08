@@ -402,6 +402,7 @@ export default function ValidatorPage() {
 
   return (
     <div className="max-w-3xl mx-auto" ref={formRef}>
+      <div ref={topRef} />
       {/* HEADER */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -411,12 +412,28 @@ export default function ValidatorPage() {
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF6803] mb-2 flex items-center gap-1.5 font-mono">
           <Zap size={10} /> Validator
         </p>
-        <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase leading-[0.9]">
-          The Interrogation<span className="text-[#FF6803]">.</span>
-        </h1>
-        <p className="text-sm text-[#1A1A1A]/40 font-bold mt-2">
-          Pitch your idea. We break it down with zero sugar-coating.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase leading-[0.9]">
+              The Interrogation<span className="text-[#FF6803]">.</span>
+            </h1>
+            <p className="text-sm text-[#1A1A1A]/40 font-bold mt-2">
+              Pitch your idea. We break it down with zero sugar-coating.
+            </p>
+          </div>
+          {hasFormData && (
+            <motion.button
+              onClick={handleClearForm}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border-2 border-[#1A1A1A]/15 rounded-xl text-[10px] font-black uppercase tracking-wider text-[#1A1A1A]/40 hover:text-red-500 hover:border-red-300 transition-all cursor-pointer shadow-sm"
+            >
+              <Trash2 size={12} /> Clear
+            </motion.button>
+          )}
+        </div>
       </motion.div>
 
       {/* WARNING BANNER */}
