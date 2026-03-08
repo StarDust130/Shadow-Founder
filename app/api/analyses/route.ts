@@ -14,7 +14,7 @@ export async function GET() {
 
     const analyses = await Analysis.find({ userId })
       .sort({ createdAt: -1 })
-      .select("idea category score verdict verdictColor summary createdAt")
+      .select("idea appName category score verdict verdictColor summary createdAt")
       .lean();
 
     return NextResponse.json(analyses);
