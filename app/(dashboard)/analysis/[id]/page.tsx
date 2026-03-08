@@ -404,7 +404,7 @@ export default function AnalysisPage() {
               whileTap={{ scale: 0.97 }}
               onClick={handleBuildMVP}
               disabled={building}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#FF6803] text-white py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all disabled:opacity-60"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#FF6803] text-white py-2.5 px-5 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all disabled:opacity-60 cursor-pointer"
             >
               {building ? (
                 <>
@@ -425,9 +425,9 @@ export default function AnalysisPage() {
                   transition: { type: "spring", stiffness: 400, damping: 15 },
                 }}
                 whileTap={{ scale: 0.97 }}
-                className="w-full flex items-center justify-center gap-2 bg-white text-[#1A1A1A] py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all"
+                className="w-full flex items-center justify-center gap-2 bg-white text-[#1A1A1A] py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all cursor-pointer"
               >
-                <RefreshCw size={14} /> Re-validate
+                <RefreshCw size={14} /> Pivot
               </motion.button>
             </Link>
 
@@ -439,14 +439,14 @@ export default function AnalysisPage() {
               }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setChatOpen(!chatOpen)}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] transition-all ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] transition-all  ${
                 chatOpen
                   ? "bg-[#FF6803] text-white shadow-[3px_3px_0_#FF6803]"
                   : "bg-white text-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#FF6803]"
               }`}
             >
               <MessageSquare size={14} />
-              <span className="hidden sm:inline">Chat</span>
+              <span className="cursor-pointer">Chat</span>
               {chatMessages.length > 0 && (
                 <span className="w-5 h-5 bg-[#FF6803]/20 rounded-full text-[10px] font-black flex items-center justify-center text-[#FF6803]">
                   {chatMessages.length}
