@@ -15,7 +15,7 @@ export interface IAnalysis extends Document {
   metrics: {
     label: string;
     value: string;
-    trend: "up" | "down";
+    trend: "up" | "down" | "neutral";
     detail: string;
   }[];
   strengths: string[];
@@ -51,7 +51,7 @@ const AnalysisSchema = new Schema<IAnalysis>(
       {
         label: String,
         value: String,
-        trend: { type: String, enum: ["up", "down"] },
+        trend: { type: String, enum: ["up", "down", "neutral"], default: "neutral" },
         detail: String,
       },
     ],
