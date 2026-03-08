@@ -217,37 +217,6 @@ export default function DashboardPage() {
         </p>
       </motion.div>
 
-      {/* ═══ LIVE STATUS ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
-        className="mb-8"
-      >
-        <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
-          <div className="flex items-center gap-2 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
-              className="w-2 h-2 bg-emerald-500 rounded-full shrink-0"
-            />
-            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 font-mono">
-              Live
-            </span>
-          </div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/40 font-mono">
-            All Systems Operational
-          </span>
-          <div className="flex-1" />
-          <div className="flex items-center gap-2 bg-[#FF6803]/8 px-2.5 py-1 rounded-lg border border-[#FF6803]/15">
-            <Activity size={11} className="text-[#FF6803]" />
-            <span className="text-[10px] font-black text-[#FF6803] font-mono hidden sm:inline">
-              99.9%
-            </span>
-          </div>
-        </div>
-      </motion.div>
-
       {/* ═══ START CTA ═══ */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -535,6 +504,37 @@ export default function DashboardPage() {
             </span>
           ))}
         </motion.div>
+      </motion.div>
+
+      {/* ═══ LIVE STATUS ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        className="mb-8"
+      >
+        <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
+          <div className="flex items-center gap-2 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+            <motion.div
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
+              className="w-2 h-2 bg-emerald-500 rounded-full shrink-0"
+            />
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 font-mono">
+              Live
+            </span>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/40 font-mono">
+            All Systems Operational
+          </span>
+          <div className="flex-1" />
+          <div className="flex items-center gap-2 bg-[#FF6803]/8 px-2.5 py-1 rounded-lg border border-[#FF6803]/15">
+            <Activity size={11} className="text-[#FF6803]" />
+            <span className="text-[10px] font-black text-[#FF6803] font-mono hidden sm:inline">
+              100%
+            </span>
+          </div>
+        </div>
       </motion.div>
 
       {/* ═══ COMING SOON ═══ */}
