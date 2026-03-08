@@ -47,6 +47,14 @@ const pitchFields = [
     required: true,
   },
   {
+    id: "appName",
+    label: "App / Product name (optional)",
+    placeholder: "e.g. ResumeAI, BookSwap, PayBuddy — or leave blank for AI to suggest",
+    icon: Sparkles,
+    type: "input" as const,
+    required: false,
+  },
+  {
     id: "target",
     label: "Target audience",
     placeholder: "Fresh graduates & job-switching professionals aged 22-35",
@@ -66,7 +74,7 @@ const pitchFields = [
   {
     id: "revenue",
     label: "Revenue model",
-    placeholder: "Freemium \u2014 $9/mo Pro plan, $29/mo Enterprise",
+    placeholder: "Freemium \u2014 \u20B9799/mo Pro plan, \u20B92,499/mo Enterprise",
     icon: DollarSign,
     type: "input" as const,
     required: false,
@@ -159,8 +167,8 @@ export default function ValidatorPage() {
   const [analysisPhase, setAnalysisPhase] = useState(-1);
   const [showFullScreenLoader, setShowFullScreenLoader] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [currentGif, setCurrentGif] = useState(() => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
-  const [currentWaitText, setCurrentWaitText] = useState(() => waitTexts[Math.floor(Math.random() * waitTexts.length)]);
+  const [currentGif, setCurrentGif] = useState(LOADING_GIFS[0]);
+  const [currentWaitText, setCurrentWaitText] = useState(waitTexts[0]);
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -260,6 +268,7 @@ export default function ValidatorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           idea: formData.idea,
+          appName: formData.appName || "",
           target: formData.target,
           problem: formData.problem,
           revenue: formData.revenue || "",
