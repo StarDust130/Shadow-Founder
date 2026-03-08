@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3,
@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   XOctagon,
   Shield,
-  ArrowRight,
   ArrowLeft,
   Sparkles,
   Lightbulb,
@@ -20,6 +19,9 @@ import {
   Loader2,
   Bot,
   User,
+  X,
+  Rocket,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -58,14 +60,124 @@ const scoreColor = (score: number) => {
   return "#EF4444";
 };
 
+const scoreEmoji = (score: number) => {
+  if (score >= 80) return "\u{1F680}";
+  if (score >= 60) return "\u26A1";
+  if (score >= 40) return "\u26A0\uFE0F";
+  return "\u{1F534}";
+};
+
+const verdictEmoji = (verdict: string) => {
+  switch (verdict) {
+    case "VIABLE":
+      return "\u2705";
+    case "CONDITIONAL PASS":
+      return "\u{1F7E1}";
+    case "RISKY":
+      return "\u{1F7E0}";
+    case "NOT VIABLE":
+      return "\u274C";
+    default:
+      return "\u{1F4CA}";
+  }
+};
+
+function formatAIResponse(content: string) {
+  const lines = content.split("\n");
+  const elements: React.ReactNode[] = [];
+  let listItems: string[] = [];
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={`list-${elements.length}`} className="space-y-2 my-3">
+          {listItems.map((item, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-2.5 text-sm leading-relaxed text-[#1A1A1A]/70"
+            >
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#FF6803] shrink-0" />
+              <span
+                dangerouslySetInnerHTML={{ __html: formatInlineText(item) }}
+              />
+            </li>
+          ))}
+        </ul>,
+      );
+      listItems = [];
+    }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      flushList();
+      continue;
+    }
+
+    const bulletMatch = line.match(/^[\*\-\u2022]\s+(.+)$/);
+    const numberedMatch = line.match(/^\d+[\.\)]\s+(.+)$/);
+
+    if (bulletMatch) {
+      listItems.push(bulletMatch[1]);
+    } else if (numberedMatch) {
+      listItems.push(numberedMatch[1]);
+    } else {
+      flushList();
+      if (
+        line.startsWith("##") ||
+        (line.startsWith("**") && line.endsWith("**"))
+      ) {
+        const heading = line
+          .replace(/^#+\s*/, "")
+          .replace(/^\*\*/, "")
+          .replace(/\*\*$/, "")
+          .replace(/:$/, "");
+        elements.push(
+          <h4
+            key={`h-${elements.length}`}
+            className="text-sm font-bold text-[#1A1A1A] mt-4 mb-2 flex items-center gap-2"
+          >
+            <span className="w-1 h-4 bg-[#FF6803] rounded-full" />
+            {heading}
+          </h4>,
+        );
+      } else {
+        elements.push(
+          <p
+            key={`p-${elements.length}`}
+            className="text-sm leading-relaxed text-[#1A1A1A]/70 my-1.5"
+            dangerouslySetInnerHTML={{ __html: formatInlineText(line) }}
+          />,
+        );
+      }
+    }
+  }
+  flushList();
+  return <div className="space-y-1">{elements}</div>;
+}
+
+function formatInlineText(text: string): string {
+  let result = text.replace(
+    /\*\*(.+?)\*\*/g,
+    '<strong class="font-semibold text-[#1A1A1A]">$1</strong>',
+  );
+  result = result.replace(/\*(.+?)\*/g, "<em>$1</em>");
+  result = result.replace(
+    /`(.+?)`/g,
+    '<code class="bg-[#FF6803]/10 text-[#FF6803] px-1.5 py-0.5 rounded text-xs font-mono">$1</code>',
+  );
+  return result;
+}
+
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
+  show: { transition: { staggerChildren: 0.07 } },
 };
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
 export default function AnalysisPage() {
@@ -76,16 +188,20 @@ export default function AnalysisPage() {
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Chat state
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  // Building state
   const [building, setBuilding] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const fetchAnalysis = async () => {
@@ -108,13 +224,12 @@ export default function AnalysisPage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  const sendChatMessage = async () => {
+  const sendChatMessage = useCallback(async () => {
     if (!chatInput.trim() || chatLoading) return;
     const msg = chatInput.trim();
     setChatInput("");
     setChatMessages((prev) => [...prev, { role: "user", content: msg }]);
     setChatLoading(true);
-
     try {
       const res = await fetch(`/api/analyses/${id}/chat`, {
         method: "POST",
@@ -138,7 +253,7 @@ export default function AnalysisPage() {
     } finally {
       setChatLoading(false);
     }
-  };
+  }, [chatInput, chatLoading, id]);
 
   const handleBuildMVP = async () => {
     setBuilding(true);
@@ -168,7 +283,17 @@ export default function AnalysisPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 size={32} className="animate-spin text-[#FF6803]" />
+        <div className="flex flex-col items-center gap-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 size={32} className="text-[#FF6803]" />
+          </motion.div>
+          <p className="text-sm font-bold text-[#1A1A1A]/40">
+            Loading analysis...
+          </p>
+        </div>
       </div>
     );
   }
@@ -190,437 +315,550 @@ export default function AnalysisPage() {
   const color = scoreColor(data.score);
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* HEADER */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+    <>
+      <div
+        className={`max-w-5xl mx-auto transition-all duration-300 ${chatOpen ? "lg:mr-105" : ""}`}
       >
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/35 hover:text-[#FF6803] transition-colors mb-4 font-mono"
-        >
-          <ArrowLeft size={12} />
-          Back to Hub
-        </Link>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center gap-3 flex-1">
-            <div className="w-11 h-11 bg-[#1A1A1A] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#FF6803]">
-              <BarChart3 size={20} className="text-[#FF6803]" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
-                VC Verdict
-              </h1>
-              <p className="text-[10px] text-[#1A1A1A]/35 font-bold font-mono uppercase tracking-[0.2em] truncate max-w-[200px]">
-                {data.idea}
-              </p>
-            </div>
-          </div>
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.3, type: "spring" }}
-            className="px-5 py-2 rounded-xl font-black text-sm uppercase tracking-wider border-2 shadow-[3px_3px_0]"
-            style={{
-              color: data.verdictColor,
-              borderColor: "#1A1A1A",
-              backgroundColor: data.verdictColor + "10",
-              boxShadow: `3px 3px 0 ${data.verdictColor}`,
-            }}
-          >
-            {data.verdict}
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* SCORE + SUMMARY */}
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
-      >
+        {/* HEADER */}
         <motion.div
-          variants={fadeUp}
-          className="bg-[#1A1A1A] rounded-2xl p-6 flex flex-col items-center justify-center text-white relative overflow-hidden border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-[#FF6803]/5 to-transparent" />
-          <div className="relative z-10 flex flex-col items-center">
-            <div className="relative w-28 h-28 mb-3">
-              <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.06)"
-                  strokeWidth="7"
-                />
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r="42"
-                  fill="none"
-                  stroke={color}
-                  strokeWidth="7"
-                  strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 42}`}
-                  initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
-                  animate={{
-                    strokeDashoffset: 2 * Math.PI * 42 * (1 - data.score / 100),
-                  }}
-                  transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span
-                  className="text-4xl font-black font-mono"
-                  style={{ color }}
-                >
-                  {data.score}
-                </span>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/35 hover:text-[#FF6803] transition-colors mb-4 font-mono"
+          >
+            <ArrowLeft size={12} /> Back to Hub
+          </Link>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
+                <BarChart3 size={22} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
+                  {verdictEmoji(data.verdict)} VC Verdict
+                </h1>
+                <p className="text-[10px] text-[#1A1A1A]/35 font-bold font-mono uppercase tracking-[0.2em] truncate max-w-70">
+                  {data.idea}
+                </p>
               </div>
             </div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 font-mono">
-              Viability Score
-            </p>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3, type: "spring" }}
+              className="px-5 py-2 rounded-xl font-black text-sm uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
+              style={{
+                color: data.verdictColor,
+                backgroundColor: data.verdictColor + "15",
+              }}
+            >
+              {data.verdict}
+            </motion.div>
           </div>
         </motion.div>
 
-        <motion.div
-          variants={fadeUp}
-          className="md:col-span-3 bg-white/40 backdrop-blur-sm border-2 border-[#1A1A1A]/8 rounded-2xl p-5 md:p-6 hover:border-[#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles size={14} className="text-[#FF6803]" />
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/35 font-mono">
-              AI Summary
-            </h3>
-          </div>
-          <p className="text-sm md:text-base font-medium text-[#1A1A1A]/65 leading-relaxed">
-            {data.summary}
-          </p>
-          <div className="mt-4 px-4 py-3 bg-[#1A1A1A]/[0.04] rounded-xl border-2 border-[#1A1A1A]/5">
-            <p className="text-xs font-bold text-[#1A1A1A]/45 italic font-mono">
-              &quot;{data.idea}&quot;
-            </p>
-          </div>
-        </motion.div>
-      </motion.div>
-
-      {/* METRICS */}
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"
-      >
-        {data.metrics.map((metric) => (
-          <motion.div
-            key={metric.label}
-            variants={fadeUp}
-            whileHover={{ y: -6 }}
-            className="bg-white/40 backdrop-blur-sm border-2 border-[#1A1A1A]/8 rounded-2xl p-4 cursor-default hover:border-[#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all group"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/35 font-mono">
-                {metric.label}
-              </span>
-              {metric.trend === "up" ? (
-                <TrendingUp size={14} className="text-emerald-500" />
+        {/* STICKY ACTION BAR */}
+        <div className="sticky top-14 z-40 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 py-3 bg-[#E5E4E2]/90 backdrop-blur-xl border-b-2 border-[#1A1A1A]/10 mb-6">
+          <div className="flex items-center gap-2 max-w-5xl mx-auto">
+            <motion.button
+              whileHover={{
+                y: -3,
+                x: -1,
+                transition: { type: "spring", stiffness: 400, damping: 15 },
+              }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleBuildMVP}
+              disabled={building}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#FF6803] text-white py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all disabled:opacity-60"
+            >
+              {building ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" /> Building...
+                </>
               ) : (
-                <TrendingDown size={14} className="text-red-400" />
+                <>
+                  <Rocket size={14} /> Build MVP
+                </>
               )}
-            </div>
-            <h4 className="text-xl font-black tracking-tight text-[#1A1A1A] mb-1">
-              {metric.value}
-            </h4>
-            <p className="text-[10px] text-[#1A1A1A]/35 font-medium leading-relaxed">
-              {metric.detail}
-            </p>
-          </motion.div>
-        ))}
-      </motion.div>
+            </motion.button>
 
-      {/* STRENGTHS & WEAKNESSES */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-emerald-500/5 border-2 border-emerald-500/20 rounded-2xl p-5 hover:shadow-[4px_4px_0_#22C55E] hover:border-emerald-500 transition-all"
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-              <CheckCircle2 size={14} className="text-white" />
-            </div>
-            <h3 className="text-sm font-black uppercase tracking-tight text-emerald-700">
-              Strengths
-            </h3>
-          </div>
-          <ul className="space-y-3">
-            {data.strengths.map((s, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2.5 text-sm font-medium text-[#1A1A1A]/55"
+            <Link href="/validator" className="flex-1 sm:flex-none">
+              <motion.button
+                whileHover={{
+                  y: -3,
+                  x: -1,
+                  transition: { type: "spring", stiffness: 400, damping: 15 },
+                }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full flex items-center justify-center gap-2 bg-white text-[#1A1A1A] py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all"
               >
-                <Shield
-                  size={14}
-                  className="text-emerald-500 mt-0.5 shrink-0"
-                />
-                {s}
-              </li>
-            ))}
-          </ul>
+                <RefreshCw size={14} /> Re-validate
+              </motion.button>
+            </Link>
+
+            <motion.button
+              whileHover={{
+                y: -3,
+                x: -1,
+                transition: { type: "spring", stiffness: 400, damping: 15 },
+              }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setChatOpen(!chatOpen)}
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] transition-all ${
+                chatOpen
+                  ? "bg-[#FF6803] text-white shadow-[3px_3px_0_#FF6803]"
+                  : "bg-white text-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#FF6803]"
+              }`}
+            >
+              <MessageSquare size={14} />
+              <span className="hidden sm:inline">Chat</span>
+              {chatMessages.length > 0 && (
+                <span className="w-5 h-5 bg-[#FF6803]/20 rounded-full text-[10px] font-black flex items-center justify-center text-[#FF6803]">
+                  {chatMessages.length}
+                </span>
+              )}
+            </motion.button>
+          </div>
+        </div>
+
+        {/* SCORE + SUMMARY */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+        >
+          <motion.div
+            variants={fadeUp}
+            whileHover={{
+              y: -6,
+              x: -3,
+              transition: { type: "spring", stiffness: 400, damping: 15 },
+            }}
+            className="bg-white rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] transition-shadow"
+          >
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="relative w-28 h-28 mb-3">
+                <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    fill="none"
+                    stroke="#E5E4E2"
+                    strokeWidth="7"
+                  />
+                  <motion.circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    fill="none"
+                    stroke={color}
+                    strokeWidth="7"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 42}`}
+                    initial={{ strokeDashoffset: 2 * Math.PI * 42 }}
+                    animate={{
+                      strokeDashoffset:
+                        2 * Math.PI * 42 * (1 - data.score / 100),
+                    }}
+                    transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl">{scoreEmoji(data.score)}</span>
+                  <span
+                    className="text-3xl font-black font-mono"
+                    style={{ color }}
+                  >
+                    {data.score}
+                  </span>
+                </div>
+              </div>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/30 font-mono">
+                Viability Score
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            whileHover={{
+              y: -6,
+              x: -3,
+              transition: { type: "spring", stiffness: 400, damping: 15 },
+            }}
+            className="md:col-span-3 bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 md:p-6 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] transition-shadow"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 bg-[#FF6803]/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                <Sparkles size={14} className="text-[#FF6803]" />
+              </div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/35 font-mono">
+                AI Summary
+              </h3>
+            </div>
+            <p className="text-sm md:text-base font-medium text-[#1A1A1A]/65 leading-relaxed">
+              {data.summary}
+            </p>
+            <div className="mt-4 px-4 py-3 bg-[#FF6803]/5 rounded-xl border-2 border-[#FF6803]/20">
+              <p className="text-xs font-medium text-[#1A1A1A]/50 italic">
+                {"\u{1F4A1}"} &quot;{data.idea}&quot;
+              </p>
+            </div>
+          </motion.div>
         </motion.div>
 
+        {/* METRICS */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.45 }}
-          className="bg-red-500/5 border-2 border-red-500/20 rounded-2xl p-5 hover:shadow-[4px_4px_0_#EF4444] hover:border-red-500 transition-all"
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"
         >
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-              <XOctagon size={14} className="text-white" />
+          {data.metrics.map((metric, i) => (
+            <motion.div
+              key={metric.label}
+              variants={fadeUp}
+              whileHover={{ y: -6, x: -2, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.97 }}
+              className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-4 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all cursor-default group relative overflow-hidden"
+            >
+              <motion.div
+                className="absolute -top-6 -right-6 w-16 h-16 rounded-full bg-[#FF6803] opacity-5"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.3,
+                  type: "tween",
+                }}
+              />
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/35 font-mono">
+                  {metric.label}
+                </span>
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                  style={{
+                    backgroundColor:
+                      metric.trend === "up" ? "#22C55E15" : "#EF444415",
+                  }}
+                >
+                  {metric.trend === "up" ? (
+                    <TrendingUp size={12} className="text-emerald-500" />
+                  ) : (
+                    <TrendingDown size={12} className="text-red-400" />
+                  )}
+                </div>
+              </div>
+              <h4 className="text-xl font-black tracking-tight text-[#1A1A1A] mb-1">
+                {metric.value}
+              </h4>
+              <p className="text-[10px] text-[#1A1A1A]/35 font-medium leading-relaxed">
+                {metric.detail}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* STRENGTHS & WEAKNESSES */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{
+              y: -6,
+              x: -3,
+              transition: { type: "spring", stiffness: 400, damping: 15 },
+            }}
+            className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#22C55E] transition-shadow"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-9 h-9 bg-emerald-500/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                <CheckCircle2 size={16} className="text-emerald-500" />
+              </div>
+              <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
+                {"\u{1F4AA}"} Strengths
+              </h3>
             </div>
-            <h3 className="text-sm font-black uppercase tracking-tight text-red-600">
-              Fatal Flaws
-            </h3>
+            <ul className="space-y-3">
+              {data.strengths.map((s, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2.5 text-sm font-medium text-[#1A1A1A]/60"
+                >
+                  <Shield
+                    size={14}
+                    className="text-emerald-500 mt-0.5 shrink-0"
+                  />
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.45 }}
+            whileHover={{
+              y: -6,
+              x: -3,
+              transition: { type: "spring", stiffness: 400, damping: 15 },
+            }}
+            className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#EF4444] transition-shadow"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-9 h-9 bg-red-500/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                <XOctagon size={16} className="text-red-500" />
+              </div>
+              <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
+                {"\u26A0\uFE0F"} Challenges
+              </h3>
+            </div>
+            <ul className="space-y-3">
+              {data.weaknesses.map((w, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2.5 text-sm font-medium text-[#1A1A1A]/60"
+                >
+                  <Swords size={14} className="text-red-400 mt-0.5 shrink-0" />
+                  {w}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+
+        {/* PIVOT ENGINE */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          whileHover={{
+            y: -6,
+            x: -3,
+            transition: { type: "spring", stiffness: 400, damping: 15 },
+          }}
+          className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 md:p-6 mb-6 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] transition-shadow relative overflow-hidden"
+        >
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-9 h-9 bg-[#FF6803]/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                <Lightbulb size={16} className="text-[#FF6803]" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
+                  {"\u{1F504}"} Pivot Engine
+                </h3>
+                <p className="text-[9px] text-[#1A1A1A]/30 font-bold uppercase tracking-widest font-mono">
+                  Recommendations
+                </p>
+              </div>
+            </div>
+            <ul className="space-y-3">
+              {data.recommendations.map((rec, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 text-sm font-medium text-[#1A1A1A]/65"
+                >
+                  <span className="w-7 h-7 min-w-7 bg-[#FF6803] rounded-lg flex items-center justify-center text-xs font-black text-white border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                    {i + 1}
+                  </span>
+                  {rec}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="space-y-3">
-            {data.weaknesses.map((w, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2.5 text-sm font-medium text-[#1A1A1A]/55"
-              >
-                <Swords size={14} className="text-red-400 mt-0.5 shrink-0" />
-                {w}
-              </li>
-            ))}
-          </ul>
         </motion.div>
       </div>
 
-      {/* RECOMMENDATIONS / PIVOT ENGINE */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-[#1A1A1A] text-white rounded-2xl p-5 md:p-6 mb-6 relative overflow-hidden border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803]"
-      >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF6803]/8 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-8 h-8 bg-[#FF6803] rounded-lg flex items-center justify-center border-2 border-white/20">
-              <Lightbulb size={14} className="text-white" />
-            </div>
-            <div>
-              <h3 className="text-sm font-black uppercase tracking-tight">
-                Pivot Engine
-              </h3>
-              <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest font-mono">
-                Recommendations
-              </p>
-            </div>
-          </div>
-          <ul className="space-y-3">
-            {data.recommendations.map((rec, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-3 text-sm font-medium text-white/65"
-              >
-                <span className="w-7 h-7 min-w-7 bg-[#FF6803] rounded-lg flex items-center justify-center text-xs font-black text-white border border-white/20">
-                  {i + 1}
-                </span>
-                {rec}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </motion.div>
-
-      {/* FOLLOW-UP CHAT */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-        className="mb-6"
-      >
-        <button
-          onClick={() => setChatOpen(!chatOpen)}
-          className="w-full flex items-center justify-between bg-white/40 border-2 border-[#1A1A1A]/10 rounded-2xl px-5 py-4 hover:border-[#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#FF6803]/10 rounded-xl flex items-center justify-center border-2 border-[#FF6803]/20">
-              <MessageSquare size={16} className="text-[#FF6803]" />
-            </div>
-            <div className="text-left">
-              <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight">
-                Ask Follow-up Questions
-              </p>
-              <p className="text-[10px] text-[#1A1A1A]/35 font-bold">
-                Ask about pivots, competitors, market strategy, or anything else
-              </p>
-            </div>
-          </div>
-          <motion.div
-            animate={{ rotate: chatOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ArrowRight size={16} className="text-[#1A1A1A]/30 rotate-90" />
-          </motion.div>
-        </button>
-
-        <AnimatePresence>
-          {chatOpen && (
+      {/* SLIDE-OUT CHAT PANEL */}
+      <AnimatePresence>
+        {chatOpen && (
+          <>
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 lg:hidden"
+              onClick={() => setChatOpen(false)}
+            />
+
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed right-0 top-0 bottom-0 w-full sm:w-100 lg:w-105 bg-white z-50 lg:z-40 border-l-2 border-[#1A1A1A] shadow-[-6px_0_0_#1A1A1A] flex flex-col"
             >
-              <div className="mt-3 bg-white border-2 border-[#1A1A1A] rounded-2xl shadow-[4px_4px_0_#1A1A1A] overflow-hidden">
-                {/* Chat Messages */}
-                <div className="max-h-80 overflow-y-auto p-4 space-y-3">
-                  {chatMessages.length === 0 && (
-                    <div className="text-center py-8">
-                      <Bot
-                        size={32}
-                        className="mx-auto text-[#1A1A1A]/15 mb-3"
-                      />
-                      <p className="text-sm font-bold text-[#1A1A1A]/30">
-                        Ask me anything about this analysis
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-2 mt-3">
-                        {[
-                          "How can I pivot this idea?",
-                          "Who are the main competitors?",
-                          "What's the best go-to-market?",
-                        ].map((q) => (
-                          <button
-                            key={q}
-                            onClick={() => {
-                              setChatInput(q);
-                            }}
-                            className="px-3 py-1.5 bg-[#FF6803]/5 border border-[#FF6803]/20 rounded-lg text-xs font-bold text-[#FF6803] hover:bg-[#FF6803]/10 transition-colors"
-                          >
-                            {q}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              {/* Chat Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b-2 border-[#1A1A1A] bg-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                    <Bot size={16} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight">
+                      Shadow AI
+                    </h3>
+                    <p className="text-[10px] text-[#1A1A1A]/30 font-medium">
+                      Ask about pivots, strategy & more
+                    </p>
+                  </div>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setChatOpen(false)}
+                  className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center hover:bg-[#FF6803] transition-colors border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                >
+                  <X size={14} className="text-white" />
+                </motion.button>
+              </div>
 
-                  {chatMessages.map((msg, i) => (
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {chatMessages.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-[#FF6803]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
+                      <Bot size={28} className="text-[#FF6803]" />
+                    </div>
+                    <p className="text-sm font-black text-[#1A1A1A]/50 mb-1 uppercase">
+                      Start a conversation {"\u{1F4AC}"}
+                    </p>
+                    <p className="text-xs text-[#1A1A1A]/25 mb-4">
+                      Ask anything about your startup analysis
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {[
+                        ["\u{1F504}", "How can I pivot this idea?"],
+                        ["\u{1F3AF}", "Who are the main competitors?"],
+                        ["\u{1F680}", "What's the best go-to-market?"],
+                        ["\u{1F4B0}", "How to improve revenue model?"],
+                      ].map(([emoji, q]) => (
+                        <motion.button
+                          key={q}
+                          whileHover={{ y: -2, x: -1 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => setChatInput(q)}
+                          className="px-4 py-2.5 bg-white border-2 border-[#1A1A1A] rounded-xl text-xs font-bold text-[#1A1A1A]/60 shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:text-[#FF6803] transition-all text-left"
+                        >
+                          {emoji} {q}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {chatMessages.map((msg, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    {msg.role === "assistant" && (
+                      <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 mt-0.5 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                        <Bot size={13} className="text-white" />
+                      </div>
+                    )}
                     <div
-                      key={i}
-                      className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                      className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed border-2 ${
+                        msg.role === "user"
+                          ? "bg-[#1A1A1A] text-white border-[#1A1A1A] rounded-br-sm shadow-[2px_2px_0_#FF6803]"
+                          : "bg-white border-[#1A1A1A] rounded-bl-sm shadow-[2px_2px_0_#1A1A1A]"
+                      }`}
                     >
-                      {msg.role === "assistant" && (
-                        <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                          <Bot size={14} className="text-white" />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm font-medium leading-relaxed ${
-                          msg.role === "user"
-                            ? "bg-[#1A1A1A] text-white rounded-br-sm"
-                            : "bg-[#F5F5F5] text-[#1A1A1A]/70 rounded-bl-sm border border-[#1A1A1A]/5"
-                        }`}
-                      >
+                      {msg.role === "assistant" ? (
+                        formatAIResponse(msg.content)
+                      ) : (
                         <p className="whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                      {msg.role === "user" && (
-                        <div className="w-7 h-7 bg-[#1A1A1A] rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                          <User size={14} className="text-white" />
-                        </div>
                       )}
                     </div>
-                  ))}
-
-                  {chatLoading && (
-                    <div className="flex gap-2.5">
-                      <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0">
-                        <Bot size={14} className="text-white" />
+                    {msg.role === "user" && (
+                      <div className="w-7 h-7 bg-[#1A1A1A] rounded-lg flex items-center justify-center shrink-0 mt-0.5 border-2 border-[#1A1A1A]">
+                        <User size={13} className="text-white" />
                       </div>
-                      <div className="bg-[#F5F5F5] rounded-2xl rounded-bl-sm px-4 py-3 border border-[#1A1A1A]/5">
-                        <Loader2
-                          size={16}
-                          className="animate-spin text-[#FF6803]"
+                    )}
+                  </motion.div>
+                ))}
+
+                {chatLoading && (
+                  <div className="flex gap-2.5">
+                    <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                      <Bot size={13} className="text-white" />
+                    </div>
+                    <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                      <div className="flex items-center gap-1.5">
+                        <motion.div
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: 0,
+                          }}
+                          className="w-2 h-2 bg-[#FF6803] rounded-full"
+                        />
+                        <motion.div
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: 0.2,
+                          }}
+                          className="w-2 h-2 bg-[#FF6803] rounded-full"
+                        />
+                        <motion.div
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: 0.4,
+                          }}
+                          className="w-2 h-2 bg-[#FF6803] rounded-full"
                         />
                       </div>
                     </div>
-                  )}
-                  <div ref={chatEndRef} />
-                </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </div>
 
-                {/* Chat Input */}
-                <div className="border-t-2 border-[#1A1A1A]/5 p-3 flex gap-2">
+              {/* Chat Input — padded for mobile bottom nav */}
+              <div
+                className={`border-t-2 border-[#1A1A1A] p-4 bg-white ${isMobile ? "pb-[calc(env(safe-area-inset-bottom,0px)+5rem)]" : ""}`}
+              >
+                <div className="flex gap-2">
                   <input
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendChatMessage()}
-                    placeholder="Ask about pivots, competitors, strategy..."
-                    className="flex-1 bg-[#F5F5F5] border-2 border-[#1A1A1A]/5 rounded-xl px-4 py-2.5 text-sm font-bold text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 focus:outline-none focus:border-[#FF6803] transition-colors"
+                    placeholder="Ask about your startup..."
+                    className="flex-1 bg-[#F5F5F5] border-2 border-[#1A1A1A] rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] placeholder:text-[#1A1A1A]/25 focus:outline-none focus:border-[#FF6803] focus:shadow-[3px_3px_0_#FF6803] transition-all shadow-[2px_2px_0_#1A1A1A]"
                   />
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ y: -2, x: -1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={sendChatMessage}
                     disabled={!chatInput.trim() || chatLoading}
-                    className="w-11 h-11 bg-[#FF6803] rounded-xl flex items-center justify-center text-white disabled:opacity-30 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                    className="w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center text-white disabled:opacity-30 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all"
                   >
                     <Send size={16} />
                   </motion.button>
                 </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* CTA */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="flex flex-col sm:flex-row gap-3"
-      >
-        <motion.button
-          whileHover={{ y: -3 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleBuildMVP}
-          disabled={building}
-          className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF8A3D] to-[#FF6803] text-white py-4 rounded-xl font-black text-sm uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all disabled:opacity-60"
-        >
-          {building ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Building MVP...
-            </>
-          ) : (
-            <>
-              <Zap size={16} />
-              Build MVP
-              <ArrowRight size={16} />
-            </>
-          )}
-        </motion.button>
-        <Link href="/validator">
-          <motion.button
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white/50 border-2 border-[#1A1A1A]/10 text-[#1A1A1A] py-4 px-6 rounded-xl font-bold text-sm hover:border-[#1A1A1A] hover:shadow-[3px_3px_0_#1A1A1A] transition-all"
-          >
-            Re-validate
-          </motion.button>
-        </Link>
-      </motion.div>
-    </div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

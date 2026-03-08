@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { connectDB } from "@/lib/mongodb";
 import { Analysis } from "@/lib/models/Analysis";
 import { Build } from "@/lib/models/Build";
 import { User } from "@/lib/models/User";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const groq = new Groq({ apiKey: process.env.QROQ_API_KEY! });
 
 const SYSTEM_PROMPT = `You are an expert full-stack developer. Given a startup idea and its analysis, generate a complete MVP codebase.
 
@@ -111,9 +113,26 @@ ${analysis.revenue ? `**Revenue Model:** ${analysis.revenue}` : ""}
 
 Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on the core value proposition. Make it visually impressive with a modern UI.`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent([SYSTEM_PROMPT, userPrompt]);
-    const rawContent = result.response.text();
+    let rawContent: string;
+
+    // Try Gemini first, fall back to Groq if it fails
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const result = await model.generateContent([SYSTEM_PROMPT, userPrompt]);
+      rawContent = result.response.text();
+    } catch (geminiError) {
+      console.warn("Gemini failed, falling back to Groq:", geminiError);
+      const groqResult = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 8000,
+      });
+      rawContent = groqResult.choices[0]?.message?.content || "";
+    }
 
     let generatedFiles;
     try {

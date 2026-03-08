@@ -241,7 +241,7 @@ export default function BuilderPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-[#1A1A1A]/35 font-bold mt-0.5 font-mono">
-                  Gemini 1.5 Flash &bull; Full-Stack Generation &bull; Ready
+                  Gemini 2.0 Flash &bull; Full-Stack Generation &bull; Ready
                 </p>
               </div>
             </div>
