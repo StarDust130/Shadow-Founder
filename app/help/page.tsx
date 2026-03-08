@@ -127,7 +127,7 @@ Shadow Founder (https://shadow-founder.vercel.app) is a SaaS tool that:
 
 3. **AI Chat** — After validation, users can have follow-up conversations with the AI about their idea to get deeper strategic insights.
 
-**Tech Stack**: Next.js, React, TypeScript, Tailwind CSS, Clerk Auth, MongoDB, Groq AI (validation), Gemini AI (code generation).
+**Tech Stack**: Next.js, React, TypeScript, Tailwind CSS, Clerk Auth, MongoDB, Shadow AI (validation & code generation).
 
 **Plans**: Free (unlimited validations, 1 build) and Pro ₹1,999 (10 builds, priority features).`;
 
