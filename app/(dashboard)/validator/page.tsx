@@ -161,6 +161,18 @@ export default function ValidatorPage() {
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // Auto-scroll to focused field when user navigates between fields
+  useEffect(() => {
+    if (focusedField) {
+      const el = document.getElementById(`field-${focusedField}`);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      }
+    }
+  }, [focusedField]);
+
   const handleChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
@@ -551,6 +563,7 @@ export default function ValidatorPage() {
         {pitchFields.map((field, idx) => (
           <motion.div
             key={field.id}
+            id={`field-${field.id}`}
             variants={{
               hidden: { opacity: 0, y: 16 },
               show: { opacity: 1, y: 0 },
@@ -630,18 +643,7 @@ export default function ValidatorPage() {
         </motion.button>
       </motion.div>
 
-      {/* ERROR */}
-      {submitError && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-4 mb-8 px-4 py-3 bg-red-50 border border-red-300 rounded-xl"
-        >
-          <p className="text-sm font-bold text-red-600 flex items-center gap-2">
-            <AlertTriangle size={14} /> {submitError}
-          </p>
-        </motion.div>
-      )}
+
     </div>
   );
 }
