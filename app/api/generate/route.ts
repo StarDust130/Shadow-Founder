@@ -41,7 +41,15 @@ DESIGN STYLE — NEOBRUTALISM (2026):
 
 REQUIRED 10 SECTIONS in preview.html:
 1. NAV — Fixed top. Logo text (app name, bold uppercase, 1.1rem). "Get Started" button right side. Border-bottom 3px.
-2. HERO — Full viewport height. App name as big headline (clamp 2rem-3.5rem). 1-line subtitle. 2 CTA buttons. Subtle animated gradient bg.
+2. HERO — MUST BE VISUALLY STUNNING:
+   - Full viewport height, centered content
+   - Animated gradient background using @keyframes (shifting warm colors)
+   - A small pill/badge above headline: "🚀 #1 Platform in India" with border, rounded-full, small text
+   - App name as BIG headline with gradient text (background-clip: text, -webkit-text-fill-color: transparent) using orange-to-dark gradient
+   - 1-line subtitle below (gray, max 50 chars)
+   - 2 CTA buttons side by side (primary orange + secondary white, both with thick borders + shadows)
+   - 3-4 floating geometric shapes (circles, squares rotated 45deg) using position:absolute + @keyframes float animation, low opacity (0.06-0.1), different sizes and positions
+   - A "Trusted by 10,000+ founders" text with small avatar circles below buttons
 3. FEATURES — 4 feature cards in 2x2 grid. Each: emoji icon + bold title + 1 sentence. White cards, thick borders, shadow.
 4. HOW IT WORKS — 3 numbered steps. Each step: number in orange circle + title + 1 sentence. Clean centered layout.
 5. STATS — Dark bg (#1A1A1A). 3-4 big stat numbers in orange. Labels below. "50K+ Users" / "99.9% Uptime" / "4.9★ Rating" / "₹2Cr+ Processed".
@@ -86,15 +94,40 @@ nav{position:fixed;top:0;width:100%;padding:1rem 2rem;display:flex;justify-conte
 nav .logo{font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:var(--dark)}
 nav .cta{padding:0.5rem 1.5rem;background:var(--primary);color:#fff;border:2px solid var(--dark);border-radius:12px;font-weight:800;font-size:0.8rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;box-shadow:var(--shadow);text-transform:uppercase;letter-spacing:0.05em}
 nav .cta:hover{transform:translateY(-2px);box-shadow:6px 6px 0 var(--dark)}
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(135deg,#FFFBF5,#FFF0E0,#FFF5EB);position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:20%;right:10%;width:200px;height:200px;border-radius:50%;background:var(--primary);opacity:0.06;animation:float 6s ease-in-out infinite}
-.hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.1;max-width:700px;color:var(--dark);text-transform:uppercase;letter-spacing:-0.03em}
-.hero p{margin-top:1rem;font-size:1rem;color:#64748b;max-width:500px;line-height:1.6}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(135deg,#FFFBF5,#FFF0E0,#FFE8CC,#FFFBF5);background-size:400% 400%;animation:heroGradient 8s ease infinite;position:relative;overflow:hidden}
+@keyframes heroGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero .shape{position:absolute;border:3px solid var(--primary);opacity:0.07;animation:float 6s ease-in-out infinite}
+.hero .shape-1{width:180px;height:180px;border-radius:50%;top:10%;right:8%;animation-delay:0s}
+.hero .shape-2{width:100px;height:100px;border-radius:18px;transform:rotate(45deg);bottom:15%;left:6%;animation-delay:1.5s}
+.hero .shape-3{width:60px;height:60px;border-radius:50%;top:30%;left:12%;background:var(--primary);opacity:0.04;animation-delay:3s}
+.hero .shape-4{width:120px;height:120px;border-radius:24px;transform:rotate(12deg);bottom:20%;right:12%;border-color:var(--dark);opacity:0.04;animation-delay:2s}
+.hero .badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1.2rem;border-radius:99px;background:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1.5rem;color:var(--dark)}
+.hero .badge span{color:var(--primary)}
+.hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;line-height:1.05;max-width:700px;text-transform:uppercase;letter-spacing:-0.03em;background:linear-gradient(135deg,var(--dark),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.hero h1::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:60%;height:4px;border-radius:4px;background:linear-gradient(90deg,transparent,var(--primary),transparent)}
+.hero .glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,104,3,0.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pulseGlow 4s ease-in-out infinite}
+@keyframes pulseGlow{0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}}
+.hero .mockup{margin-top:3rem;width:min(90%,500px);background:#fff;border:3px solid var(--dark);border-radius:16px;box-shadow:8px 8px 0 var(--dark);overflow:hidden;animation:floatMockup 4s ease-in-out infinite}
+@keyframes floatMockup{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero .mockup-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--dark);border-bottom:2px solid var(--dark)}
+.hero .mockup-bar span{width:10px;height:10px;border-radius:50%;border:1.5px solid #555}
+.hero .mockup-bar span:nth-child(1){background:#FF5F57;border-color:#E0443E}
+.hero .mockup-bar span:nth-child(2){background:#FEBC2E;border-color:#DEA123}
+.hero .mockup-bar span:nth-child(3){background:#28C840;border-color:#1AAB29}
+.hero .mockup-body{padding:1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hero .mockup-body .mock-card{background:var(--light);border:2px solid var(--dark);border-radius:10px;padding:12px;text-align:left}
+.hero .mockup-body .mock-card .mock-val{font-size:1.1rem;font-weight:900;color:var(--primary)}
+.hero .mockup-body .mock-card .mock-label{font-size:0.55rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-top:2px}
+.hero p{margin-top:1rem;font-size:1.05rem;color:#64748b;max-width:500px;line-height:1.6}
 .hero .btns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
 .hero .btns a{padding:0.875rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;border:2px solid var(--dark)}
 .hero .btns .primary{background:var(--primary);color:#fff;box-shadow:var(--shadow)}
 .hero .btns .secondary{background:#fff;color:var(--dark);box-shadow:var(--shadow)}
 .hero .btns a:hover{transform:translateY(-3px);box-shadow:6px 6px 0 var(--dark)}
+.hero .trust{margin-top:2rem;display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;color:#94a3b8;font-weight:700}
+.hero .trust .avatars{display:flex}
+.hero .trust .avatars span{width:28px;height:28px;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff}
+.hero .trust .avatars span:first-child{margin-left:0}
 section{padding:5rem 2rem}
 .features{background:#fff;border-top:3px solid var(--dark);border-bottom:3px solid var(--dark)}
 .features h2,.how-it-works h2,.stats h2,.testimonials h2,.pricing h2,.faq h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
@@ -153,15 +186,15 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700}
 .fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
 .fade-in.visible{opacity:1;transform:translateY(0)}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
-@media(max-width:640px){.hero h1{font-size:2rem}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}.how-it-works .steps{grid-template-columns:1fr}}
+@media(max-width:640px){.hero h1{font-size:2rem}.hero .mockup{width:95%}.hero .mockup-body{grid-template-columns:1fr 1fr}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}.how-it-works .steps{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <nav><div class="logo">${appName}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
 
-<section class="hero"><h1>${appName}</h1><p>${summary || "The next-generation platform built for the future."}</p><div class="btns"><a href="#features" class="primary">Explore Features</a><a href="#pricing" class="secondary">View Pricing</a></div></section>
+<section class="hero"><div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div><div class="shape shape-4"></div><div class="glow"></div><div class="badge">\u{1F680} <span>#1 Platform</span> in India</div><h1>${appName}</h1><p>${summary || "The next-generation platform built for the future."}</p><div class="btns"><a href="#features" class="primary">Explore Features</a><a href="#pricing" class="secondary">View Pricing</a></div><div class="trust"><div class="avatars"><span style="background:#FF6803">P</span><span style="background:#6366F1">A</span><span style="background:#22C55E">S</span><span style="background:#1A1A1A">R</span></div>Trusted by 10,000+ founders</div><div class="mockup"><div class="mockup-bar"><span></span><span></span><span></span></div><div class="mockup-body"><div class="mock-card"><div class="mock-val">50K+</div><div class="mock-label">Active Users</div></div><div class="mock-card"><div class="mock-val">99.9%</div><div class="mock-label">Uptime</div></div><div class="mock-card"><div class="mock-val">\u20B92Cr+</div><div class="mock-label">Processed</div></div><div class="mock-card"><div class="mock-val">4.9\u2605</div><div class="mock-label">Rating</div></div></div></div></section>
 
-<section class="features" id="features"><h2>Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">\u26A1</div><h3>Lightning Fast</h3><p>Built for speed and performance from the ground up.</p></div><div class="card fade-in"><div class="icon">\u{1F6E1}\uFE0F</div><h3>Secure by Default</h3><p>Enterprise-grade security built into every layer.</p></div><div class="card fade-in"><div class="icon">\u{1F680}</div><h3>Scale Effortlessly</h3><p>Grows with your business without breaking a sweat.</p></div></div></section>
+<section class="features" id="features"><h2>Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">\u26A1</div><h3>Lightning Fast</h3><p>Built for speed and performance from the ground up.</p></div><div class="card fade-in"><div class="icon">\u{1F6E1}\uFE0F</div><h3>Secure by Default</h3><p>Enterprise-grade security built into every layer.</p></div><div class="card fade-in"><div class="icon">\u{1F680}</div><h3>Scale Effortlessly</h3><p>Grows with your business without breaking a sweat.</p></div><div class="card fade-in"><div class="icon">\u{1F4CA}</div><h3>Smart Analytics</h3><p>Real-time insights and data-driven decisions.</p></div></div></section>
 
 <section class="how-it-works" id="how-it-works"><h2>How It Works</h2><div class="steps"><div class="step fade-in"><div class="num">1</div><h3>Sign Up</h3><p>Create your free account in under 30 seconds.</p></div><div class="step fade-in"><div class="num">2</div><h3>Setup</h3><p>Configure your workspace with our guided onboarding.</p></div><div class="step fade-in"><div class="num">3</div><h3>Launch</h3><p>Go live and start seeing results from day one.</p></div></div></section>
 
@@ -240,7 +273,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const appName = analysis.appName || analysis.idea.split(" ").slice(0, 2).join(" ");
+    const appName = analysis.appName || analysis.idea.split(" ").filter((w: string) => w.length > 3).pop() || "LaunchPad";
 
     const userPrompt = `Build an MVP for this startup:
 
@@ -301,17 +334,22 @@ CRITICAL INSTRUCTIONS:
       if (!Array.isArray(generatedFiles) || generatedFiles.length === 0) {
         throw new Error("No files generated");
       }
-      // Ensure preview.html exists — generate a fallback if AI omitted it
-      const hasPreview = generatedFiles.some(
-        (f: { path: string }) => f.path === "preview.html",
+      // Sanitize file contents — fix double-escaped newlines from AI
+      generatedFiles = generatedFiles.map((f: { path: string; content: string; lang: string }) => ({
+        ...f,
+        content: typeof f.content === 'string'
+          ? f.content.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '')
+          : f.content,
+      }));
+      // ALWAYS use our handcrafted preview.html — AI-generated previews are unreliable
+      generatedFiles = generatedFiles.filter(
+        (f: { path: string }) => f.path !== "preview.html",
       );
-      if (!hasPreview) {
-        generatedFiles.push({
-          path: "preview.html",
-          content: buildFallbackPreview(appName, analysis.idea, analysis.summary),
-          lang: "html",
-        });
-      }
+      generatedFiles.push({
+        path: "preview.html",
+        content: buildFallbackPreview(appName, analysis.idea, analysis.summary),
+        lang: "html",
+      });
     } catch {
       // Fallback minimal project
       generatedFiles = [
