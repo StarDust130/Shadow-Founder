@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useUser } from "@clerk/nextjs";
 import {
   Crosshair,
   Code2,
@@ -9,17 +10,20 @@ import {
   Zap,
   ArrowRight,
   BarChart3,
-  Target,
-  Plus,
   Sparkles,
   CheckCircle2,
   XCircle,
   Globe,
   Rocket,
   Cloud,
-  Eye,
+  Flame,
+  Activity,
+  Cpu,
+  Layers,
+  MousePointerClick,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const pastIdeas = [
   {
@@ -27,6 +31,9 @@ const pastIdeas = [
     title: "AI Resume Builder",
     pitch:
       "An AI-powered resume builder that creates ATS-optimized resumes in 30 seconds for job seekers.",
+    target: "Fresh graduates & job-switching professionals aged 22-35",
+    problem:
+      "75% of resumes get rejected by ATS before a human ever reads them.",
     score: 82,
     status: "Viable" as const,
     category: "SaaS",
@@ -37,6 +44,8 @@ const pastIdeas = [
     title: "Crypto Pet Insurance",
     pitch:
       "Blockchain-based pet insurance platform that uses smart contracts for instant claim payouts.",
+    target: "Crypto-savvy pet owners in the US",
+    problem: "Pet insurance claims take 4-6 weeks to process.",
     score: 23,
     status: "Saturated" as const,
     category: "FinTech",
@@ -47,6 +56,8 @@ const pastIdeas = [
     title: "Developer Meme Generator",
     pitch:
       "AI that generates context-aware programming memes from your GitHub commit messages.",
+    target: "Software developers on social media",
+    problem: "Developers waste time making memes manually for Twitter/X.",
     score: 61,
     status: "Viable" as const,
     category: "Developer Tools",
@@ -57,6 +68,9 @@ const pastIdeas = [
     title: "Smart Grocery List",
     pitch:
       "ML-powered meal planner that auto-generates optimized grocery lists based on dietary needs.",
+    target: "Health-conscious families and meal-preppers",
+    problem:
+      "People waste 30% of groceries due to poor planning and impulse buying.",
     score: 45,
     status: "Saturated" as const,
     category: "HealthTech",
@@ -67,6 +81,9 @@ const pastIdeas = [
     title: "Code Review Copilot",
     pitch:
       "AI agent that performs deep code reviews with security analysis and performance suggestions.",
+    target: "Engineering teams at startups and mid-size companies",
+    problem:
+      "Code reviews are bottlenecks — senior devs spend 40% of their time reviewing.",
     score: 91,
     status: "Viable" as const,
     category: "AI / ML",
@@ -77,6 +94,9 @@ const pastIdeas = [
     title: "Freelancer CRM Lite",
     pitch:
       "Minimalist CRM for solo freelancers to manage invoices, contracts, and client comms in one place.",
+    target: "Solo freelancers earning $50k-$200k annually",
+    problem:
+      "Freelancers juggle 5+ tools for invoicing, contracts, and client management.",
     score: 73,
     status: "Viable" as const,
     category: "SaaS",
@@ -148,6 +168,20 @@ function StatusBadge({ status }: { status: "Viable" | "Saturated" }) {
 }
 
 export default function DashboardPage() {
+  const { user } = useUser();
+  const router = useRouter();
+  const firstName = user?.firstName || "Builder";
+
+  const handleIdeaClick = (idea: (typeof pastIdeas)[0]) => {
+    const params = new URLSearchParams({
+      idea: idea.pitch,
+      target: idea.target,
+      problem: idea.problem,
+      category: idea.category,
+    });
+    router.push(`/validator?${params.toString()}`);
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       {/* ═══ HERO ═══ */}
@@ -160,13 +194,106 @@ export default function DashboardPage() {
           <Zap size={10} />
           Command Center
         </p>
-        <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-[#1A1A1A] uppercase leading-[0.9]">
-          Welcome Back
-          <span className="text-[#FF6803]">.</span>
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tighter text-[#1A1A1A] uppercase leading-[0.9]">
+            Welcome Back, {firstName}
+            <span className="text-[#FF6803]">.</span>
+          </h1>
+          <motion.div
+            animate={{ rotate: [0, 14, -8, 14, 0] }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              repeatDelay: 3,
+              type: "tween",
+            }}
+            className="text-3xl md:text-4xl origin-bottom-right hidden sm:block"
+          >
+            👋
+          </motion.div>
+        </div>
         <p className="text-sm text-[#1A1A1A]/40 font-medium mt-2">
           Overview of all your validated startup ideas and projects.
         </p>
+      </motion.div>
+
+      {/* ═══ LIVE PULSE BAR ═══ */}
+      <motion.div
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ delay: 0.15, duration: 0.5 }}
+        className="mb-8 origin-left"
+      >
+        <div className="flex items-center gap-3 bg-[#1A1A1A] rounded-xl px-4 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803]">
+          <motion.div
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
+            className="w-2 h-2 bg-emerald-400 rounded-full shrink-0"
+          />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 font-mono">
+            All Systems Operational
+          </span>
+          <div className="flex-1" />
+          <div className="flex items-center gap-2">
+            <Activity size={12} className="text-emerald-400" />
+            <span className="text-[10px] font-bold text-emerald-400 font-mono hidden sm:inline">
+              99.9% uptime
+            </span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ═══ START CTA ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-8"
+      >
+        <Link href="/validator">
+          <motion.div
+            whileHover={{
+              y: -4,
+              transition: { type: "spring", stiffness: 400, damping: 15 },
+            }}
+            whileTap={{ scale: 0.98 }}
+            className="relative flex items-center gap-4 p-5 bg-[#1A1A1A] rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] hover:shadow-[6px_6px_0_#FF6803] transition-all cursor-pointer group overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-linear-to-r from-[#1A1A1A] via-[#2A2A2A] to-[#1A1A1A]" />
+            <motion.div
+              className="absolute inset-0 bg-linear-to-r from-transparent via-white/[0.03] to-transparent"
+              animate={{ x: ["-100%", "100%"] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+
+            <div className="relative z-10 w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center shrink-0 border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.3)]">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              >
+                <Cpu size={22} className="text-white" />
+              </motion.div>
+            </div>
+            <div className="relative z-10 flex-1">
+              <h3 className="text-white font-black uppercase tracking-tight flex items-center gap-2">
+                Start New Project
+                <motion.span
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, type: "tween" }}
+                >
+                  <Sparkles size={14} className="text-[#FF6803]" />
+                </motion.span>
+              </h3>
+              <p className="text-white/40 text-xs font-medium mt-0.5">
+                Submit your startup pitch &bull; AI validates in ~15s
+              </p>
+            </div>
+            <ArrowRight
+              size={20}
+              className="relative z-10 text-white/20 group-hover:text-[#FF6803] group-hover:translate-x-1 transition-all shrink-0"
+            />
+          </motion.div>
+        </Link>
       </motion.div>
 
       {/* ═══ STATS ═══ */}
@@ -176,35 +303,104 @@ export default function DashboardPage() {
         animate="show"
         className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8"
       >
-        {stats.map((stat) => (
+        {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
             variants={fadeUp}
-            whileHover={{
-              y: -6,
-              x: -2,
-              transition: { duration: 0.2 },
-            }}
+            whileHover={{ y: -6, x: -2, transition: { duration: 0.2 } }}
             whileTap={{ scale: 0.97 }}
-            className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-4 md:p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all cursor-default group"
+            className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-4 md:p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all cursor-default group relative overflow-hidden"
           >
+            <motion.div
+              className="absolute -top-6 -right-6 w-16 h-16 rounded-full opacity-10"
+              style={{ backgroundColor: stat.color }}
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                delay: i * 0.3,
+                type: "tween",
+              }}
+            />
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] transition-all"
+              className="relative z-10 w-10 h-10 rounded-xl flex items-center justify-center mb-3 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] transition-all"
               style={{ backgroundColor: stat.color + "18" }}
             >
               <stat.icon size={18} style={{ color: stat.color }} />
             </div>
-            <h3 className="text-3xl font-black tracking-tighter text-[#1A1A1A]">
+            <h3 className="relative z-10 text-3xl font-black tracking-tighter text-[#1A1A1A]">
               {stat.value}
             </h3>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/30 mt-1 font-mono">
+            <p className="relative z-10 text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/30 mt-1 font-mono">
               {stat.label}
             </p>
           </motion.div>
         ))}
       </motion.div>
 
-      {/* ═══ PAST IDEAS — BENTO GRID ═══ */}
+      {/* ═══ QUICK ACTIONS ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8"
+      >
+        {[
+          {
+            label: "Validate Idea",
+            desc: "AI-powered pitch analysis",
+            href: "/validator",
+            icon: Crosshair,
+            accent: "#FF6803",
+          },
+          {
+            label: "Build Code",
+            desc: "Generate MVP codebase",
+            href: "/builder",
+            icon: Code2,
+            accent: "#8B5CF6",
+          },
+          {
+            label: "View Analytics",
+            desc: "Track your ideas",
+            href: "/dashboard",
+            icon: BarChart3,
+            accent: "#22C55E",
+          },
+        ].map((action, i) => (
+          <Link key={action.label} href={action.href}>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.06 }}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.97 }}
+              className="flex items-center gap-3 p-4 bg-white border-2 border-[#1A1A1A] rounded-xl shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all cursor-pointer group"
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                style={{ backgroundColor: action.accent + "15" }}
+              >
+                <action.icon size={16} style={{ color: action.accent }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-[#1A1A1A] uppercase tracking-tight">
+                  {action.label}
+                </p>
+                <p className="text-[10px] text-[#1A1A1A]/30 font-medium">
+                  {action.desc}
+                </p>
+              </div>
+              <MousePointerClick
+                size={14}
+                className="text-[#1A1A1A]/10 group-hover:text-[#FF6803] transition-colors shrink-0"
+              />
+            </motion.div>
+          </Link>
+        ))}
+      </motion.div>
+
+      {/* ═══ PROJECT IDEAS — BENTO GRID ═══ */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -213,8 +409,8 @@ export default function DashboardPage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-mono flex items-center gap-2">
-            <Eye size={12} className="text-[#FF6803]" />
-            Past Projects
+            <Flame size={12} className="text-[#FF6803]" />
+            Project Ideas
           </h2>
           <Link href="/validator">
             <motion.button
@@ -243,8 +439,22 @@ export default function DashboardPage() {
                 transition: { type: "spring", stiffness: 400, damping: 25 },
               }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[6px_6px_0_#1A1A1A] hover:shadow-[8px_8px_0_#FF6803] transition-shadow cursor-pointer group"
+              onClick={() => handleIdeaClick(idea)}
+              className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[6px_6px_0_#1A1A1A] hover:shadow-[8px_8px_0_#FF6803] transition-shadow cursor-pointer group relative overflow-hidden"
             >
+              <motion.div
+                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                animate={{ y: [0, -2, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, type: "tween" }}
+              >
+                <div className="flex items-center gap-1 bg-[#FF6803]/10 rounded-lg px-2 py-1">
+                  <MousePointerClick size={10} className="text-[#FF6803]" />
+                  <span className="text-[8px] font-bold text-[#FF6803] uppercase">
+                    Auto-fill
+                  </span>
+                </div>
+              </motion.div>
+
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-black text-[#1A1A1A] tracking-tight truncate group-hover:text-[#FF6803] transition-colors">
@@ -281,36 +491,49 @@ export default function DashboardPage() {
         </motion.div>
       </motion.div>
 
-      {/* ═══ START CTA ═══ */}
+      {/* ═══ TECH STACK MARQUEE ═══ */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mb-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.35 }}
+        className="mb-8 overflow-hidden rounded-xl border-2 border-[#1A1A1A]/10 bg-white/50 py-3"
       >
-        <Link href="/validator">
-          <motion.div
-            whileHover={{ y: -3 }}
-            whileTap={{ scale: 0.99 }}
-            className="flex items-center gap-4 p-5 bg-linear-to-r from-[#FF6803] to-[#FF8A3D] rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all cursor-pointer group"
-          >
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-              <Plus size={22} className="text-[#FF6803]" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-white font-black uppercase tracking-tight">
-                Start New Project
-              </h3>
-              <p className="text-white/60 text-xs font-medium mt-0.5">
-                Submit your startup pitch &bull; AI validates in ~15s
-              </p>
-            </div>
-            <ArrowRight
-              size={20}
-              className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0"
-            />
-          </motion.div>
-        </Link>
+        <motion.div
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="flex items-center gap-8 whitespace-nowrap"
+        >
+          {[
+            "Next.js 16",
+            "TypeScript",
+            "Tailwind CSS",
+            "Prisma ORM",
+            "Clerk Auth",
+            "Framer Motion",
+            "Vercel",
+            "OpenAI",
+            "Supabase",
+            "Stripe",
+            "Next.js 16",
+            "TypeScript",
+            "Tailwind CSS",
+            "Prisma ORM",
+            "Clerk Auth",
+            "Framer Motion",
+            "Vercel",
+            "OpenAI",
+            "Supabase",
+            "Stripe",
+          ].map((tech, i) => (
+            <span
+              key={i}
+              className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/15 font-mono flex items-center gap-2"
+            >
+              <Layers size={10} />
+              {tech}
+            </span>
+          ))}
+        </motion.div>
       </motion.div>
 
       {/* ═══ COMING SOON ═══ */}
@@ -331,7 +554,8 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.45 + i * 0.08 }}
-              className="bg-[#D9D9D9]/60 border-2 border-[#1A1A1A]/10 border-dashed rounded-2xl p-5 opacity-60 hover:opacity-80 transition-opacity cursor-default"
+              whileHover={{ y: -3 }}
+              className="bg-[#D9D9D9]/60 border-2 border-[#1A1A1A]/10 border-dashed rounded-2xl p-5 opacity-60 hover:opacity-80 transition-all cursor-default"
             >
               <div className="w-10 h-10 bg-[#1A1A1A]/5 rounded-xl flex items-center justify-center mb-3 border-2 border-[#1A1A1A]/8">
                 <item.icon size={18} className="text-[#1A1A1A]/25" />

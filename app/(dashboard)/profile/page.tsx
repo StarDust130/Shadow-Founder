@@ -2,10 +2,84 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { UserProfile } from "@clerk/nextjs";
-import { User, Coins, ArrowRight, Sparkles, Crown, Zap } from "lucide-react";
+import { UserProfile, useUser } from "@clerk/nextjs";
+import {
+  User,
+  Coins,
+  ArrowRight,
+  Sparkles,
+  Crown,
+  Zap,
+  Shield,
+  Bell,
+  Webhook,
+  Key,
+  Clock,
+  BarChart3,
+  Globe,
+  Palette,
+  Download,
+  GitBranch,
+  Layers,
+} from "lucide-react";
+
+const comingSoonFeatures = [
+  {
+    title: "API Keys",
+    desc: "Generate API keys for programmatic access to Shadow AI",
+    icon: Key,
+  },
+  {
+    title: "Webhooks",
+    desc: "Get real-time notifications when validations complete",
+    icon: Webhook,
+  },
+  {
+    title: "Notifications",
+    desc: "Email & push alerts for project updates and new features",
+    icon: Bell,
+  },
+  {
+    title: "Usage Analytics",
+    desc: "Detailed breakdown of your validation history and trends",
+    icon: BarChart3,
+  },
+  {
+    title: "Custom Domains",
+    desc: "Deploy generated MVPs under your own domain name",
+    icon: Globe,
+  },
+  {
+    title: "Theme Editor",
+    desc: "Customize the look and feel of your generated projects",
+    icon: Palette,
+  },
+  {
+    title: "Export Data",
+    desc: "Download all your validation reports as PDF or CSV",
+    icon: Download,
+  },
+  {
+    title: "Team Access",
+    desc: "Invite co-founders and team members to collaborate",
+    icon: GitBranch,
+  },
+];
+
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
 
 export default function ProfilePage() {
+  const { user } = useUser();
+  const firstName = user?.firstName || "Builder";
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* ═══ HEADER ═══ */}
@@ -30,7 +104,43 @@ export default function ProfilePage() {
             </p>
           </div>
         </div>
-        <div className="h-[3px] bg-[#1A1A1A] rounded-full" />
+        <div className="h-0.75 bg-[#1A1A1A] rounded-full" />
+      </motion.div>
+
+      {/* ═══ WELCOME CARD ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="mb-8"
+      >
+        <div className="bg-[#1A1A1A] rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-[#FF6803]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="w-14 h-14 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.3)]">
+              <span className="text-2xl font-black text-white">
+                {firstName.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+                Hey, {firstName}
+                <span className="text-[#FF6803]">!</span>
+              </h2>
+              <p className="text-xs font-bold text-white/30">
+                {user?.primaryEmailAddress?.emailAddress ||
+                  "Manage your account below"}
+              </p>
+            </div>
+            <div className="flex-1" />
+            <div className="hidden sm:flex items-center gap-2 bg-white/5 rounded-lg px-3 py-1.5 border border-white/10">
+              <Shield size={12} className="text-emerald-400" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-white/30 font-mono">
+                Free Plan
+              </span>
+            </div>
+          </div>
+        </div>
       </motion.div>
 
       {/* ═══ CREDIT BALANCE + UPGRADE ═══ */}
@@ -50,7 +160,7 @@ export default function ProfilePage() {
             <div className="w-9 h-9 bg-[#FF6803]/10 rounded-xl flex items-center justify-center border-2 border-[#FF6803]/30">
               <Coins size={16} className="text-[#FF6803]" />
             </div>
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-mono">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-mono">
               Credit Balance
             </h2>
           </div>
@@ -64,13 +174,13 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <p className="text-[11px] text-[#1A1A1A]/35 font-medium">
+          <p className="text-[11px] text-[#1A1A1A]/35 font-bold">
             Credits remaining on your current plan
           </p>
 
           <div className="mt-4 flex items-center gap-2 bg-[#FF6803]/5 rounded-lg px-3 py-2 border border-[#FF6803]/15">
             <Zap size={12} className="text-[#FF6803]" />
-            <span className="text-[10px] font-bold text-[#FF6803]/70 font-mono">
+            <span className="text-[10px] font-black text-[#FF6803]/70 font-mono">
               1 credit = 1 full validation cycle
             </span>
           </div>
@@ -89,7 +199,7 @@ export default function ProfilePage() {
               <div className="w-9 h-9 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-white/20 shadow-[0_0_15px_rgba(255,104,3,0.3)]">
                 <Crown size={16} className="text-white" />
               </div>
-              <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 font-mono">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 font-mono">
                 Upgrade Plan
               </h2>
             </div>
@@ -97,7 +207,7 @@ export default function ProfilePage() {
             <h3 className="text-xl font-black text-white tracking-tight mb-1">
               Go <span className="text-[#FF6803]">Pro</span>
             </h3>
-            <p className="text-[11px] text-white/30 font-medium mb-5">
+            <p className="text-[11px] text-white/30 font-bold mb-5">
               Unlimited validations, priority AI analysis, and advanced code
               generation.
             </p>
@@ -109,7 +219,7 @@ export default function ProfilePage() {
                 transition: { type: "spring", stiffness: 400 },
               }}
               whileTap={{ scale: 0.97 }}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-r from-[#FF8A3D] to-[#FF6803] text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.25)] hover:shadow-[0_0_30px_rgba(255,104,3,0.4)] transition-shadow"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-[#FF6803] text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-white/20 shadow-[0_0_20px_rgba(255,104,3,0.25)] hover:shadow-[0_0_30px_rgba(255,104,3,0.4)] transition-shadow"
             >
               <Sparkles size={14} />
               Upgrade Now
@@ -117,7 +227,7 @@ export default function ProfilePage() {
             </motion.button>
 
             <div className="mt-4 flex items-center justify-center gap-1">
-              <span className="text-[9px] font-bold text-white/15 uppercase tracking-widest font-mono">
+              <span className="text-[9px] font-black text-white/15 uppercase tracking-widest font-mono">
                 Starting at $9/mo
               </span>
             </div>
@@ -125,15 +235,66 @@ export default function ProfilePage() {
         </motion.div>
       </motion.div>
 
+      {/* ═══ QUICK STATS ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
+      >
+        {[
+          { label: "Total Ideas", value: "6", icon: Layers, color: "#FF6803" },
+          {
+            label: "Viable",
+            value: "4",
+            icon: Sparkles,
+            color: "#22C55E",
+          },
+          {
+            label: "Credits Used",
+            value: "5",
+            icon: Zap,
+            color: "#FF8A3D",
+          },
+          {
+            label: "Member Since",
+            value: "2026",
+            icon: Clock,
+            color: "#1A1A1A",
+          },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 + i * 0.05 }}
+            whileHover={{ y: -3 }}
+            className="bg-white border-2 border-[#1A1A1A]/10 rounded-xl p-4 hover:border-[#1A1A1A] hover:shadow-[3px_3px_0_#1A1A1A] transition-all cursor-default"
+          >
+            <stat.icon
+              size={16}
+              style={{ color: stat.color }}
+              className="mb-2"
+            />
+            <h3 className="text-2xl font-black tracking-tighter text-[#1A1A1A]">
+              {stat.value}
+            </h3>
+            <p className="text-[9px] font-black uppercase tracking-widest text-[#1A1A1A]/25 font-mono mt-1">
+              {stat.label}
+            </p>
+          </motion.div>
+        ))}
+      </motion.div>
+
       {/* ═══ CLERK USER PROFILE ═══ */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white border-2 border-[#1A1A1A] rounded-2xl shadow-[6px_6px_0_#1A1A1A] overflow-hidden mb-4"
+        className="bg-white border-2 border-[#1A1A1A] rounded-2xl shadow-[6px_6px_0_#1A1A1A] overflow-hidden mb-8"
       >
         <div className="px-5 py-4 border-b-2 border-[#1A1A1A]/5 bg-[#FAFAFA]">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-mono flex items-center gap-2">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]/30 font-mono flex items-center gap-2">
             <User size={12} className="text-[#FF6803]" />
             Account Settings
           </h2>
@@ -152,6 +313,50 @@ export default function ProfilePage() {
             }}
           />
         </div>
+      </motion.div>
+
+      {/* ═══ COMING SOON FEATURES ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="mb-4"
+      >
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]/25 mb-4 font-mono flex items-center gap-2">
+          <Sparkles size={12} className="text-[#FF6803]/40" />
+          Coming Soon
+        </h2>
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3"
+        >
+          {comingSoonFeatures.map((feature) => (
+            <motion.div
+              key={feature.title}
+              variants={fadeUp}
+              whileHover={{ y: -3 }}
+              className="bg-[#D9D9D9]/50 border-2 border-[#1A1A1A]/10 border-dashed rounded-xl p-4 opacity-60 hover:opacity-80 transition-all cursor-default"
+            >
+              <div className="w-9 h-9 bg-[#1A1A1A]/5 rounded-lg flex items-center justify-center mb-3 border border-[#1A1A1A]/8">
+                <feature.icon size={16} className="text-[#1A1A1A]/25" />
+              </div>
+              <h3 className="text-xs font-black text-[#1A1A1A]/50 uppercase tracking-tight mb-1">
+                {feature.title}
+              </h3>
+              <p className="text-[10px] text-[#1A1A1A]/25 font-bold leading-relaxed">
+                {feature.desc}
+              </p>
+              <div className="mt-3 inline-flex items-center gap-1 px-2 py-0.5 bg-[#1A1A1A]/5 rounded-md">
+                <Clock size={8} className="text-[#1A1A1A]/20" />
+                <span className="text-[7px] font-black uppercase tracking-widest text-[#1A1A1A]/25 font-mono">
+                  Soon
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.div>
     </div>
   );

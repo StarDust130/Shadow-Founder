@@ -3,9 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { UserButton, useUser } from "@clerk/nextjs";
-import { LayoutDashboard, Crosshair, Code2, User, Zap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import {
+  LayoutDashboard,
+  Crosshair,
+  Code2,
+  User,
+  Zap,
+  Activity,
+  Cpu,
+} from "lucide-react";
 import Image from "next/image";
 
 const navItems = [
@@ -21,6 +29,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -44,7 +53,7 @@ export default function DashboardLayout({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col gap-1.5 p-2.5 bg-white/15 backdrop-blur-2xl border border-white/30 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-60 flex flex-col gap-2 p-2.5 bg-white/20 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
           >
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
@@ -55,40 +64,50 @@ export default function DashboardLayout({
                   <motion.div
                     whileHover={
                       isProfileAvatar
-                        ? { scale: 1.08, y: -2 }
-                        : { scale: 1.15, rotate: [0, -10, 10, -10, 0] }
+                        ? { scale: 1.06, y: -1 }
+                        : {
+                            scale: 1.12,
+                            rotate: [0, -8, 8, 0],
+                            transition: {
+                              rotate: {
+                                type: "tween",
+                                duration: 0.35,
+                                ease: "easeInOut",
+                              },
+                            },
+                          }
                     }
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 12 }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 14 }}
                     className="relative group"
                   >
                     <div
-                      className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all duration-200 overflow-hidden ${
+                      className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 overflow-hidden ${
                         isActive && !isProfileAvatar
                           ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
                           : isActive && isProfileAvatar
-                            ? "border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] bg-white/30"
+                            ? "border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-white/40"
                             : isProfileAvatar
-                              ? "opacity-80 hover:opacity-100 hover:shadow-lg"
-                              : "text-[#1A1A1A]/35 hover:text-[#1A1A1A] hover:bg-white/50"
+                              ? "opacity-75 hover:opacity-100"
+                              : "text-[#1A1A1A]/30 hover:text-[#1A1A1A] hover:bg-white/50"
                       }`}
                     >
                       {isProfileAvatar ? (
                         <Image
                           src={user.imageUrl!}
                           alt="Profile"
-                          width={48}
-                          height={48}
+                          width={40}
+                          height={40}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <item.icon size={20} />
+                        <item.icon size={18} />
                       )}
                     </div>
-                    {/* Tooltip */}
-                    <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#1A1A1A] text-white text-[11px] font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg z-50">
+                    {/* Tooltip - instant, no animation */}
+                    <div className="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-100 whitespace-nowrap shadow-lg z-50">
                       {item.label}
-                      <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-[#1A1A1A]" />
+                      <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-[#1A1A1A]" />
                     </div>
                   </motion.div>
                 </Link>
@@ -99,16 +118,20 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* ═══ TOP HEADER ═══ */}
-      <header className="sticky top-0 z-50 h-14 px-4 lg:pl-24 flex items-center justify-between bg-[#E5E4E2]/80 backdrop-blur-2xl border-b border-[#1A1A1A]/[0.04]">
+      <header className="sticky top-0 z-50 h-14 px-4 lg:pl-24 flex items-center justify-between bg-[#E5E4E2]/80 backdrop-blur-2xl border-b border-[#1A1A1A]/6">
         <div className="flex items-center gap-3">
           <Link href="/dashboard" className="flex items-center gap-2 group">
-            <div className="w-7 h-7 bg-[#FF6803] grid grid-cols-2 gap-[2px] p-[2px] rounded-md border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] group-hover:shadow-[3px_3px_0_#FF6803] transition-shadow">
-              <div className="bg-white rounded-[2px]" />
-              <div className="bg-white rounded-[2px]" />
-              <div className="bg-white rounded-[2px]" />
-              <div className="bg-white rounded-[2px]" />
-            </div>
-            <span className="font-bold text-sm tracking-tight text-[#1A1A1A] hidden sm:inline">
+            <motion.div
+              whileHover={{ rotate: 6 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="w-7 h-7 bg-[#FF6803] grid grid-cols-2 gap-0.5 p-0.5 rounded-md border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] group-hover:shadow-[3px_3px_0_#FF6803] transition-shadow"
+            >
+              <div className="bg-white rounded-xs" />
+              <div className="bg-white rounded-xs" />
+              <div className="bg-white rounded-xs" />
+              <div className="bg-white rounded-xs" />
+            </motion.div>
+            <span className="font-black text-sm tracking-tight text-[#1A1A1A] hidden sm:inline">
               Shadow<span className="text-[#FF6803]">.</span>
             </span>
           </Link>
@@ -118,26 +141,47 @@ export default function DashboardLayout({
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Status pill - neubrutalist */}
+        <div className="flex items-center gap-2.5">
+          {/* AI Engine Status */}
+          <div className="hidden sm:flex items-center gap-2 bg-white/50 border border-[#1A1A1A]/8 rounded-lg px-3 py-1.5">
+            <Cpu size={10} className="text-[#FF6803]" />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-[#1A1A1A]/40 font-mono">
+              AI Engine
+            </span>
+            <motion.div
+              animate={{ scale: [1, 1.3, 1] }}
+              transition={{ duration: 2, repeat: Infinity, type: "tween" }}
+              className="w-1.5 h-1.5 bg-emerald-400 rounded-full"
+            />
+          </div>
+
+          {/* Status pill */}
           <div className="flex items-center gap-1.5 bg-[#1A1A1A] border-2 border-[#1A1A1A] rounded-full px-3 py-1 shadow-[2px_2px_0_#FF6803]">
-            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+            <Activity size={10} className="text-emerald-400" />
             <span className="text-[9px] font-bold uppercase tracking-wider text-white/70 hidden sm:inline">
-              Engine Ready
+              Online
             </span>
             <Zap size={10} className="text-[#FF6803] sm:hidden" />
           </div>
 
-          {/* Mobile user */}
-          <div className="lg:hidden">
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox:
-                    "w-8 h-8 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] rounded-lg",
-                },
-              }}
-            />
+          {/* Mobile user avatar — click redirects to /profile */}
+          <div
+            className="lg:hidden cursor-pointer"
+            onClick={() => router.push("/profile")}
+          >
+            {user?.imageUrl ? (
+              <Image
+                src={user.imageUrl}
+                alt="Profile"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-lg border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-[#FF6803] flex items-center justify-center">
+                <User size={14} className="text-white" />
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -160,7 +204,7 @@ export default function DashboardLayout({
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-[60] bg-white/25 backdrop-blur-2xl border-t-2 border-[#1A1A1A] px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)]">
+        <nav className="fixed bottom-0 left-0 right-0 z-60 bg-white border-t-2 border-[#1A1A1A] px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)]">
           <div className="flex items-center justify-around">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
@@ -171,16 +215,26 @@ export default function DashboardLayout({
                   <motion.div
                     whileHover={
                       !isProfileAvatar
-                        ? { y: -2, rotate: [-5, 5, 0] }
+                        ? {
+                            y: -2,
+                            rotate: [-4, 4, 0],
+                            transition: {
+                              rotate: {
+                                type: "tween",
+                                duration: 0.3,
+                                ease: "easeInOut",
+                              },
+                            },
+                          }
                         : { y: -2 }
                     }
-                    whileTap={{ scale: 0.85, y: 2 }}
+                    whileTap={{ scale: 0.88, y: 1 }}
                     transition={{ type: "spring", stiffness: 400, damping: 14 }}
                     className={`flex flex-col items-center gap-0.5 py-2 mx-1 rounded-xl transition-all ${
                       isActive && !isProfileAvatar
                         ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
                         : isActive && isProfileAvatar
-                          ? "border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-white/20"
+                          ? "border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-[#1A1A1A]/5"
                           : "text-[#1A1A1A]/35"
                     }`}
                   >
@@ -188,9 +242,9 @@ export default function DashboardLayout({
                       <Image
                         src={user.imageUrl!}
                         alt="Profile"
-                        width={24}
-                        height={24}
-                        className={`w-6 h-6 rounded-md object-cover ${
+                        width={22}
+                        height={22}
+                        className={`w-5.5 h-5.5 rounded-md object-cover ${
                           isActive ? "" : "opacity-60"
                         }`}
                       />

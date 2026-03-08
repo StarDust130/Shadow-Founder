@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 import {
   Crosshair,
   Send,
@@ -12,11 +13,12 @@ import {
   Lightbulb,
   ChevronDown,
   Loader2,
-  Sparkles,
   Terminal,
   Hash,
   CheckCircle2,
   Circle,
+  Zap,
+  Shield,
 } from "lucide-react";
 
 const categories = [
@@ -91,8 +93,22 @@ const terminalSteps = [
 ];
 
 export default function ValidatorPage() {
-  const [formData, setFormData] = useState<Record<string, string>>({});
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const searchParams = useSearchParams();
+
+  // Read URL params for auto-fill (from dashboard idea click)
+  const initialIdea = searchParams.get("idea") || "";
+  const initialTarget = searchParams.get("target") || "";
+  const initialProblem = searchParams.get("problem") || "";
+  const initialCategory = searchParams.get("category") || "";
+
+  const [formData, setFormData] = useState<Record<string, string>>(() => {
+    const data: Record<string, string> = {};
+    if (initialIdea) data.idea = initialIdea;
+    if (initialTarget) data.target = initialTarget;
+    if (initialProblem) data.problem = initialProblem;
+    return data;
+  });
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -108,9 +124,11 @@ export default function ValidatorPage() {
   useEffect(() => {
     if (!terminalActive || currentStep < 0) return;
     if (currentStep >= terminalSteps.length) {
-      setTerminalActive(false);
-      setIsSubmitting(false);
-      return;
+      const t = setTimeout(() => {
+        setTerminalActive(false);
+        setIsSubmitting(false);
+      }, 0);
+      return () => clearTimeout(t);
     }
 
     const step = terminalSteps[currentStep];
@@ -146,9 +164,12 @@ export default function ValidatorPage() {
         className="mb-8"
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-11 h-11 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
+          <motion.div
+            whileHover={{ rotate: -8 }}
+            className="w-11 h-11 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
+          >
             <Crosshair size={20} className="text-white" />
-          </div>
+          </motion.div>
           <div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
               The Interrogation
@@ -158,7 +179,7 @@ export default function ValidatorPage() {
             </p>
           </div>
         </div>
-        <div className="h-[3px] bg-[#1A1A1A] rounded-full" />
+        <div className="h-0.75 bg-[#1A1A1A] rounded-full" />
       </motion.div>
 
       {/* ═══ WARNING BANNER ═══ */}
@@ -166,18 +187,17 @@ export default function ValidatorPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex items-start gap-3 bg-[#FF6803]/5 border-2 border-[#FF6803]/25 rounded-xl p-4 mb-8 shadow-[3px_3px_0_rgba(255,104,3,0.15)]"
+        className="flex items-start gap-3 bg-[#1A1A1A] rounded-xl p-4 mb-8 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803]"
       >
-        <div className="w-8 h-8 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-          <AlertTriangle size={14} className="text-white" />
+        <div className="w-8 h-8 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-white/20">
+          <Shield size={14} className="text-white" />
         </div>
         <div>
-          <p className="text-xs font-black text-[#1A1A1A]/80 uppercase">
+          <p className="text-xs font-black text-white uppercase tracking-wide">
             The Shadow Founder is brutally honest.
           </p>
-          <p className="text-[11px] text-[#1A1A1A]/40 font-medium mt-0.5">
-            Market viability, competition, and unit economics — assessed without
-            sugar-coating. Be prepared for unfiltered feedback.
+          <p className="text-[11px] text-white/40 font-bold mt-0.5">
+            Market viability, competition & unit economics — zero sugar-coating.
           </p>
         </div>
       </motion.div>
@@ -189,12 +209,12 @@ export default function ValidatorPage() {
         transition={{ delay: 0.12 }}
         className="mb-6 flex items-center gap-3"
       >
-        <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/30 font-mono">
+        <span className="text-[9px] font-black uppercase tracking-widest text-[#1A1A1A]/30 font-mono">
           Fields
         </span>
-        <div className="flex-1 h-2 bg-[#1A1A1A]/5 rounded-full overflow-hidden border border-[#1A1A1A]/10">
+        <div className="flex-1 h-2.5 bg-[#1A1A1A]/5 rounded-full overflow-hidden border-2 border-[#1A1A1A]/10">
           <motion.div
-            className="h-full bg-linear-to-r from-[#FF6803] to-[#FF8A3D] rounded-full"
+            className="h-full bg-[#FF6803] rounded-full"
             initial={{ width: 0 }}
             animate={{
               width: `${(filledCount / pitchFields.length) * 100}%`,
@@ -202,7 +222,7 @@ export default function ValidatorPage() {
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </div>
-        <span className="text-[10px] font-bold text-[#1A1A1A]/40 font-mono">
+        <span className="text-[10px] font-black text-[#1A1A1A]/40 font-mono">
           {filledCount}/{pitchFields.length}
         </span>
       </motion.div>
@@ -214,16 +234,22 @@ export default function ValidatorPage() {
         transition={{ delay: 0.15 }}
         className="mb-6"
       >
-        <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/40 mb-2 font-mono">
+        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]/40 mb-2 font-mono">
           <Hash size={10} />
           Category
         </label>
         <div className="relative">
           <button
             onClick={() => setCategoryOpen(!categoryOpen)}
-            className="w-full flex items-center justify-between bg-white/50 border-2 border-[#1A1A1A]/10 hover:border-[#1A1A1A] rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] transition-all hover:shadow-[3px_3px_0_#1A1A1A]"
+            className="w-full flex items-center justify-between bg-white border-2 border-[#1A1A1A]/15 hover:border-[#1A1A1A] rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] transition-all hover:shadow-[3px_3px_0_#1A1A1A]"
           >
-            {selectedCategory || "Select a category..."}
+            <span
+              className={
+                selectedCategory ? "font-bold" : "text-[#1A1A1A]/30 font-bold"
+              }
+            >
+              {selectedCategory || "Select a category..."}
+            </span>
             <ChevronDown
               size={16}
               className={`text-[#1A1A1A]/30 transition-transform ${
@@ -238,7 +264,7 @@ export default function ValidatorPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -8, scale: 0.98 }}
                 transition={{ duration: 0.15 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-2xl border-2 border-[#1A1A1A] rounded-xl shadow-[4px_4px_0_#1A1A1A] z-20 overflow-hidden"
+                className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-[#1A1A1A] rounded-xl shadow-[4px_4px_0_#1A1A1A] z-20 overflow-hidden"
               >
                 {categories.map((cat) => (
                   <button
@@ -281,10 +307,12 @@ export default function ValidatorPage() {
             }}
           >
             <label className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-black text-[#FF6803] font-mono w-5">
-                {String(idx + 1).padStart(2, "0")}
+              <span className="w-7 h-7 bg-[#FF6803]/10 rounded-lg flex items-center justify-center border border-[#FF6803]/20">
+                <span className="text-[10px] font-black text-[#FF6803] font-mono">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1A1A1A]/40 font-mono">
+              <span className="text-[11px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/50 font-mono">
                 {field.label}
               </span>
               {field.required && (
@@ -299,10 +327,10 @@ export default function ValidatorPage() {
                 onBlur={() => setFocusedField(null)}
                 placeholder={field.placeholder}
                 rows={field.id === "idea" ? 4 : 3}
-                className={`w-full bg-white/50 border-2 rounded-xl px-4 py-3 text-sm font-medium text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 placeholder:font-normal resize-none focus:outline-none transition-all ${
+                className={`w-full bg-white border-2 rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 placeholder:font-normal resize-none focus:outline-none transition-all ${
                   focusedField === field.id
                     ? "border-[#FF6803] shadow-[3px_3px_0_#FF6803]"
-                    : "border-[#1A1A1A]/8 hover:border-[#1A1A1A]/20"
+                    : "border-[#1A1A1A]/10 hover:border-[#1A1A1A]/25"
                 }`}
               />
             ) : (
@@ -313,10 +341,10 @@ export default function ValidatorPage() {
                 onFocus={() => setFocusedField(field.id)}
                 onBlur={() => setFocusedField(null)}
                 placeholder={field.placeholder}
-                className={`w-full bg-white/50 border-2 rounded-xl px-4 py-3 text-sm font-medium text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 placeholder:font-normal focus:outline-none transition-all ${
+                className={`w-full bg-white border-2 rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 placeholder:font-normal focus:outline-none transition-all ${
                   focusedField === field.id
                     ? "border-[#FF6803] shadow-[3px_3px_0_#FF6803]"
-                    : "border-[#1A1A1A]/8 hover:border-[#1A1A1A]/20"
+                    : "border-[#1A1A1A]/10 hover:border-[#1A1A1A]/25"
                 }`}
               />
             )}
@@ -342,7 +370,7 @@ export default function ValidatorPage() {
           disabled={!filledRequired || isSubmitting}
           className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all border-2 ${
             filledRequired && !isSubmitting
-              ? "bg-linear-to-r from-[#FF8A3D] to-[#FF6803] text-white border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A]"
+              ? "bg-[#FF6803] text-white border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A]"
               : isSubmitting
                 ? "bg-[#FF6803]/60 text-white/80 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
                 : "bg-[#1A1A1A]/5 text-[#1A1A1A]/25 border-[#1A1A1A]/5 cursor-not-allowed"
@@ -351,12 +379,12 @@ export default function ValidatorPage() {
           {isSubmitting ? (
             <>
               <Loader2 size={18} className="animate-spin" />
-              Agent Analyzing...
+              <span className="font-black">Agent Analyzing...</span>
             </>
           ) : (
             <>
               <Send size={16} />
-              Run Validation
+              <span className="font-black">Run Validation</span>
             </>
           )}
         </motion.button>
@@ -367,9 +395,9 @@ export default function ValidatorPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="mt-8"
+        className="mt-8 mb-4"
       >
-        <div className="bg-[#1A1A1A] rounded-2xl border-2 border-[#1A1A1A] shadow-[6px_6px_0_#FF6803] overflow-hidden">
+        <div className="bg-[#0D0D0D] rounded-2xl border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A] overflow-hidden">
           {/* Terminal Header */}
           <div className="flex items-center gap-2 px-4 py-3 bg-[#111] border-b border-white/5">
             <div className="flex items-center gap-1.5">
@@ -378,7 +406,7 @@ export default function ValidatorPage() {
               <div className="w-3 h-3 rounded-full bg-[#28C840]" />
             </div>
             <div className="flex-1 text-center">
-              <span className="text-[10px] font-bold text-white/20 font-mono uppercase tracking-widest">
+              <span className="text-[10px] font-black text-white/20 font-mono uppercase tracking-widest">
                 Shadow Agent Terminal
               </span>
             </div>
@@ -388,90 +416,80 @@ export default function ValidatorPage() {
           {/* Terminal Body */}
           <div
             ref={terminalRef}
-            className="p-4 font-mono text-sm min-h-[180px] max-h-[280px] overflow-y-auto"
+            className="p-4 font-mono text-sm min-h-45 max-h-70 overflow-y-auto"
           >
             {terminalLines.length === 0 && !terminalActive && (
               <div className="flex items-center gap-2 text-white/15">
-                <span className="text-[#FF6803]">$</span>
-                <span>Waiting for pitch submission...</span>
+                <span className="text-[#FF6803] font-bold">$</span>
+                <span className="font-bold">
+                  Waiting for pitch submission...
+                </span>
                 <motion.span
                   animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
+                  transition={{
+                    duration: 0.8,
+                    repeat: Infinity,
+                    type: "tween",
+                  }}
                   className="inline-block w-2 h-4 bg-[#FF6803]/40"
                 />
               </div>
             )}
 
-            <AnimatePresence>
-              {terminalLines.map((line, i) => {
-                const isLast = i === terminalLines.length - 1;
-                const isDone = line.startsWith("✓");
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={`flex items-start gap-2 py-1 ${
-                      isDone ? "text-emerald-400" : "text-white/60"
-                    }`}
-                  >
-                    {isDone ? (
-                      <CheckCircle2
-                        size={14}
-                        className="text-emerald-400 mt-0.5 shrink-0"
-                      />
-                    ) : isLast && terminalActive ? (
-                      <Loader2
-                        size={14}
-                        className="text-[#FF6803] mt-0.5 animate-spin shrink-0"
-                      />
-                    ) : (
-                      <Circle
-                        size={14}
-                        className="text-white/15 mt-0.5 shrink-0"
-                      />
-                    )}
-                    <span className={`text-xs ${isDone ? "font-bold" : ""}`}>
-                      {line}
-                    </span>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-
-            {terminalActive && currentStep < terminalSteps.length && (
-              <motion.div
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="flex items-center gap-2 mt-2 text-[#FF6803]/40"
-              >
-                <span className="text-[#FF6803]">$</span>
-                <span className="text-xs font-mono">processing</span>
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
-                  className="inline-block w-2 h-4 bg-[#FF6803]"
-                />
-              </motion.div>
-            )}
+            {terminalLines.map((line, i) => {
+              const isLast = i === terminalLines.length - 1;
+              const isDone = line.startsWith("✓");
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={`flex items-start gap-2 py-1 ${
+                    isDone ? "text-emerald-400" : "text-white/60"
+                  }`}
+                >
+                  {isDone ? (
+                    <CheckCircle2
+                      size={14}
+                      className="text-emerald-400 mt-0.5 shrink-0"
+                    />
+                  ) : isLast && terminalActive ? (
+                    <Loader2
+                      size={14}
+                      className="animate-spin text-[#FF6803] mt-0.5 shrink-0"
+                    />
+                  ) : (
+                    <Circle
+                      size={14}
+                      className="text-white/15 mt-0.5 shrink-0"
+                    />
+                  )}
+                  <span className="font-bold">{line}</span>
+                </motion.div>
+              );
+            })}
           </div>
-        </div>
-      </motion.div>
 
-      {/* ═══ BOTTOM HINT ═══ */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="mt-6 mb-4 flex items-center justify-center gap-2"
-      >
-        <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-full px-4 py-2 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#FF6803]">
-          <Terminal size={12} className="text-[#FF6803]" />
-          <span className="text-[10px] font-bold text-white/50 font-mono">
-            Powered by Gemini Pro
-          </span>
-          <Sparkles size={10} className="text-[#FF6803]" />
+          {/* Terminal Footer */}
+          <div className="px-4 py-2 bg-[#111] border-t border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap size={10} className="text-[#FF6803]/40" />
+              <span className="text-[9px] font-black text-white/15 uppercase tracking-widest font-mono">
+                Shadow Engine v3.0
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <motion.div
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity, type: "tween" }}
+                className="w-1.5 h-1.5 bg-emerald-400/60 rounded-full"
+              />
+              <span className="text-[9px] font-black text-white/15 uppercase tracking-widest font-mono">
+                Ready
+              </span>
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>
