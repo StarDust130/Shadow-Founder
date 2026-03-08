@@ -10,9 +10,9 @@ import { User } from "@/lib/models/User";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const groq = new Groq({ apiKey: process.env.QROQ_API_KEY! });
 
-const SYSTEM_PROMPT = `You are an expert full-stack developer. Given a startup idea and its analysis, generate a complete MVP codebase.
+const SYSTEM_PROMPT = `You are an elite full-stack developer and UI/UX designer. Given a startup idea and its analysis, generate a complete, visually stunning MVP codebase.
 
-Generate a working Next.js 14 project with TypeScript and Tailwind CSS. The code should be production-ready, clean, and well-structured.
+Generate a working Next.js 14 project with TypeScript and Tailwind CSS. The code must be production-quality, clean, well-structured, and visually impressive.
 
 You MUST respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
 {
@@ -31,20 +31,43 @@ Requirements:
 - Use modern React patterns (Server Components, Client Components where needed)
 - Include package.json with all dependencies
 - Include tailwind.config.ts and tsconfig.json
-- Make the UI professional with Tailwind CSS - use a clean modern design
+- Use EXCEPTIONAL UI design with Tailwind CSS:
+  * Modern color palette with gradients (not plain gray/white)
+  * Smooth hover effects, focus rings, and micro-interactions
+  * Beautiful card layouts with shadows and rounded corners
+  * Professional typography hierarchy (font sizes, weights, spacing)
+  * Responsive design that looks great on mobile and desktop
+  * Use backdrop-blur, glass-morphism, or neumorphism where appropriate
+  * Include subtle animations with CSS transitions
+  * Well-designed buttons with hover/active states
+  * Proper spacing system (consistent padding/margins)
 - Include proper TypeScript types
 - Include at least one API route
 - Make it functional and demonstrable
 
 IMPORTANT — LANDING PAGE PREVIEW:
-You MUST also include a file with path "preview.html" — a single standalone HTML file (with all CSS and JS inlined) that serves as a beautiful, modern landing page for the startup. This preview.html must:
+You MUST also include a file with path "preview.html" — a single standalone HTML file (with all CSS and JS inlined) that serves as a stunning, world-class landing page for the startup. This preview.html must:
 - Be a complete self-contained HTML document with inline <style> and <script> tags
 - NOT use any external CDN links, imports, or dependencies
-- Have a modern, visually stunning design with gradients, animations, hover effects
-- Include: hero section with headline + CTA, features/benefits section, social proof/stats, pricing or signup section, footer
-- Use CSS variables for a consistent color scheme
-- Include smooth scroll, subtle CSS animations, and responsive design
-- Be production-quality and look impressive
+- Have a VISUALLY STUNNING modern design that looks like a real SaaS landing page:
+  * Rich gradient backgrounds (e.g. from-purple-600 via-blue-500 to-cyan-400 style)
+  * Floating shapes, subtle SVG patterns, or animated background elements
+  * Glass-morphism cards with backdrop-blur effects
+  * Smooth CSS animations (fade-in, slide-up on scroll, hover transforms)
+  * Professional shadow system (multiple shadow layers for depth)
+  * Modern typography with large bold headlines and clean body text
+  * Consistent color scheme using CSS custom properties
+  * Well-designed CTA buttons with gradient backgrounds and hover effects
+- Include these well-designed sections:
+  * Navigation bar with logo and smooth-scroll links
+  * Hero: bold headline, compelling subtitle, CTA button, optional hero illustration/graphic using CSS shapes
+  * Features/Benefits: 3-6 feature cards with icons (use Unicode/emoji icons) and descriptions
+  * Social proof: stats counters (e.g. "10K+ users", "99.9% uptime") or testimonial quotes
+  * Pricing: at least 2 tiers with highlighted recommended plan, feature comparison
+  * CTA section with email signup form
+  * Footer with links and branding
+- Use CSS smooth scroll, intersection observer for scroll animations, and responsive breakpoints
+- Must look like a REAL professional product page, not a template
 
 DO NOT include any text outside the JSON. Only output the JSON object.`;
 
@@ -122,7 +145,7 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
 
     // Try Gemini first, fall back to Groq if it fails
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       const result = await model.generateContent([SYSTEM_PROMPT, userPrompt]);
       rawContent = result.response.text();
     } catch (geminiError) {
