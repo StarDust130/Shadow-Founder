@@ -8,88 +8,68 @@ import { User } from "@/lib/models/User";
 
 const groq = new Groq({ apiKey: process.env.QROQ_API_KEY! });
 
-const SYSTEM_PROMPT = `You are a world-class full-stack developer and award-winning UI/UX designer in 2026. You build breathtaking, modern web applications that look like they belong in a design portfolio.
+const SYSTEM_PROMPT = `You are the world's best frontend developer building a startup landing page in 2026.
 
-Given a startup idea and its analysis, generate a STUNNING MVP codebase that would impress any investor or user at first glance.
+Given a startup idea, generate a COMPLETE MVP codebase with a STUNNING preview.html landing page.
 
-Generate a working Next.js 14 project with TypeScript and Tailwind CSS. The code must be production-quality, clean, well-structured, and VISUALLY BREATHTAKING.
-
-You MUST respond with ONLY valid JSON (no markdown, no code blocks, no explanations) in this exact format:
+RESPOND WITH ONLY VALID JSON (no markdown, no code blocks):
 {
   "files": [
-    {
-      "path": "src/app/page.tsx",
-      "content": "<full file content>",
-      "lang": "typescript"
-    }
+    { "path": "preview.html", "content": "<full HTML>", "lang": "html" },
+    { "path": "package.json", "content": "...", "lang": "json" },
+    { "path": "src/app/page.tsx", "content": "...", "lang": "typescript" }
   ]
 }
 
-Requirements:
-- Generate 8-15 files for a realistic MVP
-- Include: layout, main page, at least 2-3 feature pages, API routes, components, types, config files
-- Use modern React patterns (Server Components, Client Components where needed)
-- Include package.json with all dependencies
-- Include tailwind.config.ts and tsconfig.json
-- Code MUST compile — no syntax errors, no missing imports
+Generate 5-10 files. Include package.json, layout, page, and preview.html.
 
-CRITICAL — LANDING PAGE PREVIEW FILE (preview.html):
-You MUST include a file at path "preview.html". This is the MOST IMPORTANT file — it's shown as a live preview.
+═══════════════════════════════════════════
+  PREVIEW.HTML — THIS IS THE MOST IMPORTANT FILE
+═══════════════════════════════════════════
 
-The preview.html MUST be:
-- A COMPLETE standalone HTML document with ALL CSS and JS inlined
-- ZERO external dependencies — no CDN links, no imports, no external fonts
-- Use the startup's APP NAME (provided in the prompt) as the brand name throughout
+The preview.html must be a COMPLETE standalone HTML file with ALL CSS inlined in <style> tags and ALL JS inlined in <script> tags. ZERO external dependencies. No CDN links.
 
-PREVIEW DESIGN — NEOBRUTALISM + MODERN HYBRID STYLE:
-Use a bold, striking Neobrutalism design with modern touches:
-- Thick black borders (2-4px solid #1A1A1A) on cards, buttons, sections
-- Hard box shadows (4px 4px 0 #1A1A1A, 6px 6px 0 <accent>)
-- Bold uppercase typography with tight letter-spacing  
-- Vibrant accent colors (pick ONE: #FF6803 orange, #6366F1 indigo, #22C55E green, #8B5CF6 purple)
-- White/cream backgrounds with colored accent cards
-- Rounded corners (border-radius: 16px-24px) 
-- Hover effects: cards lift up (translateY(-4px)) and shadow grows
-- Large hero text (clamp(2rem, 5vw, 3.5rem)) — NOT too massive, readable and clean
-- Professional body text (14-16px), NOT oversized
-- Clean whitespace and good spacing
+DESIGN STYLE — NEOBRUTALISM (2026):
+- Color palette: Use CSS variables. Primary accent: #FF6803 (orange). Dark: #1A1A1A. Light bg: #FFFBF5.
+- Borders: 2-3px solid #1A1A1A on ALL cards, buttons, inputs
+- Shadows: box-shadow: 4px 4px 0 #1A1A1A on cards. 6px 6px 0 #FF6803 on hover.
+- Typography: system-ui font. Bold (700-900 weight). Uppercase headings with letter-spacing: -0.02em.
+- Corners: border-radius: 14-20px
+- Hover: translateY(-4px) + shadow grows
+- Buttons: bg #FF6803, white text, 2px border #1A1A1A, box-shadow, uppercase, font-weight 800
+- Body bg: #FFFBF5 (warm cream). Cards: white bg.
 
-PREVIEW SECTIONS (10 sections, all well-designed with Indian context):
-1. NAV: Sticky top bar with app name logo (bold uppercase) + "Get Started" CTA button with thick border
-2. HERO: Bold headline (not too big — max 3.5rem), subtitle (1 line), 2 CTA buttons, animated gradient background
-3. FEATURES: 3-4 cards in grid, each with emoji icon + title + short description, neobrutalism card style
-4. HOW IT WORKS: 3-4 numbered steps explaining the user journey. Simple icons, clean layout
-5. SOCIAL PROOF: 3 stat counters in a row (e.g. "10K+ Users", "99.9% Uptime", "4.9★ Rating")
-6. TESTIMONIALS: 2-3 quote cards with user names and roles. Make them feel real and Indian (use Indian names like Priya, Arjun, Sneha)
-7. PRICING: 3 tier cards with ₹ (Indian Rupee) values — e.g. Free/₹0, Pro/₹999/mo, Enterprise/₹4,999/mo. Popular one highlighted. Checkmark feature lists
-8. FAQ: 4-5 collapsible FAQ items with toggle arrows. Common questions about the product
-9. CTA: Sign-up section with email input + button, bold headline
-10. FOOTER: Clean minimal footer with copyright + links
+REQUIRED 10 SECTIONS in preview.html:
+1. NAV — Fixed top. Logo text (app name, bold uppercase, 1.1rem). "Get Started" button right side. Border-bottom 3px.
+2. HERO — Full viewport height. App name as big headline (clamp 2rem-3.5rem). 1-line subtitle. 2 CTA buttons. Subtle animated gradient bg.
+3. FEATURES — 4 feature cards in 2x2 grid. Each: emoji icon + bold title + 1 sentence. White cards, thick borders, shadow.
+4. HOW IT WORKS — 3 numbered steps. Each step: number in orange circle + title + 1 sentence. Clean centered layout.
+5. STATS — Dark bg (#1A1A1A). 3-4 big stat numbers in orange. Labels below. "50K+ Users" / "99.9% Uptime" / "4.9★ Rating" / "₹2Cr+ Processed".
+6. TESTIMONIALS — 3 quote cards. Big quotation mark. Real text. Indian names: Priya Sharma (Mumbai), Arjun Mehta (Bangalore), Sneha Patel (Delhi). Role + company.
+7. PRICING — 3 tier cards. FREE (₹0), PRO (₹999/mo, popular/highlighted), ENTERPRISE (₹4,999/mo). Feature checklists. "Popular" badge on Pro. ALL PRICES IN ₹.
+8. FAQ — 4 collapsible <details> items. Clean borders. + icon that rotates on open.
+9. CTA — Dark bg. Bold headline. Email input + "Sign Up Free" button. "Join 50,000+ founders" text.
+10. FOOTER — Dark bg. Copyright 2026. Privacy + Terms links.
 
-IMPORTANT — INDIAN CONTEXT:
-- ALL pricing MUST use Indian Rupees (₹) — e.g. ₹0, ₹999, ₹2,499, ₹4,999. Do NOT use $ dollar signs
-- Use Indian user names in testimonials (Priya Sharma, Arjun Mehta, Sneha Patel, etc.)
-- Reference Indian cities/context where relevant (Bangalore, Mumbai, Delhi)
-- Stats should feel realistic for Indian market (e.g. "50K+ Users across India", "Trusted by 500+ startups")
+TEXT RULES:
+- Use the APP NAME (provided in prompt) as brand name everywhere — nav, hero, CTA, footer. NEVER use the raw idea description as display text.
+- Headlines: 3-6 words, punchy, uppercase
+- Descriptions: 1 sentence, max 15 words
+- NO lorem ipsum. NO filler. NO "coming soon". Write REAL startup copy relevant to the idea.
+- Keep it SHORT and DIRECT
 
-TEXT CONTENT RULES:
-- Use the app name (not the raw idea description) as the brand
-- Write REAL compelling copy that matches the startup idea
-- Headlines should be punchy, 3-7 words max
-- Descriptions should be 1-2 short sentences, clear and professional
-- NO filler text, NO lorem ipsum, NO "coming soon"
-- Pricing should use Indian Rupees: ₹0/Free, ₹999/mo, ₹4,999/mo
+CSS RULES (MUST FOLLOW):
+- Use :root { --primary: #FF6803; --dark: #1A1A1A; --light: #FFFBF5; --shadow: 4px 4px 0 #1A1A1A; }
+- nav: position fixed, top 0, z-index 100, border-bottom 3px solid var(--dark)
+- Hero: min-height 100vh, centered, animated gradient background using @keyframes
+- All cards: padding 2rem, border-radius 18px, border 2px solid var(--dark), box-shadow var(--shadow)
+- .fade-in class with IntersectionObserver for scroll animations
+- Responsive: @media (max-width: 640px) adjustments
+- Smooth scrolling: scroll-behavior: smooth
+- section padding: 5rem 2rem
+- max-width containers: 900px for grids, centered with margin auto
 
-CSS RULES:
-- Use CSS custom properties for the color palette
-- @keyframes for subtle animated gradient on hero background
-- Scroll-triggered fade-in animations via IntersectionObserver
-- Responsive @media queries (mobile-first, looks great on all sizes)
-- Smooth scrolling (scroll-behavior: smooth)
-- Keep text sizes reasonable: hero h1 max 3.5rem, body 0.875-1rem, small text 0.75rem
-- Clean typography hierarchy — h1 > h2 > h3 > p
-
-DO NOT include any text outside the JSON. Only output the JSON object.`;
+DO NOT output anything except the JSON object.`;
 
 function buildFallbackPreview(appName: string, idea: string, summary: string) {
   return `<!DOCTYPE html>
@@ -260,11 +240,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const appName = analysis.appName || analysis.idea.split(" ").slice(0, 3).join(" ");
+    const appName = analysis.appName || analysis.idea.split(" ").slice(0, 2).join(" ");
 
     const userPrompt = `Build an MVP for this startup:
 
-**App Name:** ${appName}
+**App Name (BRAND):** ${appName}
 **Idea:** ${analysis.idea}
 **Target Audience:** ${analysis.target}
 **Problem:** ${analysis.problem}
@@ -275,7 +255,13 @@ ${analysis.revenue ? `**Revenue Model:** ${analysis.revenue}` : ""}
 **Key Strengths:** ${analysis.strengths.join(", ")}
 **Recommendations:** ${analysis.recommendations.join(", ")}
 
-IMPORTANT: Use "${appName}" as the brand/product name throughout the preview.html and all files. Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on the core value proposition. Make it visually impressive.`;
+CRITICAL INSTRUCTIONS:
+1. The brand name is "${appName}" — use "${appName}" as the product name EVERYWHERE in the preview.html and all files. Do NOT use the raw idea description as text. The hero headline should be "${appName}", the nav logo should say "${appName}", etc.
+2. Write SHORT, punchy marketing copy — not long descriptions. Headlines: 3-6 words. Subtitles: 1 sentence max.
+3. The preview.html MUST have FULL CSS inlined in <style> tags. It must look beautiful with neobrutalism design, proper colors, proper spacing, hover effects, animations.
+4. Include 8-10 sections: Nav, Hero, Features (4 cards), How It Works (3 steps), Stats, Testimonials (Indian names), Pricing (\u20b9 values), FAQ, CTA, Footer.
+5. ALL pricing in Indian Rupees (\u20b9). No dollar signs.
+6. Make it look like a real 2026 startup landing page — professional, bold, clean.`;
 
     let rawContent: string;
 
@@ -287,8 +273,8 @@ IMPORTANT: Use "${appName}" as the brand/product name throughout the preview.htm
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
-        temperature: 1,
-        max_completion_tokens: 8192,
+        temperature: 0.7,
+        max_completion_tokens: 16384,
         top_p: 1,
       });
       rawContent = result.choices[0]?.message?.content || "";

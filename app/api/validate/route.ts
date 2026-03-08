@@ -24,7 +24,9 @@ When given a startup idea, analyze it and respond with ONLY valid JSON (no markd
     {"label": "Revenue Potential", "value": "<e.g. ₹40L ARR>", "trend": "<up or down>", "detail": "<1 sentence in Indian context>"},
     {"label": "Feasibility", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence>"},
     {"label": "India Market Fit", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence about India-specific opportunity>"},
-    {"label": "Time to MVP", "value": "<e.g. 3-4 months>", "trend": "<up or down>", "detail": "<1 sentence about dev timeline>"}
+    {"label": "Time to MVP", "value": "<e.g. 3-4 months>", "trend": "<up or down>", "detail": "<1 sentence about dev timeline>"},
+    {"label": "Scalability", "value": "<Low/Medium/High>", "trend": "<up or down>", "detail": "<1 sentence about growth potential>"},
+    {"label": "User Acquisition", "value": "<Easy/Moderate/Hard>", "trend": "<up or down>", "detail": "<1 sentence about how easy to get first 1000 users>"}
   ],
   "bigPlayers": [
     {"name": "<competitor name>", "strength": "<what they do well>", "weakness": "<their gap you can exploit>"},
@@ -136,6 +138,8 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
           { label: "Feasibility", value: "Medium", trend: "up", detail: "Technical feasibility undetermined" },
           { label: "India Market Fit", value: "Medium", trend: "up", detail: "Indian market potential unclear" },
           { label: "Time to MVP", value: "3-6 months", trend: "up", detail: "Standard development timeline" },
+          { label: "Scalability", value: "Medium", trend: "up", detail: "Growth potential to be evaluated" },
+          { label: "User Acquisition", value: "Moderate", trend: "up", detail: "Acquisition strategy needs validation" },
         ],
         bigPlayers: [
           { name: "Unknown", strength: "Established presence", weakness: "To be researched" },
@@ -161,13 +165,19 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
       const ideaLower = idea.toLowerCase().trim();
       const aiNameLower = aiName.toLowerCase();
       // Check if AI name is missing, too long, or just the raw idea text
-      const isBadName = !aiName || aiName.length > 20 || aiNameLower === ideaLower || aiName.split(" ").length > 3;
+      const isBadName = !aiName || aiName.length > 20 || aiNameLower === ideaLower || aiName.split(" ").length > 3 || ideaLower.includes(aiNameLower);
       if (isBadName) {
-        // Generate a short name: take key words from the idea, capitalize, join
-        const stopWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","that","with","as","by","this","from","at","app","platform","tool","system","service","website","build","create","make"]);
-        const words = idea.split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()) && w.length > 2).slice(0, 2);
-        const generated = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
-        analysisData.appName = generated || idea.split(" ").slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
+        // Creative name gen: extract core concept words, add startup-style suffix
+        const stopWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","its","that","with","as","by","this","from","at","app","platform","tool","system","service","website","build","create","make","like","want","need","can","will","would","should","could","my","your","our","their","just","very","really","also","which","about","based","using","use","new","get","go","do","does","has","have","had","been","was","were","are","being","but","not","no","all","any","each","every","some","such","than","too","more","most","other","into","over","through","between","both","after","before","during","where","when","how","what","who","whom","why","so","then","up","out","off","down","back","only"]);
+        const words = idea.split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()) && w.length > 2);
+        const suffixes = ["ly", "ify", "io", "hub", "sync", "flow", "nest", "base", "mint", "wave", "pulse", "spark", "dock", "verse", "stack"];
+        if (words.length >= 1) {
+          const core = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
+          const suffix = suffixes[core.charCodeAt(0) % suffixes.length];
+          analysisData.appName = core + suffix;
+        } else {
+          analysisData.appName = "LaunchPad";
+        }
       }
     }
 
