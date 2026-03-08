@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 
 interface UserPlan {
-  plan: "free" | "pro";
+  plan: "free" | "pro" | "enterprise";
   buildsUsed: number;
   maxBuilds: number;
 }
@@ -140,6 +140,16 @@ const PRO_FEATURES = [
   "Early access to new features",
 ];
 
+const ENTERPRISE_FEATURES = [
+  "Everything in Pro",
+  "Unlimited MVP builds",
+  "Dedicated AI pipeline",
+  "Custom code templates",
+  "White-label exports",
+  "1-on-1 onboarding call",
+  "Slack priority support",
+];
+
 export default function ProfilePage() {
   const { user } = useUser();
   const firstName = user?.firstName || "Builder";
@@ -150,7 +160,10 @@ export default function ProfilePage() {
   const [viableCount, setViableCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [selectedUpgradePlan, setSelectedUpgradePlan] = useState<"pro" | "enterprise">("pro");
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
+  const [upgraded, setUpgraded] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -182,11 +195,14 @@ export default function ProfilePage() {
     load();
   }, []);
 
-  const handleUpgradeClick = useCallback(async () => {
+  const handleUpgradeClick = useCallback(async (planType: "pro" | "enterprise" = "pro") => {
+    setSelectedUpgradePlan(planType);
     setShowUpgradeModal(true);
+    setUpgraded(false);
+    const amount = planType === "enterprise" ? "50000" : "1999";
     try {
       const QRCode = (await import("qrcode")).default;
-      const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${UPI_AMOUNT}&cu=INR&tn=ShadowFounder+Pro+Upgrade`;
+      const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=ShadowFounder+${planType === "enterprise" ? "Enterprise" : "Pro"}+Upgrade`;
       const dataUrl = await QRCode.toDataURL(upiUri, {
         width: 280,
         margin: 2,
@@ -198,8 +214,30 @@ export default function ProfilePage() {
     }
   }, []);
 
+  const handleConfirmPayment = useCallback(async () => {
+    setUpgrading(true);
+    try {
+      const res = await fetch("/api/user", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: selectedUpgradePlan }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUserPlan(data);
+        setUpgraded(true);
+      }
+    } catch {
+      // silent
+    } finally {
+      setUpgrading(false);
+    }
+  }, [selectedUpgradePlan]);
+
   const plan = userPlan?.plan || "free";
   const isPro = plan === "pro";
+  const isEnterprise = plan === "enterprise";
+  const isPaid = isPro || isEnterprise;
   const buildsUsed = userPlan?.buildsUsed ?? 0;
   const maxBuilds = userPlan?.maxBuilds ?? 1;
   const buildsRemaining = Math.max(0, maxBuilds - buildsUsed);
@@ -207,7 +245,8 @@ export default function ProfilePage() {
     ? new Date(user.createdAt).getFullYear()
     : new Date().getFullYear();
 
-  const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${UPI_AMOUNT}&cu=INR&tn=ShadowFounder+Pro+Upgrade`;
+  const upgradeAmount = selectedUpgradePlan === "enterprise" ? "50000" : "1999";
+  const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${upgradeAmount}&cu=INR&tn=ShadowFounder+${selectedUpgradePlan === "enterprise" ? "Enterprise" : "Pro"}+Upgrade`;
 
   const creditRequestEmail = `mailto:chandanbsd9@gmail.com?subject=${encodeURIComponent("Free Build Credit Request — Shadow Founder")}&body=${encodeURIComponent(`Hi Shadow Founder Team,\n\nI'd like to request a free build credit for my account.\n\nName: ${user?.fullName || firstName}\nEmail: ${user?.primaryEmailAddress?.emailAddress || ""}\nUser ID: ${user?.id || ""}\n\nThank you!`)}`;
 
@@ -286,17 +325,17 @@ export default function ProfilePage() {
             </div>
             <div className="flex-1" />
             <div
-              className={`hidden sm:flex items-center gap-2 rounded-lg px-3 py-1.5 border ${isPro ? "bg-[#FF6803]/8 border-[#FF6803]/15" : "bg-emerald-500/8 border-emerald-500/15"}`}
+              className={`hidden sm:flex items-center gap-2 rounded-lg px-3 py-1.5 border ${isPaid ? "bg-[#FF6803]/8 border-[#FF6803]/15" : "bg-emerald-500/8 border-emerald-500/15"}`}
             >
-              {isPro ? (
+              {isPaid ? (
                 <Crown size={12} className="text-[#FF6803]" />
               ) : (
                 <Shield size={12} className="text-emerald-500" />
               )}
               <span
-                className={`text-[9px] font-black uppercase tracking-widest font-mono ${isPro ? "text-[#FF6803]" : "text-emerald-600"}`}
+                className={`text-[9px] font-black uppercase tracking-widest font-mono ${isPaid ? "text-[#FF6803]" : "text-emerald-600"}`}
               >
-                {isPro ? "Pro Plan" : "Free Plan"}
+                {isEnterprise ? "Enterprise" : isPro ? "Pro Plan" : "Free Plan"}
               </span>
             </div>
           </div>
@@ -371,24 +410,28 @@ export default function ProfilePage() {
                       </span>
                     </div>
                     <p className="text-[11px] text-[#1A1A1A]/35 font-bold">
-                      {isPro
-                        ? `${buildsRemaining} of ${maxBuilds} builds remaining on Pro`
-                        : `${buildsUsed} of ${maxBuilds} build credits used`}
+                      {isEnterprise
+                        ? "Unlimited builds on Enterprise"
+                        : isPro
+                          ? `${buildsRemaining} of ${maxBuilds} builds remaining on Pro`
+                          : `${buildsUsed} of ${maxBuilds} build credits used`}
                     </p>
                     <div className="mt-4 flex items-center gap-2 bg-[#FF6803]/5 rounded-lg px-3 py-2 border border-[#FF6803]/15">
                       <Zap size={12} className="text-[#FF6803]" />
                       <span className="text-[10px] font-black text-[#FF6803]/70 font-mono">
-                        {isPro
-                          ? "Unlimited validations • 10 MVP builds"
-                          : "Unlimited validations • 1 MVP build"}
+                        {isEnterprise
+                          ? "Unlimited validations • Unlimited builds"
+                          : isPro
+                            ? "Unlimited validations • 10 MVP builds"
+                            : "Unlimited validations • 1 MVP build"}
                       </span>
                     </div>
                   </>
                 )}
               </motion.div>
 
-              {/* Upgrade / Pro Status */}
-              {isPro ? (
+              {/* Upgrade / Plan Status */}
+              {isPaid ? (
                 <motion.div
                   whileHover={{ y: -4, x: -2 }}
                   className="bg-emerald-500 border-2 border-[#1A1A1A] rounded-2xl p-6 shadow-[6px_6px_0_#1A1A1A] transition-all relative overflow-hidden cursor-default"
@@ -403,10 +446,12 @@ export default function ProfilePage() {
                       </h2>
                     </div>
                     <h3 className="text-xl font-black text-white tracking-tight mb-1">
-                      Pro Active
+                      {isEnterprise ? "Enterprise Active" : "Pro Active"}
                     </h3>
                     <p className="text-[11px] text-white/60 font-bold mb-4">
-                      You have unlimited access to all features.
+                      {isEnterprise
+                        ? "Unlimited builds & all premium features unlocked."
+                        : "You have access to all Pro features."}
                     </p>
                     <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-2">
                       <CheckCircle2 size={14} className="text-white" />
@@ -414,6 +459,16 @@ export default function ProfilePage() {
                         All features unlocked
                       </span>
                     </div>
+                    {isPro && !isEnterprise && (
+                      <motion.button
+                        onClick={() => handleUpgradeClick("enterprise")}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 bg-white/20 text-white font-black text-[10px] uppercase tracking-wider rounded-xl border border-white/30 hover:bg-white/30 transition-all cursor-pointer"
+                      >
+                        <Sparkles size={12} /> Upgrade to Enterprise
+                      </motion.button>
+                    )}
                   </div>
                 </motion.div>
               ) : (
@@ -447,7 +502,7 @@ export default function ProfilePage() {
                       code generation.
                     </p>
                     <motion.button
-                      onClick={handleUpgradeClick}
+                      onClick={() => handleUpgradeClick("pro")}
                       whileHover={{
                         y: -3,
                         x: -2,
@@ -461,7 +516,7 @@ export default function ProfilePage() {
                     </motion.button>
                     <div className="mt-4 flex items-center justify-center gap-1">
                       <span className="text-[9px] font-black text-white/40 uppercase tracking-widest font-mono">
-                        ₹1,999 one-time via UPI
+                        Starting at ₹1,999/month via UPI
                       </span>
                     </div>
                   </div>
@@ -565,12 +620,12 @@ export default function ProfilePage() {
             transition={{ duration: 0.25 }}
           >
             {/* Plan Comparison */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               {/* Free Plan Card */}
               <motion.div
                 whileHover={{ y: -4, x: -2 }}
                 className={`bg-white border-2 rounded-2xl p-6 transition-all ${
-                  !isPro
+                  !isPaid
                     ? "border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A]"
                     : "border-[#1A1A1A]/15 shadow-[4px_4px_0_#1A1A1A]/10"
                 }`}
@@ -579,7 +634,7 @@ export default function ProfilePage() {
                   <div className="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center border-2 border-emerald-500/20">
                     <Shield size={16} className="text-emerald-500" />
                   </div>
-                  {!isPro && (
+                  {!isPaid && (
                     <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md font-mono">
                       Current
                     </span>
@@ -654,7 +709,7 @@ export default function ProfilePage() {
                       ₹1,999
                     </span>
                     <span className="text-sm font-bold text-white/40">
-                      one-time
+                      /month
                     </span>
                   </div>
                   <div className="space-y-2.5 mb-5">
@@ -671,14 +726,72 @@ export default function ProfilePage() {
                       </div>
                     ))}
                   </div>
-                  {!isPro && (
+                  {!isPaid && (
                     <motion.button
-                      onClick={handleUpgradeClick}
+                      onClick={() => handleUpgradeClick("pro")}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.97 }}
                       className="w-full flex items-center justify-center gap-2 py-3 bg-white text-[#FF6803] font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow cursor-pointer"
                     >
                       <Sparkles size={14} /> Upgrade to Pro
+                    </motion.button>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Enterprise Plan Card */}
+              <motion.div
+                whileHover={{ y: -4, x: -2 }}
+                className={`border-2 rounded-2xl p-6 transition-all relative overflow-hidden ${
+                  isEnterprise
+                    ? "bg-emerald-500 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A]"
+                    : "bg-[#1A1A1A] border-[#1A1A1A] shadow-[6px_6px_0_#FF6803]"
+                }`}
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                      <Zap size={16} className={isEnterprise ? "text-emerald-500" : "text-[#1A1A1A]"} />
+                    </div>
+                    {isEnterprise && (
+                      <span className="text-[8px] font-black uppercase tracking-widest text-white/80 bg-white/20 px-2 py-0.5 rounded-md font-mono">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-lg font-black text-white tracking-tight">
+                    Enterprise
+                  </h3>
+                  <div className="flex items-baseline gap-1 mt-1 mb-4">
+                    <span className="text-3xl font-black text-white">
+                      ₹50,000
+                    </span>
+                    <span className="text-sm font-bold text-white/40">
+                      /month
+                    </span>
+                  </div>
+                  <div className="space-y-2.5 mb-5">
+                    {ENTERPRISE_FEATURES.map((feature) => (
+                      <div
+                        key={feature}
+                        className="flex items-center gap-2 text-xs font-bold text-white/70"
+                      >
+                        <Check
+                          size={14}
+                          className="text-white shrink-0"
+                        />
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
+                  {!isEnterprise && (
+                    <motion.button
+                      onClick={() => handleUpgradeClick("enterprise")}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-white text-[#1A1A1A] font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow cursor-pointer"
+                    >
+                      <Zap size={14} /> Go Enterprise
                     </motion.button>
                   )}
                 </div>
@@ -693,8 +806,8 @@ export default function ProfilePage() {
               </h3>
               <p className="text-xs text-[#1A1A1A]/35 font-bold">
                 All payments are processed via UPI (Unified Payments Interface).
-                One-time payment, no recurring charges. Your Pro access is
-                activated instantly after payment confirmation.
+                Monthly subscription — Pro at ₹1,999/month, Enterprise at ₹50,000/month.
+                Your access is activated instantly after payment confirmation.
               </p>
             </div>
           </motion.div>
@@ -744,7 +857,7 @@ export default function ProfilePage() {
         )}
       </AnimatePresence>
 
-      {/* UPI UPGRADE MODAL — with Plan Details Gate */}
+      {/* UPI UPGRADE MODAL */}
       <AnimatePresence>
         {showUpgradeModal && (
           <motion.div
@@ -768,42 +881,62 @@ export default function ProfilePage() {
                 <X size={18} className="text-[#1A1A1A]/40" />
               </button>
 
-              <div className="text-center mb-5">
-                <div className="w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center mx-auto mb-3 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
-                  <Crown size={22} className="text-white" />
+              {upgraded ? (
+                <div className="text-center py-8">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                    className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A]"
+                  >
+                    <CheckCircle2 size={28} className="text-white" />
+                  </motion.div>
+                  <h3 className="text-2xl font-black text-[#1A1A1A] uppercase tracking-tight mb-2">
+                    You&apos;re {selectedUpgradePlan === "enterprise" ? "Enterprise" : "Pro"} Now!
+                  </h3>
+                  <p className="text-sm text-[#1A1A1A]/40 font-bold mb-6">
+                    {selectedUpgradePlan === "enterprise"
+                      ? "Unlimited builds unlocked. Go build everything."
+                      : "10 MVP build credits unlocked. Start building."}
+                  </p>
+                  <motion.button
+                    onClick={() => setShowUpgradeModal(false)}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="px-8 py-3 bg-[#FF6803] text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] cursor-pointer"
+                  >
+                    Let&apos;s Go
+                  </motion.button>
                 </div>
-                <h3 className="text-xl font-black text-[#1A1A1A] uppercase tracking-tight">
-                  Upgrade to Pro
-                </h3>
-                <p className="text-xs text-[#1A1A1A]/40 font-bold mt-1">
-                  One-time payment • Lifetime access
-                </p>
-              </div>
+              ) : (
+                <>
+                  <div className="text-center mb-5">
+                    <div className="w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center mx-auto mb-3 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]">
+                      <Crown size={22} className="text-white" />
+                    </div>
+                    <h3 className="text-xl font-black text-[#1A1A1A] uppercase tracking-tight">
+                      Upgrade to {selectedUpgradePlan === "enterprise" ? "Enterprise" : "Pro"}
+                    </h3>
+                    <p className="text-xs text-[#1A1A1A]/40 font-bold mt-1">
+                      Pay via UPI &bull; Activate instantly
+                    </p>
+                  </div>
 
-              <>
-                {/* What You Get */}
+                  {/* What You Get */}
                   <div className="bg-[#FAFAFA] rounded-xl border-2 border-[#1A1A1A]/8 p-4 mb-4">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/30 font-mono mb-3 flex items-center gap-1.5">
-                      <Star size={10} className="text-[#FF6803]" /> What you
-                      unlock
+                      <Star size={10} className="text-[#FF6803]" /> What you unlock
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
-                      {[
-                        "10 MVP Build Credits",
-                        "Priority AI Analysis",
-                        "Advanced Code Gen",
-                        "Premium Landing Pages",
-                        "Priority Support",
-                        "Early Feature Access",
-                      ].map((item) => (
+                      {(selectedUpgradePlan === "enterprise"
+                        ? ["Unlimited MVP Builds", "Dedicated AI Pipeline", "Custom Code Templates", "White-label Exports", "1-on-1 Onboarding", "Slack Support"]
+                        : ["10 MVP Build Credits", "Priority AI Analysis", "Advanced Code Gen", "Premium Landing Pages", "Priority Support", "Early Feature Access"]
+                      ).map((item) => (
                         <div
                           key={item}
                           className="flex items-center gap-1.5 text-[11px] font-bold text-[#1A1A1A]/50"
                         >
-                          <Check
-                            size={12}
-                            className="text-emerald-500 shrink-0"
-                          />
+                          <Check size={12} className="text-emerald-500 shrink-0" />
                           {item}
                         </div>
                       ))}
@@ -814,10 +947,10 @@ export default function ProfilePage() {
                   <div className="text-center mb-4">
                     <div className="inline-flex items-baseline gap-1 bg-[#FF6803]/5 rounded-xl px-5 py-2.5 border border-[#FF6803]/15">
                       <span className="text-3xl font-black text-[#FF6803]">
-                        ₹1,999
+                        ₹{selectedUpgradePlan === "enterprise" ? "50,000" : "1,999"}
                       </span>
                       <span className="text-sm font-bold text-[#1A1A1A]/25">
-                        one-time
+                        /month
                       </span>
                     </div>
                   </div>
@@ -859,7 +992,7 @@ export default function ProfilePage() {
                       href={upiUri}
                       className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#FF6803] text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] cursor-pointer"
                     >
-                      <Smartphone size={16} /> Pay ₹1,999 with UPI
+                      <Smartphone size={16} /> Pay ₹{selectedUpgradePlan === "enterprise" ? "50,000" : "1,999"} with UPI
                     </a>
                     <p className="text-center text-[9px] text-[#1A1A1A]/25 font-mono mt-2">
                       Opens your UPI app directly
@@ -868,20 +1001,29 @@ export default function ProfilePage() {
 
                   <div className="border-t-2 border-[#1A1A1A]/5 pt-4">
                     <p className="text-[10px] text-[#1A1A1A]/30 font-bold text-center mb-3">
-                      After completing payment, send us an email to activate Pro
+                      After completing payment, click below to activate your plan
                     </p>
-                    <a href={`mailto:chandanbsd9@gmail.com?subject=${encodeURIComponent("I Paid — Upgrade to Pro — Shadow Founder")}&body=${encodeURIComponent(`Hi,\n\nI've completed the UPI payment of ₹1,999 for Shadow Founder Pro.\n\nPlease upgrade my account.\n\nName: ${user?.fullName || firstName}\nEmail: ${user?.primaryEmailAddress?.emailAddress || ""}\nUser ID: ${user?.id || ""}\n\nThank you!`)}`}>
-                      <motion.button
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow cursor-pointer"
-                      >
-                        <Mail size={16} />
-                        I&apos;ve Paid — Send Upgrade Request
-                      </motion.button>
-                    </a>
+                    <motion.button
+                      onClick={handleConfirmPayment}
+                      disabled={upgrading}
+                      whileHover={!upgrading ? { y: -2 } : {}}
+                      whileTap={!upgrading ? { scale: 0.97 } : {}}
+                      className={`w-full flex items-center justify-center gap-2 py-3 font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow cursor-pointer ${
+                        upgrading
+                          ? "bg-[#1A1A1A]/10 text-[#1A1A1A]/30"
+                          : "bg-emerald-500 text-white"
+                      }`}
+                    >
+                      {upgrading ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <CheckCircle2 size={16} />
+                      )}
+                      {upgrading ? "Activating..." : "I've Paid — Activate Plan"}
+                    </motion.button>
                   </div>
-              </>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
