@@ -25,6 +25,11 @@ import {
   RefreshCw,
   Pencil,
   Clock,
+  AlertTriangle,
+  Crown,
+  Target,
+  DollarSign,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -41,6 +46,12 @@ interface ChatMessage {
   content: string;
 }
 
+interface BigPlayer {
+  name: string;
+  strength: string;
+  weakness: string;
+}
+
 interface AnalysisData {
   _id: string;
   idea: string;
@@ -55,6 +66,10 @@ interface AnalysisData {
   strengths: string[];
   weaknesses: string[];
   recommendations: string[];
+  bigPlayers?: BigPlayer[];
+  failureRisks?: string[];
+  founderChecklist?: string[];
+  monetization?: string[];
   followUpMessages: ChatMessage[];
 }
 
@@ -217,18 +232,10 @@ export default function AnalysisPage() {
   const [renameValue, setRenameValue] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
   const [buildElapsed, setBuildElapsed] = useState(0);
-  const [currentGif, setCurrentGif] = useState(
-    () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
-  );
-  const [currentWaitText, setCurrentWaitText] = useState(
-    () => waitTexts[Math.floor(Math.random() * waitTexts.length)],
-  );
-  const [buildGif, setBuildGif] = useState(
-    () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
-  );
-  const [buildWaitText, setBuildWaitText] = useState(
-    () => waitTexts[Math.floor(Math.random() * waitTexts.length)],
-  );
+  const [currentGif, setCurrentGif] = useState(LOADING_GIFS[0]);
+  const [currentWaitText, setCurrentWaitText] = useState(waitTexts[0]);
+  const [buildGif, setBuildGif] = useState(LOADING_GIFS[0]);
+  const [buildWaitText, setBuildWaitText] = useState(waitTexts[0]);
 
   const {
     messages: chatMessages,
@@ -875,6 +882,148 @@ export default function AnalysisPage() {
             </ul>
           </motion.div>
         </div>
+
+        {/* BIG PLAYERS / COMPETITORS */}
+        {data.bigPlayers && data.bigPlayers.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.42 }}
+            whileHover={{ y: -6, x: -3, transition: { type: "spring", stiffness: 400, damping: 15 } }}
+            className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 md:p-6 mb-6 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] transition-shadow"
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-9 h-9 bg-[#FF6803]/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                <Crown size={16} className="text-[#FF6803]" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
+                  {"\u{1F3C6}"} Big Players
+                </h3>
+                <p className="text-[9px] text-[#1A1A1A]/30 font-bold uppercase tracking-widest font-mono">
+                  Know Your Competition
+                </p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {data.bigPlayers.map((player, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col sm:flex-row sm:items-start gap-3 p-4 bg-[#FAFAFA] rounded-xl border-2 border-[#1A1A1A]/10"
+                >
+                  <div className="w-10 h-10 bg-[#1A1A1A] rounded-xl flex items-center justify-center text-white font-black text-sm shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#FF6803]">
+                    {player.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight mb-1">{player.name}</h4>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-[11px] text-emerald-600 font-bold"><span className="text-[#1A1A1A]/30 font-mono mr-1">STR</span> {player.strength}</p>
+                      <p className="text-[11px] text-red-500 font-bold"><span className="text-[#1A1A1A]/30 font-mono mr-1">GAP</span> {player.weakness}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* FAILURE RISKS & MONETIZATION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {data.failureRisks && data.failureRisks.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.46 }}
+              whileHover={{ y: -6, x: -3, transition: { type: "spring", stiffness: 400, damping: 15 } }}
+              className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#EF4444] transition-shadow"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 bg-red-500/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                  <AlertTriangle size={16} className="text-red-500" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
+                  {"\u{1F4A3}"} Why This Could Fail
+                </h3>
+              </div>
+              <ul className="space-y-3">
+                {data.failureRisks.map((risk, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-[#1A1A1A]/60">
+                    <span className="w-6 h-6 min-w-6 bg-red-100 rounded-lg flex items-center justify-center text-[10px] font-black text-red-500 border border-red-200 mt-0.5">
+                      {i + 1}
+                    </span>
+                    {risk}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
+
+          {data.monetization && data.monetization.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.48 }}
+              whileHover={{ y: -6, x: -3, transition: { type: "spring", stiffness: 400, damping: 15 } }}
+              className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#22C55E] transition-shadow"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 bg-emerald-500/15 rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                  <DollarSign size={16} className="text-emerald-500" />
+                </div>
+                <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
+                  {"\u{1F4B0}"} Monetization Plays
+                </h3>
+              </div>
+              <ul className="space-y-3">
+                {data.monetization.map((m, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm font-medium text-[#1A1A1A]/60">
+                    <span className="w-6 h-6 min-w-6 bg-emerald-100 rounded-lg flex items-center justify-center text-[10px] font-black text-emerald-600 border border-emerald-200 mt-0.5">
+                      {"\u20B9"}
+                    </span>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
+        </div>
+
+        {/* FOUNDER CHECKLIST */}
+        {data.founderChecklist && data.founderChecklist.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.49 }}
+            whileHover={{ y: -6, x: -3, transition: { type: "spring", stiffness: 400, damping: 15 } }}
+            className="bg-[#1A1A1A] border-2 border-[#1A1A1A] rounded-2xl p-5 md:p-6 mb-6 shadow-[4px_4px_0_#FF6803] relative overflow-hidden"
+          >
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-9 h-9 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-white/20 shadow-[2px_2px_0_#FF8A3D]">
+                  <Target size={16} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-tight text-white">
+                    {"\u2705"} Founder Checklist
+                  </h3>
+                  <p className="text-[9px] text-white/30 font-bold uppercase tracking-widest font-mono">
+                    Do This Before Building
+                  </p>
+                </div>
+              </div>
+              <ul className="space-y-3">
+                {data.founderChecklist.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm font-medium text-white/70">
+                    <span className="w-7 h-7 min-w-7 bg-[#FF6803]/20 rounded-lg flex items-center justify-center text-xs font-black text-[#FF6803] border border-[#FF6803]/30">
+                      {i + 1}
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        )}
 
         {/* PIVOT ENGINE */}
         <motion.div
