@@ -78,16 +78,18 @@ function ScoreBadge({ score }: { score: number }) {
 }
 
 function StatusBadge({ verdict }: { verdict: string }) {
-  const isViable = verdict === "VIABLE" || verdict === "PASS";
+  const isViable = verdict === "VIABLE";
+  const isPass = verdict === "CONDITIONAL PASS";
+  const colorClass = isViable
+    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+    : isPass
+      ? "bg-amber-500/10 text-amber-600 border-amber-500/30"
+      : "bg-red-500/10 text-red-500 border-red-500/30";
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-2 ${
-        isViable
-          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-          : "bg-red-500/10 text-red-500 border-red-500/30"
-      }`}
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border-2 ${colorClass}`}
     >
-      {isViable ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
+      {isViable || isPass ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
       {verdict}
     </span>
   );
@@ -132,7 +134,7 @@ export default function DashboardPage() {
 
   const totalProjects = analyses.length;
   const viableCount = analyses.filter(
-    (a) => a.verdict === "VIABLE" || a.verdict === "PASS",
+    (a) => a.verdict === "VIABLE" || a.verdict === "CONDITIONAL PASS",
   ).length;
   const avgScore =
     totalProjects > 0
