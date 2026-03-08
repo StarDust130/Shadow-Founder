@@ -420,7 +420,7 @@ export default function ValidatorPage() {
         <div className="relative">
           <button
             onClick={() => setCategoryOpen(!categoryOpen)}
-            className="w-full flex items-center justify-between bg-white/70 backdrop-blur-sm border border-[#1A1A1A]/10 hover:border-[#1A1A1A]/30 rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] transition-all"
+            className="w-full flex items-center justify-between bg-white/70 backdrop-blur-sm border border-[#1A1A1A]/10 hover:border-[#1A1A1A]/30 rounded-xl px-4 py-3 text-sm font-bold text-[#1A1A1A] transition-all cursor-pointer"
           >
             <span
               className={
@@ -450,7 +450,7 @@ export default function ValidatorPage() {
                       setSelectedCategory(cat);
                       setCategoryOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-[#FF6803]/5 transition-colors ${
+                    className={`w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-[#FF6803]/5 transition-colors cursor-pointer ${
                       selectedCategory === cat
                         ? "text-[#FF6803] bg-[#FF6803]/5"
                         : "text-[#1A1A1A]/70"
@@ -547,7 +547,7 @@ export default function ValidatorPage() {
           disabled={!filledRequired || isSubmitting}
           className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all border ${
             filledRequired && !isSubmitting
-              ? "bg-linear-to-r from-[#FF8A3D] to-[#FF6803] text-white border-[#FF6803]/30 shadow-lg hover:shadow-xl"
+              ? "bg-linear-to-r from-[#FF8A3D] to-[#FF6803] text-white border-[#FF6803]/30 shadow-lg hover:shadow-xl cursor-pointer"
               : "bg-[#1A1A1A]/5 text-[#1A1A1A]/25 border-[#1A1A1A]/5 cursor-not-allowed"
           }`}
         >
