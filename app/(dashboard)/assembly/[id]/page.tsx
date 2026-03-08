@@ -17,6 +17,7 @@ import {
   Layers,
   Zap,
   Loader2,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -90,6 +91,7 @@ export default function AssemblyPage() {
     new Set(),
   );
   const [downloading, setDownloading] = useState(false);
+  const [viewMode, setViewMode] = useState<"code" | "preview">("code");
 
   useEffect(() => {
     const fetchBuild = async () => {
@@ -185,6 +187,9 @@ export default function AssemblyPage() {
   const fileTree = buildFileTree(build.files);
   const allFiles = build.files.length;
   const totalLines = build.files.reduce((sum, f) => sum + (f.lines || 0), 0);
+
+  // Find preview.html for iframe preview
+  const previewFile = build.files.find((f) => f.path === "preview.html");
 
   const renderTreeNode = (node: FolderNode | FileNode, depth = 0) => {
     if (node.type === "folder") {
@@ -360,82 +365,128 @@ export default function AssemblyPage() {
               shadow-vault
             </span>
           </div>
-          <span className="text-[10px] font-mono text-[#FF6803]/60 bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
-            AI Generated
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode("code")}
+              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded ${
+                viewMode === "code"
+                  ? "text-[#FF6803] border-[#FF6803]/40 bg-[#FF6803]/10"
+                  : "text-white/30 border-white/10 hover:text-white/50"
+              }`}
+            >
+              <Code2 size={12} /> Code
+            </button>
+            <button
+              onClick={() => setViewMode("preview")}
+              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded ${
+                viewMode === "preview"
+                  ? "text-emerald-400 border-emerald-400/40 bg-emerald-400/10"
+                  : "text-white/30 border-white/10 hover:text-white/50"
+              }`}
+            >
+              <Eye size={12} /> Preview
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row min-h-[500px] max-h-[70vh]">
-          {/* File Tree */}
-          <div className="w-full md:w-56 lg:w-64 border-b-2 md:border-b-0 md:border-r-2 border-[#2A2A2A] bg-[#161616] overflow-y-auto p-3 max-h-[200px] md:max-h-none">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF6803]/40 px-2 mb-3 block">
-              Explorer
-            </span>
-            {fileTree.map((node) => renderTreeNode(node))}
-          </div>
+          {viewMode === "code" ? (
+            <>
+              {/* File Tree */}
+              <div className="w-full md:w-56 lg:w-64 border-b-2 md:border-b-0 md:border-r-2 border-[#2A2A2A] bg-[#161616] overflow-y-auto p-3 max-h-[200px] md:max-h-none">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF6803]/40 px-2 mb-3 block">
+                  Explorer
+                </span>
+                {fileTree.map((node) => renderTreeNode(node))}
+              </div>
 
-          {/* Code Viewer */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {selectedFile ? (
-              <>
-                <div className="flex items-center justify-between px-4 py-2.5 bg-[#1E1E1E] border-b-2 border-[#2A2A2A]">
-                  <div className="flex items-center gap-2">
-                    <FileCode size={14} className="text-[#FF6803]" />
-                    <span className="text-xs font-mono font-bold text-white/70">
-                      {selectedFile.path}
-                    </span>
-                    <span className="text-[10px] font-mono font-bold text-[#FF6803] bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
-                      {selectedFile.lang}
+              {/* Code Viewer */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {selectedFile ? (
+                  <>
+                    <div className="flex items-center justify-between px-4 py-2.5 bg-[#1E1E1E] border-b-2 border-[#2A2A2A]">
+                      <div className="flex items-center gap-2">
+                        <FileCode size={14} className="text-[#FF6803]" />
+                        <span className="text-xs font-mono font-bold text-white/70">
+                          {selectedFile.path}
+                        </span>
+                        <span className="text-[10px] font-mono font-bold text-[#FF6803] bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
+                          {selectedFile.lang}
+                        </span>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() =>
+                          copyCode(selectedFile.content, selectedFile.path)
+                        }
+                        className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1.5 border transition-all ${
+                          copiedFile === selectedFile.path
+                            ? "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
+                            : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20 hover:bg-white/5"
+                        }`}
+                      >
+                        {copiedFile === selectedFile.path ? (
+                          <>
+                            <Check size={12} /> Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={12} /> Copy
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                    <div className="flex-1 overflow-auto p-4">
+                      <pre className="text-sm font-mono text-white/80 leading-relaxed whitespace-pre">
+                        {selectedFile.content?.split("\n").map((line, i) => (
+                          <div
+                            key={i}
+                            className="flex hover:bg-[#FF6803]/5 transition-colors"
+                          >
+                            <span className="w-10 text-right pr-4 text-white/15 select-none text-xs leading-relaxed font-bold">
+                              {i + 1}
+                            </span>
+                            <code>{line}</code>
+                          </div>
+                        ))}
+                      </pre>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center text-white/20 gap-3">
+                    <Code2 size={32} className="text-[#FF6803]/30" />
+                    <span className="text-sm font-mono font-bold uppercase tracking-wider">
+                      Select a file to preview
                     </span>
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() =>
-                      copyCode(selectedFile.content, selectedFile.path)
-                    }
-                    className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1.5 border transition-all ${
-                      copiedFile === selectedFile.path
-                        ? "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
-                        : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20 hover:bg-white/5"
-                    }`}
-                  >
-                    {copiedFile === selectedFile.path ? (
-                      <>
-                        <Check size={12} /> Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={12} /> Copy
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-                <div className="flex-1 overflow-auto p-4">
-                  <pre className="text-sm font-mono text-white/80 leading-relaxed whitespace-pre">
-                    {selectedFile.content?.split("\n").map((line, i) => (
-                      <div
-                        key={i}
-                        className="flex hover:bg-[#FF6803]/5 transition-colors"
-                      >
-                        <span className="w-10 text-right pr-4 text-white/15 select-none text-xs leading-relaxed font-bold">
-                          {i + 1}
-                        </span>
-                        <code>{line}</code>
-                      </div>
-                    ))}
-                  </pre>
-                </div>
-              </>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-white/20 gap-3">
-                <Code2 size={32} className="text-[#FF6803]/30" />
-                <span className="text-sm font-mono font-bold uppercase tracking-wider">
-                  Select a file to preview
-                </span>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            /* Live Preview via iframe */
+            <div className="flex-1 min-h-[500px] bg-white">
+              {previewFile ? (
+                <iframe
+                  srcDoc={previewFile.content}
+                  title="Landing Page Preview"
+                  className="w-full h-full min-h-[500px] border-0"
+                  sandbox="allow-scripts"
+                />
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[500px] text-[#1A1A1A]/30 gap-4 p-8">
+                  <Eye size={40} className="text-[#FF6803]/30" />
+                  <p className="text-sm font-black uppercase tracking-wider text-center">
+                    Preview not available
+                  </p>
+                  <p className="text-xs text-center max-w-sm">
+                    This build was generated before live preview support.
+                    Rebuild your MVP to get a beautiful landing page preview.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </motion.div>
 

@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { Groq } from "groq-sdk";
+import { createGroq } from "@ai-sdk/groq";
+import { streamText } from "ai";
 import { connectDB } from "@/lib/mongodb";
 import { Analysis } from "@/lib/models/Analysis";
 
-const groq = new Groq({ apiKey: process.env.QROQ_API_KEY });
+const groq = createGroq({ apiKey: process.env.QROQ_API_KEY });
 
 export async function POST(
   req: Request,
@@ -13,32 +13,47 @@ export async function POST(
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const { id } = await params;
     const body = await req.json();
-    const { message } = body;
+    // useChat v6 sends { messages: [...] } with parts arrays, not content strings
+    const messages = body.messages || [];
+    const lastUserMessage = messages
+      .filter((m: { role: string }) => m.role === "user")
+      .pop();
+    // AI SDK v6 UIMessage format uses parts array; fall back to content for legacy
+    const message =
+      lastUserMessage?.parts
+        ?.filter((p: { type: string }) => p.type === "text")
+        .map((p: { text: string }) => p.text)
+        .join("") ||
+      lastUserMessage?.content ||
+      body.message;
 
     if (
       !message ||
       typeof message !== "string" ||
       message.trim().length === 0
     ) {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 },
-      );
+      return new Response(JSON.stringify({ error: "Message is required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     await connectDB();
 
     const analysis = await Analysis.findOne({ _id: id, userId });
     if (!analysis) {
-      return NextResponse.json(
-        { error: "Analysis not found" },
-        { status: 404 },
-      );
+      return new Response(JSON.stringify({ error: "Analysis not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Build conversation history for context
@@ -74,34 +89,43 @@ RESPONSE STYLE RULES:
 - Keep responses under 200 words unless the question demands more detail
 - Format headings with ** bold ** markers, not markdown headers`;
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...conversationHistory,
-        { role: "user", content: message },
-      ],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.7,
-      max_completion_tokens: 1024,
+    // Save user message immediately
+    analysis.followUpMessages.push({
+      role: "user",
+      content: message,
+      timestamp: new Date(),
     });
-
-    const aiResponse =
-      completion.choices[0]?.message?.content ||
-      "I couldn't generate a response. Please try again.";
-
-    // Save both messages to the analysis
-    analysis.followUpMessages.push(
-      { role: "user", content: message, timestamp: new Date() },
-      { role: "assistant", content: aiResponse, timestamp: new Date() },
-    );
     await analysis.save();
 
-    return NextResponse.json({ response: aiResponse });
+    const result = streamText({
+      model: groq("llama-3.3-70b-versatile"),
+      system: systemPrompt,
+      messages: [
+        ...conversationHistory,
+        { role: "user" as const, content: message },
+      ],
+      temperature: 0.7,
+      async onFinish({ text }) {
+        // Save AI response after streaming completes
+        await connectDB();
+        const doc = await Analysis.findById(id);
+        if (doc) {
+          doc.followUpMessages.push({
+            role: "assistant",
+            content: text,
+            timestamp: new Date(),
+          });
+          await doc.save();
+        }
+      },
+    });
+
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("Chat error:", error);
-    return NextResponse.json(
-      { error: "Failed to process message. Please try again." },
-      { status: 500 },
+    return new Response(
+      JSON.stringify({ error: "Failed to process message. Please try again." }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
 }

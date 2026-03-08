@@ -9,9 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^3.0.29",
+    "@ai-sdk/react": "^3.0.118",
     "@clerk/nextjs": "^7.0.1",
     "@google/generative-ai": "^0.24.1",
     "@splinetool/react-spline": "^4.1.0",
+    "ai": "^6.0.116",
     "framer-motion": "^12.35.0",
     "groq-sdk": "^0.37.0",
     "jszip": "^3.10.1",

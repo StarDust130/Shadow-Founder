@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useChat } from "@ai-sdk/react";
+import { TextStreamChatTransport } from "ai";
 import {
   BarChart3,
   TrendingUp,
@@ -13,7 +15,6 @@ import {
   Sparkles,
   Lightbulb,
   Swords,
-  Zap,
   MessageSquare,
   Send,
   Loader2,
@@ -189,14 +190,26 @@ export default function AnalysisPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState("");
-  const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [building, setBuilding] = useState(false);
   const [buildStep, setBuildStep] = useState(0);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  const {
+    messages: chatMessages,
+    sendMessage,
+    status: chatStatus,
+    setMessages,
+  } = useChat({
+    transport: new TextStreamChatTransport({
+      api: `/api/analyses/${id}/chat`,
+    }),
+  });
+
+  const chatLoading = chatStatus === "submitted" || chatStatus === "streaming";
+  const chatWaiting = chatStatus === "submitted"; // waiting for first token
+  const [chatInput, setChatInput] = useState("");
 
   const buildSteps = [
     { emoji: "\u{1F9E0}", text: "Analyzing your idea architecture..." },
@@ -222,7 +235,16 @@ export default function AnalysisPage() {
         if (!res.ok) throw new Error("Analysis not found");
         const analysis = await res.json();
         setData(analysis);
-        setChatMessages(analysis.followUpMessages || []);
+        // Load existing chat history into useChat
+        if (analysis.followUpMessages?.length > 0) {
+          setMessages(
+            analysis.followUpMessages.map((msg: ChatMessage, i: number) => ({
+              id: `hist-${i}`,
+              role: msg.role,
+              parts: [{ type: "text" as const, text: msg.content }],
+            })),
+          );
+        }
       } catch {
         setError("Could not load analysis. It may have been deleted.");
       } finally {
@@ -230,7 +252,7 @@ export default function AnalysisPage() {
       }
     };
     fetchAnalysis();
-  }, [id]);
+  }, [id, setMessages]);
 
   useEffect(() => {
     if (chatOpen) {
@@ -241,36 +263,13 @@ export default function AnalysisPage() {
     }
   }, [chatMessages, chatLoading, chatOpen]);
 
-  const sendChatMessage = useCallback(async () => {
+  // Send chat message
+  const sendChatMessage = () => {
     if (!chatInput.trim() || chatLoading) return;
     const msg = chatInput.trim();
     setChatInput("");
-    setChatMessages((prev) => [...prev, { role: "user", content: msg }]);
-    setChatLoading(true);
-    try {
-      const res = await fetch(`/api/analyses/${id}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg }),
-      });
-      if (!res.ok) throw new Error("Chat failed");
-      const { response } = await res.json();
-      setChatMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: response },
-      ]);
-    } catch {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Sorry, I couldn't process that. Try again.",
-        },
-      ]);
-    } finally {
-      setChatLoading(false);
-    }
-  }, [chatInput, chatLoading, id]);
+    sendMessage({ text: msg });
+  };
 
   const handleBuildMVP = async () => {
     setBuilding(true);
@@ -349,7 +348,7 @@ export default function AnalysisPage() {
   return (
     <>
       <div
-        className={`max-w-5xl mx-auto transition-all duration-300 ${chatOpen ? "lg:mr-105" : ""}`}
+        className={`max-w-5xl mx-auto transition-all duration-300 ${chatOpen ? "lg:mr-107.5" : ""}`}
       >
         {/* HEADER */}
         <motion.div
@@ -714,6 +713,7 @@ export default function AnalysisPage() {
       <AnimatePresence>
         {chatOpen && (
           <>
+            {/* Mobile backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -727,10 +727,10 @@ export default function AnalysisPage() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed right-0 top-0 bottom-0 w-full sm:w-100 lg:w-105 bg-white z-50 lg:z-40 border-l-2 border-[#1A1A1A] shadow-[-6px_0_0_#1A1A1A] flex flex-col"
+              className="fixed right-0 top-0 bottom-0 w-full sm:w-96 lg:w-105 bg-white z-50 border-l-2 border-[#1A1A1A] shadow-[-4px_0_0_#1A1A1A] flex flex-col"
             >
               {/* Chat Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b-2 border-[#1A1A1A] bg-white">
+              <div className="flex items-center justify-between px-5 py-4 border-b-2 border-[#1A1A1A] bg-white shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-[#FF6803] rounded-xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
                     <Bot size={16} className="text-white" />
@@ -739,16 +739,19 @@ export default function AnalysisPage() {
                     <h3 className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight">
                       Shadow AI
                     </h3>
-                    <p className="text-[10px] text-[#1A1A1A]/30 font-medium">
-                      Ask about pivots, strategy & more
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <p className="text-[10px] text-[#1A1A1A]/30 font-medium">
+                        Streaming · Groq LLM
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setChatOpen(false)}
-                  className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center hover:bg-[#FF6803] transition-colors border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                  className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center hover:bg-red-500 transition-colors border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] cursor-pointer"
                 >
                   <X size={14} className="text-white" />
                 </motion.button>
@@ -788,78 +791,91 @@ export default function AnalysisPage() {
                   </div>
                 )}
 
-                {chatMessages.map((msg, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    {msg.role === "assistant" && (
-                      <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 mt-0.5 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                {chatMessages.map((msg) => {
+                  const textContent =
+                    msg.parts
+                      ?.filter(
+                        (p): p is { type: "text"; text: string } =>
+                          p.type === "text",
+                      )
+                      .map((p) => p.text)
+                      .join("") || "";
+                  if (!textContent && msg.role === "assistant") return null;
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      {msg.role === "assistant" && (
+                        <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 mt-0.5 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                          <Bot size={13} className="text-white" />
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed border-2 ${
+                          msg.role === "user"
+                            ? "bg-[#1A1A1A] text-white border-[#1A1A1A] rounded-br-sm shadow-[2px_2px_0_#FF6803]"
+                            : "bg-white border-[#1A1A1A] rounded-bl-sm shadow-[2px_2px_0_#1A1A1A]"
+                        }`}
+                      >
+                        {msg.role === "assistant" ? (
+                          formatAIResponse(textContent)
+                        ) : (
+                          <p className="whitespace-pre-wrap">{textContent}</p>
+                        )}
+                      </div>
+                      {msg.role === "user" && (
+                        <div className="w-7 h-7 bg-[#1A1A1A] rounded-lg flex items-center justify-center shrink-0 mt-0.5 border-2 border-[#1A1A1A]">
+                          <User size={13} className="text-white" />
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+
+                {chatWaiting &&
+                  chatMessages[chatMessages.length - 1]?.role !==
+                    "assistant" && (
+                    <div className="flex gap-2.5">
+                      <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
                         <Bot size={13} className="text-white" />
                       </div>
-                    )}
-                    <div
-                      className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed border-2 ${
-                        msg.role === "user"
-                          ? "bg-[#1A1A1A] text-white border-[#1A1A1A] rounded-br-sm shadow-[2px_2px_0_#FF6803]"
-                          : "bg-white border-[#1A1A1A] rounded-bl-sm shadow-[2px_2px_0_#1A1A1A]"
-                      }`}
-                    >
-                      {msg.role === "assistant" ? (
-                        formatAIResponse(msg.content)
-                      ) : (
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                      )}
-                    </div>
-                    {msg.role === "user" && (
-                      <div className="w-7 h-7 bg-[#1A1A1A] rounded-lg flex items-center justify-center shrink-0 mt-0.5 border-2 border-[#1A1A1A]">
-                        <User size={13} className="text-white" />
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-
-                {chatLoading && (
-                  <div className="flex gap-2.5">
-                    <div className="w-7 h-7 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-                      <Bot size={13} className="text-white" />
-                    </div>
-                    <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-                      <div className="flex items-center gap-1.5">
-                        <motion.div
-                          animate={{ scale: [1, 1.3, 1] }}
-                          transition={{
-                            duration: 0.6,
-                            repeat: Infinity,
-                            delay: 0,
-                          }}
-                          className="w-2 h-2 bg-[#FF6803] rounded-full"
-                        />
-                        <motion.div
-                          animate={{ scale: [1, 1.3, 1] }}
-                          transition={{
-                            duration: 0.6,
-                            repeat: Infinity,
-                            delay: 0.2,
-                          }}
-                          className="w-2 h-2 bg-[#FF6803] rounded-full"
-                        />
-                        <motion.div
-                          animate={{ scale: [1, 1.3, 1] }}
-                          transition={{
-                            duration: 0.6,
-                            repeat: Infinity,
-                            delay: 0.4,
-                          }}
-                          className="w-2 h-2 bg-[#FF6803] rounded-full"
-                        />
+                      <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
+                        <div className="flex items-center gap-1.5">
+                          <motion.div
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: 0,
+                            }}
+                            className="w-2 h-2 bg-[#FF6803] rounded-full"
+                          />
+                          <motion.div
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: 0.2,
+                            }}
+                            className="w-2 h-2 bg-[#FF6803] rounded-full"
+                          />
+                          <motion.div
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Infinity,
+                              delay: 0.4,
+                            }}
+                            className="w-2 h-2 bg-[#FF6803] rounded-full"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
                 <div ref={chatEndRef} />
               </div>
 

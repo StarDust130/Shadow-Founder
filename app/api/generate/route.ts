@@ -21,11 +21,6 @@ You MUST respond with ONLY valid JSON (no markdown, no code blocks) in this exac
       "path": "src/app/page.tsx",
       "content": "<full file content>",
       "lang": "typescript"
-    },
-    {
-      "path": "src/app/layout.tsx",
-      "content": "<full file content>",
-      "lang": "typescript"
     }
   ]
 }
@@ -40,6 +35,16 @@ Requirements:
 - Include proper TypeScript types
 - Include at least one API route
 - Make it functional and demonstrable
+
+IMPORTANT — LANDING PAGE PREVIEW:
+You MUST also include a file with path "preview.html" — a single standalone HTML file (with all CSS and JS inlined) that serves as a beautiful, modern landing page for the startup. This preview.html must:
+- Be a complete self-contained HTML document with inline <style> and <script> tags
+- NOT use any external CDN links, imports, or dependencies
+- Have a modern, visually stunning design with gradients, animations, hover effects
+- Include: hero section with headline + CTA, features/benefits section, social proof/stats, pricing or signup section, footer
+- Use CSS variables for a consistent color scheme
+- Include smooth scroll, subtle CSS animations, and responsive design
+- Be production-quality and look impressive
 
 DO NOT include any text outside the JSON. Only output the JSON object.`;
 
