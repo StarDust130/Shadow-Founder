@@ -12,8 +12,8 @@ const SYSTEM_PROMPT = `You are Shadow Founder AI — a brutally honest startup a
 When given a startup idea, analyze it and respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
 {
   "score": <number 0-100>,
-  "verdict": "<one of: VIABLE, CONDITIONAL PASS, RISKY, NOT VIABLE>",
-  "verdictColor": "<hex color: #22C55E for VIABLE, #FF8A3D for CONDITIONAL PASS, #FF6803 for RISKY, #EF4444 for NOT VIABLE>",
+  "verdict": "<one of: VIABLE, PASS, RISKY, NOT VIABLE>",
+  "verdictColor": "<hex color: #22C55E for VIABLE, #FF8A3D for PASS, #FF6803 for RISKY, #EF4444 for NOT VIABLE>",
   "summary": "<2-3 sentence executive summary of the idea's potential>",
   "metrics": [
     {"label": "Market Size (TAM)", "value": "<e.g. $4.2B>", "trend": "<up or down>", "detail": "<1 sentence explanation>"},
@@ -28,7 +28,7 @@ When given a startup idea, analyze it and respond with ONLY valid JSON (no markd
 
 Scoring guide:
 - 80-100: VIABLE — Strong market fit, clear differentiation, solid economics
-- 60-79: CONDITIONAL PASS — Has potential but needs pivots or better execution
+- 60-79: PASS — Has potential but needs pivots or better execution
 - 40-59: RISKY — Significant challenges, crowded market, or weak economics
 - 1-39: NOT VIABLE — Fatal flaws, no market, or impossible economics
 - 0: ILLEGAL/UNETHICAL — The idea is illegal, unethical, harmful, promotes fraud, violence, exploitation, drug dealing, scams, weapons, child exploitation, hacking, phishing, or anything that violates law or basic ethics
@@ -159,10 +159,17 @@ Provide your analysis as JSON.`;
 
     // Sanitize trend values
     const validTrends = ["up", "down"];
-    const sanitizedMetrics = (analysisData.metrics || []).map((m: { label?: string; value?: string; trend?: string; detail?: string }) => ({
-      ...m,
-      trend: validTrends.includes(m.trend || "") ? m.trend : "up",
-    }));
+    const sanitizedMetrics = (analysisData.metrics || []).map(
+      (m: {
+        label?: string;
+        value?: string;
+        trend?: string;
+        detail?: string;
+      }) => ({
+        ...m,
+        trend: validTrends.includes(m.trend || "") ? m.trend : "up",
+      }),
+    );
 
     const analysis = await Analysis.create({
       userId,
