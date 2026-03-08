@@ -5,13 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import {
-  LayoutDashboard,
-  Crosshair,
-  Code2,
-  User,
-  Zap,
-} from "lucide-react";
+import { LayoutDashboard, Crosshair, Code2, User, Zap } from "lucide-react";
 import Image from "next/image";
 
 const navItems = [
@@ -102,18 +96,6 @@ export default function DashboardLayout({
                         <item.icon size={18} />
                       )}
                     </div>
-                    {/* Online indicator for profile avatar */}
-                    {isProfileAvatar && (
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          type: "tween",
-                        }}
-                        className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white"
-                      />
-                    )}
                     {/* Tooltip - instant, no animation */}
                     <div className="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-100 whitespace-nowrap shadow-lg z-50">
                       {item.label}
@@ -159,7 +141,6 @@ export default function DashboardLayout({
               BE COOL
             </span>
             <div className="w-px h-3 bg-[#1a1a1a]/8" />
-        
             <span className="text-[9px] font-bold uppercase tracking-wider text-orange-600/90 font-mono">
               STAY COOL
             </span>
@@ -167,11 +148,6 @@ export default function DashboardLayout({
 
           {/* Mobile-only status dot */}
           <div className="sm:hidden flex items-center gap-1.5 bg-white/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-[#1A1A1A]/6">
-            <motion.div
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity, type: "tween" }}
-              className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
-            />
             <Zap size={10} className="text-[#FF6803]" />
           </div>
 
@@ -195,12 +171,6 @@ export default function DashboardLayout({
                 <User size={14} className="text-white" />
               </div>
             )}
-            {/* Online dot */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity, type: "tween" }}
-              className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#E5E4E2]"
-            />
           </motion.div>
         </div>
       </header>
@@ -223,7 +193,7 @@ export default function DashboardLayout({
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-60 bg-white border-t-2 border-[#1A1A1A] px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)]">
+        <nav className="fixed bottom-0 left-0 right-0 z-60 bg-white/80 backdrop-blur-2xl border-t border-[#1A1A1A]/8 px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),6px)]">
           <div className="flex items-center justify-around">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
@@ -232,60 +202,36 @@ export default function DashboardLayout({
               return (
                 <Link key={item.href} href={item.href} className="flex-1">
                   <motion.div
-                    whileHover={
-                      !isProfileAvatar
-                        ? {
-                            y: -2,
-                            rotate: [-4, 4, 0],
-                            transition: {
-                              rotate: {
-                                type: "tween",
-                                duration: 0.3,
-                                ease: "easeInOut",
-                              },
-                            },
-                          }
-                        : { y: -2 }
-                    }
-                    whileTap={{ scale: 0.88, y: 1 }}
+                    whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 14 }}
-                    className={`flex flex-col items-center gap-0.5 py-2 mx-1 rounded-xl transition-all ${
+                    className={`flex flex-col items-center gap-0.5 py-2 mx-0.5 rounded-2xl transition-all duration-200 ${
                       isActive && !isProfileAvatar
-                        ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                        ? "bg-[#FF6803] text-white shadow-[0_2px_12px_rgba(255,104,3,0.3)]"
                         : isActive && isProfileAvatar
-                          ? "bg-white/80 border-2 border-[#FF6803]/30 shadow-[0_0_8px_rgba(255,104,3,0.15)]"
-                          : "text-[#1A1A1A]/35"
+                          ? "bg-[#FF6803]/8"
+                          : "text-[#1A1A1A]/30"
                     }`}
                   >
-                    <div className="relative">
-                      {isProfileAvatar ? (
-                        <Image
-                          src={user.imageUrl!}
-                          alt="Profile"
-                          width={22}
-                          height={22}
-                          className={`w-5.5 h-5.5 rounded-full object-cover ring-1 ${
-                            isActive
-                              ? "ring-[#FF6803] ring-offset-1"
-                              : "ring-[#1A1A1A]/10 opacity-60"
-                          }`}
-                        />
-                      ) : (
-                        <item.icon size={18} />
-                      )}
-                      {isProfileAvatar && isActive && (
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1] }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            type: "tween",
-                          }}
-                          className="absolute -bottom-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border border-white"
-                        />
-                      )}
-                    </div>
-                    <span className="text-[8px] font-bold uppercase tracking-wider">
+                    {isProfileAvatar ? (
+                      <Image
+                        src={user.imageUrl!}
+                        alt="Profile"
+                        width={22}
+                        height={22}
+                        className={`w-5.5 h-5.5 rounded-full object-cover transition-all ${
+                          isActive
+                            ? "ring-2 ring-[#FF6803] ring-offset-1"
+                            : "opacity-50 grayscale-30"
+                        }`}
+                      />
+                    ) : (
+                      <item.icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
+                    )}
+                    <span
+                      className={`text-[8px] font-bold uppercase tracking-wider ${
+                        isActive && isProfileAvatar ? "text-[#FF6803]" : ""
+                      }`}
+                    >
                       {item.label}
                     </span>
                   </motion.div>
