@@ -19,6 +19,7 @@ import {
   Sparkles,
   ArrowRight,
   Trash2,
+  Clock,
 } from "lucide-react";
 import { useToast } from "@/lib/toast-context";
 
@@ -78,6 +79,23 @@ const pitchFields = [
     type: "input" as const,
     required: false,
   },
+];
+
+const LOADING_GIFS = [
+  "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
+  "https://media.tenor.com/hYkRcm80JFwAAAAj/foxy-foxplushy.gif",
+  "https://media.tenor.com/KOQYL00kmYEAAAAm/happy-holidays.webp",
+  "https://media.tenor.com/v-eI1P9681IAAAAm/goose-dance.webp",
+];
+
+const waitTexts = [
+  "Good things take time... like your startup \u{1F680}",
+  "Grab a coffee, we\u2019re crunching numbers \u2615",
+  "Our agents are in a meeting about your idea \u{1F4AC}",
+  "Patience is the founder\u2019s superpower \u{1F4AA}",
+  "Almost there... the magic is happening \u2728",
+  "Building greatness, one byte at a time \u{1F9F1}",
+  "Your idea is being stress-tested \u{1F527}",
 ];
 
 const analysisSteps = [
@@ -140,6 +158,9 @@ export default function ValidatorPage() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [analysisPhase, setAnalysisPhase] = useState(-1);
   const [showFullScreenLoader, setShowFullScreenLoader] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [currentGif, setCurrentGif] = useState(() => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
+  const [currentWaitText, setCurrentWaitText] = useState(() => waitTexts[Math.floor(Math.random() * waitTexts.length)]);
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -172,6 +193,26 @@ export default function ValidatorPage() {
       }
     }
   }, [focusedField]);
+
+  // Timer for loading screen
+  useEffect(() => {
+    if (!showFullScreenLoader) {
+      setElapsedTime(0);
+      return;
+    }
+    const timer = setInterval(() => setElapsedTime((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, [showFullScreenLoader]);
+
+  // Rotate GIF + wait text every 5 seconds
+  useEffect(() => {
+    if (!showFullScreenLoader) return;
+    const interval = setInterval(() => {
+      setCurrentGif(LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
+      setCurrentWaitText(waitTexts[Math.floor(Math.random() * waitTexts.length)]);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [showFullScreenLoader]);
 
   const handleChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
@@ -257,47 +298,57 @@ export default function ValidatorPage() {
 
   // Full screen loading overlay
   if (showFullScreenLoader) {
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = elapsedTime % 60;
+    const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="fixed inset-0 z-100 bg-[#E5E4E2] flex items-center justify-center"
+        className="fixed inset-0 z-100 bg-white flex items-center justify-center"
       >
-        <div className="max-w-md w-full mx-auto px-6">
-          {/* Logo Animation */}
+        <div className="max-w-sm w-full mx-auto px-6 flex flex-col items-center">
+          {/* GIF */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex flex-col items-center mb-10"
+            key={currentGif}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="mb-6"
           >
-            <motion.div
-              animate={{ scale: [1, 1.06, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="w-16 h-16 bg-linear-to-br from-[#FF6803] to-[#FF8A3D] rounded-2xl grid grid-cols-2 gap-[3px] p-[7px] shadow-xl border-2 border-[#1A1A1A] mb-4"
-            >
-              {[0, 1, 2, 3].map((i) => (
-                <motion.div
-                  key={i}
-                  animate={{ opacity: [0.3, 1, 0.3] }}
-                  transition={{
-                    duration: 1.4,
-                    repeat: Infinity,
-                    delay: i * 0.15,
-                  }}
-                  className="bg-white rounded-sm"
-                />
-              ))}
-            </motion.div>
-            <h2 className="text-2xl font-black text-[#1A1A1A] uppercase tracking-tight text-center">
-              Analyzing Your Idea
-            </h2>
-            <p className="text-sm text-[#1A1A1A]/40 font-medium mt-1 text-center">
-              Our AI is evaluating your startup potential
-            </p>
+            <img
+              src={currentGif}
+              alt="Loading..."
+              className="w-24 h-24 object-contain rounded-2xl"
+            />
           </motion.div>
 
-          {/* Progress Steps */}
-          <div className="space-y-3">
+          {/* Title */}
+          <h2 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight text-center mb-1">
+            Analyzing Your Idea
+          </h2>
+
+          {/* Wait text */}
+          <motion.p
+            key={currentWaitText}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-xs text-[#1A1A1A]/40 font-bold text-center mb-5"
+          >
+            {currentWaitText}
+          </motion.p>
+
+          {/* Timer */}
+          <div className="flex items-center gap-2 bg-[#FAFAFA] rounded-full px-4 py-1.5 border border-[#1A1A1A]/8 mb-5">
+            <Clock size={12} className="text-[#FF6803]" />
+            <span className="text-[11px] font-black text-[#1A1A1A]/50 font-mono tracking-wider">
+              {timeStr}
+            </span>
+          </div>
+
+          {/* Compact Steps */}
+          <div className="w-full space-y-1.5 mb-5">
             {analysisSteps.map((step, i) => {
               const isActive = i === analysisPhase;
               const isComplete = i < analysisPhase;
@@ -306,104 +357,48 @@ export default function ValidatorPage() {
               return (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{
-                    opacity: isPending ? 0.3 : 1,
-                    x: 0,
-                  }}
-                  transition={{ delay: i * 0.05, duration: 0.3 }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? "bg-white shadow-md border border-[#FF6803]/20"
-                      : isComplete
-                        ? "bg-white/50"
-                        : "bg-transparent"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: isPending ? 0.25 : 1, x: 0 }}
+                  transition={{ delay: i * 0.03, duration: 0.2 }}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all ${
+                    isActive ? "bg-[#FF6803]/5 border border-[#FF6803]/15" : ""
                   }`}
                 >
-                  <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                  <div className="w-5 h-5 flex items-center justify-center shrink-0">
                     {isComplete ? (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring" }}
-                      >
-                        <CheckCircle2 size={20} className="text-emerald-500" />
-                      </motion.div>
+                      <CheckCircle2 size={14} className="text-emerald-500" />
                     ) : isActive ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                      >
-                        <Loader2 size={20} className="text-[#FF6803]" />
+                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+                        <Loader2 size={14} className="text-[#FF6803]" />
                       </motion.div>
                     ) : (
-                      <span className="text-lg">{step.emoji}</span>
+                      <span className="text-xs">{step.emoji}</span>
                     )}
                   </div>
-                  <span
-                    className={`text-sm font-bold ${
-                      isActive
-                        ? "text-[#1A1A1A]"
-                        : isComplete
-                          ? "text-[#1A1A1A]/50"
-                          : "text-[#1A1A1A]/25"
-                    }`}
-                  >
+                  <span className={`text-xs font-bold ${isActive ? "text-[#1A1A1A]" : isComplete ? "text-[#1A1A1A]/40" : "text-[#1A1A1A]/20"}`}>
                     {step.text}
                   </span>
-                  {isActive && (
-                    <motion.div
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="ml-auto"
-                    >
-                      <div className="flex gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#FF6803]" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#FF6803]/50" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#FF6803]/25" />
-                      </div>
-                    </motion.div>
-                  )}
                 </motion.div>
               );
             })}
           </div>
 
-          {/* Completion state */}
+          {/* Completion */}
           {analysisPhase >= analysisSteps.length && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mt-8 text-center"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 0.5 }}
-                className="text-4xl mb-3"
-              >
-                {"\u{1F389}"}
-              </motion.div>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
               <p className="text-sm font-black text-emerald-600 uppercase tracking-wide">
                 Analysis Complete!
               </p>
-              <p className="text-xs text-[#1A1A1A]/40 mt-1">
-                Redirecting to your results...
-              </p>
+              <p className="text-[11px] text-[#1A1A1A]/30 mt-1">Redirecting to your results...</p>
             </motion.div>
           )}
 
           {/* Progress bar */}
-          <div className="mt-8 h-1.5 bg-[#1A1A1A]/5 rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-[#1A1A1A]/5 rounded-full overflow-hidden mt-3">
             <motion.div
-              className="h-full bg-linear-to-r from-[#FF6803] to-[#FF8A3D] rounded-full"
+              className="h-full bg-[#FF6803] rounded-full"
               initial={{ width: "0%" }}
-              animate={{
-                width: `${Math.min(((analysisPhase + 1) / analysisSteps.length) * 100, 100)}%`,
-              }}
+              animate={{ width: `${Math.min(((analysisPhase + 1) / analysisSteps.length) * 100, 100)}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
