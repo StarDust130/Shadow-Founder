@@ -49,7 +49,7 @@ const pitchFields = [
   {
     id: "appName",
     label: "App / Product name (optional)",
-    placeholder: "e.g. ResumeAI, BookSwap, PayBuddy — or leave blank for AI to suggest",
+    placeholder: "e.g. PhoneCart, ResumeAI, BookSwap — leave blank & AI will suggest a catchy name",
     icon: Sparkles,
     type: "input" as const,
     required: false,
