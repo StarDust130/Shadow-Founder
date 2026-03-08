@@ -601,7 +601,7 @@ export default function AssemblyPage() {
         </div>
       </motion.div>
 
-      {/* SETUP TERMINAL */}
+      {/* GETTING STARTED */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -611,33 +611,33 @@ export default function AssemblyPage() {
         <div className="flex items-center gap-2 mb-4">
           <Terminal size={16} className="text-[#FF6803]" />
           <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
-            Quick Deploy
+            Getting Started
           </h3>
           <div className="ml-auto flex items-center gap-1.5 text-[10px] font-mono text-[#1A1A1A]/30 bg-[#E5E4E2] px-2 py-0.5 border border-[#1A1A1A]/10">
-            <Zap size={10} />3 commands
+            <Zap size={10} />3 steps
           </div>
         </div>
-        <div className="bg-[#1A1A1A] border-2 border-[#1A1A1A] p-4 font-mono text-sm space-y-2 overflow-x-auto">
+        <div className="space-y-3">
           {[
-            "npx create-next-app@latest my-mvp --typescript --tailwind",
-            "# Copy generated files into your project",
-            "npm run dev",
-          ].map((cmd, i) => (
-            <motion.p
+            { step: "1", text: "Download the ZIP using the button above", emoji: "📦" },
+            { step: "2", text: "Extract the files and open preview.html in your browser", emoji: "🌐" },
+            { step: "3", text: "Customize the code files to build your full app", emoji: "🚀" },
+          ].map((item, i) => (
+            <motion.div
               key={i}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + i * 0.1 }}
-              className="text-white/70"
+              className="flex items-center gap-3 p-3 bg-[#FFFBF5] border-2 border-[#1A1A1A]/10 rounded-xl"
             >
-              <span className="text-[#FF6803] font-bold">$</span>{" "}
-              <span className="text-white/80">{cmd}</span>
-            </motion.p>
+              <span className="text-lg">{item.emoji}</span>
+              <span className="text-sm font-bold text-[#1A1A1A]/70">{item.text}</span>
+            </motion.div>
           ))}
         </div>
         <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-[#1A1A1A]/30 uppercase tracking-wider">
           <Sparkles size={12} className="text-[#FF6803]/50" />
-          <span>Download the ZIP and extract into your project</span>
+          <span>Your MVP codebase is ready to customize</span>
         </div>
       </motion.div>
 
