@@ -31,6 +31,7 @@ import {
   Crown,
 } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "@/lib/toast-context";
 
 interface AnalysisSummary {
   _id: string;
