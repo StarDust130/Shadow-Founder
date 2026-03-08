@@ -51,7 +51,7 @@ const AnalysisSchema = new Schema<IAnalysis>(
       {
         label: String,
         value: String,
-        trend: { type: String, enum: ["up", "down", "neutral"], default: "neutral" },
+        trend: { type: String, default: "up" },
         detail: String,
       },
     ],
