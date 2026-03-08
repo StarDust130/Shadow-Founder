@@ -33,6 +33,7 @@ interface BuildFile {
 
 interface BuildData {
   _id: string;
+  analysisId: string;
   ideaTitle: string;
   techStack: string[];
   files: BuildFile[];
@@ -323,11 +324,11 @@ export default function AssemblyPage() {
         className="mb-8"
       >
         <Link
-          href="/dashboard"
+          href={build.analysisId ? `/analysis/${build.analysisId}` : "/dashboard"}
           className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#1A1A1A]/40 hover:text-[#FF6803] transition-colors mb-4"
         >
           <ArrowLeft size={14} />
-          Back to HQ
+          Back to Analysis
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-start gap-4">
           <div className="flex-1">
