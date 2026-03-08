@@ -138,6 +138,23 @@ function ScoreBadge({ score }: { score: number }) {
   );
 }
 
+const LOADING_GIFS = [
+  "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
+  "https://media.tenor.com/hYkRcm80JFwAAAAj/foxy-foxplushy.gif",
+  "https://media.tenor.com/KOQYL00kmYEAAAAm/happy-holidays.webp",
+  "https://media.tenor.com/v-eI1P9681IAAAAm/goose-dance.webp",
+];
+
+const waitTexts = [
+  "Great things take a moment... grab a coffee ☕",
+  "Building something amazing just for you...",
+  "Our AI is cooking up your MVP 🍳",
+  "Rome wasn't built in a day, but your MVP will be!",
+  "Patience is the key to masterpieces 🎨",
+  "Almost there... well, maybe not, but hang tight!",
+  "Your code is being crafted with love 💛",
+];
+
 export default function BuilderPage() {
   const router = useRouter();
   const { showToast } = useToast();
@@ -148,6 +165,13 @@ export default function BuilderPage() {
   const [buildingId, setBuildingId] = useState<string | null>(null);
   const [buildStep, setBuildStep] = useState(0);
   const [buildError, setBuildError] = useState<string | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [currentGif, setCurrentGif] = useState(
+    () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
+  );
+  const [currentWaitText, setCurrentWaitText] = useState(
+    () => waitTexts[Math.floor(Math.random() * waitTexts.length)],
+  );
 
   const buildSteps = [
     { emoji: "\u{1F9E0}", text: "Analyzing your idea architecture..." },
@@ -158,6 +182,30 @@ export default function BuilderPage() {
     { emoji: "\u{1F4E6}", text: "Bundling Next.js project..." },
     { emoji: "\u2705", text: "Finalizing your MVP codebase..." },
   ];
+
+  // Timer effect for build loading
+  useEffect(() => {
+    if (!buildingId) {
+      setElapsedTime(0);
+      return;
+    }
+    const timer = setInterval(() => setElapsedTime((prev) => prev + 1), 1000);
+    return () => clearInterval(timer);
+  }, [buildingId]);
+
+  // GIF & text rotation during build
+  useEffect(() => {
+    if (!buildingId) return;
+    const rotator = setInterval(() => {
+      setCurrentGif(
+        LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
+      );
+      setCurrentWaitText(
+        waitTexts[Math.floor(Math.random() * waitTexts.length)],
+      );
+    }, 5000);
+    return () => clearInterval(rotator);
+  }, [buildingId]);
 
   useEffect(() => {
     const load = async () => {
@@ -204,7 +252,7 @@ export default function BuilderPage() {
         const errorMsg =
           data.error === "BUILD_LIMIT_REACHED"
             ? data.message || "Free plan allows only 1 build."
-            : data.error || "Build failed";
+            : data.error || data.message || "Build failed. Please try again.";
         setBuildError(errorMsg);
         showToast(errorMsg, "error");
         setBuildingId(null);
@@ -212,9 +260,9 @@ export default function BuilderPage() {
       }
       setBuildStep(6);
       setTimeout(() => router.push(`/assembly/${data.id}`), 800);
-    } catch {
+    } catch (err) {
       clearInterval(stepInterval);
-      const errorMsg = "Network error. Please try again.";
+      const errorMsg = err instanceof Error ? err.message : "Network error. Please try again.";
       setBuildError(errorMsg);
       showToast(errorMsg, "error");
       setBuildingId(null);
@@ -222,8 +270,136 @@ export default function BuilderPage() {
   };
 
   const viableIdeas = analyses.filter(
-    (a) => a.verdict === "VIABLE" || a.verdict === "CONDITIONAL PASS",
+    (a) => a.verdict === "VIABLE" || a.verdict === "PASS",
   );
+
+  // Full-screen build loading overlay
+  if (buildingId) {
+    const minutes = Math.floor(elapsedTime / 60);
+    const seconds = elapsedTime % 60;
+    const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-100 bg-white flex items-center justify-center"
+      >
+        <div className="max-w-sm w-full mx-auto px-6 flex flex-col items-center">
+          {/* GIF */}
+          <motion.div
+            key={currentGif}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            className="mb-6"
+          >
+            <img
+              src={currentGif}
+              alt="Loading..."
+              className="w-24 h-24 object-contain rounded-2xl"
+            />
+          </motion.div>
+
+          {/* Title */}
+          <h2 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight text-center mb-1">
+            Building Your MVP
+          </h2>
+
+          {/* Wait text */}
+          <motion.p
+            key={currentWaitText}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-xs text-[#1A1A1A]/40 font-bold text-center mb-5"
+          >
+            {currentWaitText}
+          </motion.p>
+
+          {/* Timer */}
+          <div className="flex items-center gap-2 bg-[#FAFAFA] rounded-full px-4 py-1.5 border border-[#1A1A1A]/8 mb-5">
+            <Clock size={12} className="text-[#FF6803]" />
+            <span className="text-[11px] font-black text-[#1A1A1A]/50 font-mono tracking-wider">
+              {timeStr}
+            </span>
+          </div>
+
+          {/* Compact Steps */}
+          <div className="w-full space-y-1.5 mb-5">
+            {buildSteps.map((step, i) => {
+              const isActive = i === buildStep;
+              const isComplete = i < buildStep;
+              const isPending = i > buildStep;
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: isPending ? 0.25 : 1, x: 0 }}
+                  transition={{ delay: i * 0.03, duration: 0.2 }}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all ${
+                    isActive ? "bg-[#FF6803]/5 border border-[#FF6803]/15" : ""
+                  }`}
+                >
+                  <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                    {isComplete ? (
+                      <CheckCircle2 size={14} className="text-emerald-500" />
+                    ) : isActive ? (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      >
+                        <Loader2 size={14} className="text-[#FF6803]" />
+                      </motion.div>
+                    ) : (
+                      <span className="text-xs">{step.emoji}</span>
+                    )}
+                  </div>
+                  <span
+                    className={`text-xs font-bold ${isActive ? "text-[#1A1A1A]" : isComplete ? "text-[#1A1A1A]/40" : "text-[#1A1A1A]/20"}`}
+                  >
+                    {step.text}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Completion */}
+          {buildStep >= buildSteps.length && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center"
+            >
+              <p className="text-sm font-black text-emerald-600 uppercase tracking-wide">
+                Build Complete!
+              </p>
+              <p className="text-[11px] text-[#1A1A1A]/30 mt-1">
+                Redirecting to your code...
+              </p>
+            </motion.div>
+          )}
+
+          {/* Progress bar */}
+          <div className="w-full h-1 bg-[#1A1A1A]/5 rounded-full overflow-hidden mt-3">
+            <motion.div
+              className="h-full bg-[#FF6803] rounded-full"
+              initial={{ width: "0%" }}
+              animate={{
+                width: `${Math.min(((buildStep + 1) / buildSteps.length) * 100, 100)}%`,
+              }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <>
@@ -295,7 +471,7 @@ export default function BuilderPage() {
                     </div>
                   </div>
                   <p className="text-[11px] text-[#1A1A1A]/35 font-bold mt-0.5 font-mono">
-                    Gemini 2.5 Flash &bull; Full-Stack Generation &bull; Ready
+                    Shadow Engine &bull; Full-Stack Generation &bull; Ready
                   </p>
                 </div>
               </div>
@@ -355,13 +531,17 @@ export default function BuilderPage() {
                     Want Production-Level Code?
                   </h3>
                   <p className="text-[11px] text-white/70 font-bold mt-0.5">
-                    Upgrade to Pro for unlimited builds, premium landing pages & advanced AI code generation
+                    Upgrade to Pro for unlimited builds, premium landing pages &
+                    advanced AI code generation
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-1.5 bg-white text-[#FF6803] px-3 py-2 rounded-xl border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] font-black text-[10px] uppercase tracking-wider shrink-0 group-hover:shadow-[3px_3px_0_#1A1A1A] transition-shadow">
                   <Crown size={12} /> Upgrade Now
                 </div>
-                <ArrowRight size={18} className="text-white/50 sm:hidden shrink-0 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight
+                  size={18}
+                  className="text-white/50 sm:hidden shrink-0 group-hover:translate-x-1 transition-transform"
+                />
               </div>
             </motion.div>
           </Link>
@@ -426,9 +606,9 @@ export default function BuilderPage() {
               className="space-y-3"
             >
               {analyses.map((idea) => {
-                const isViable =
-                  idea.verdict === "VIABLE" ||
-                  idea.verdict === "CONDITIONAL PASS";
+                const isViable = idea.verdict === "VIABLE";
+                const isPass = idea.verdict === "PASS";
+                const canBuild = isViable || isPass;
                 const isBuilding = buildingId === idea._id;
                 return (
                   <motion.div
@@ -439,28 +619,36 @@ export default function BuilderPage() {
                         ? { y: -4, x: -2, transition: { duration: 0.2 } }
                         : {}
                     }
-                    className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] transition-all relative overflow-hidden"
+                    className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-4 md:p-5 shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#FF6803] transition-all relative overflow-hidden"
                   >
-                    <div className="flex items-center gap-4">
-                      <ScoreBadge score={idea.score} />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-black text-[#1A1A1A] tracking-tight truncate">
-                          {idea.idea.length > 60
-                            ? idea.idea.slice(0, 60) + "..."
-                            : idea.idea}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
-                            {idea.category}
-                          </span>
-                          <span
-                            className={`text-[9px] font-black uppercase tracking-widest font-mono px-2 py-0.5 rounded ${isViable ? "text-emerald-600 bg-emerald-500/10" : "text-red-500 bg-red-500/10"}`}
-                          >
-                            {idea.verdict}
-                          </span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <ScoreBadge score={idea.score} />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-black text-[#1A1A1A] tracking-tight truncate">
+                            {idea.idea.length > 60
+                              ? idea.idea.slice(0, 60) + "..."
+                              : idea.idea}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]/25 font-mono bg-[#1A1A1A]/5 px-2 py-0.5 rounded">
+                              {idea.category}
+                            </span>
+                            <span
+                              className={`text-[9px] font-black uppercase tracking-widest font-mono px-2 py-0.5 rounded ${
+                                isViable
+                                  ? "text-emerald-600 bg-emerald-500/10"
+                                  : isPass
+                                    ? "text-amber-600 bg-amber-500/10"
+                                    : "text-red-500 bg-red-500/10"
+                              }`}
+                            >
+                              {idea.verdict}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                         <Link href={`/analysis/${idea._id}`}>
                           <motion.button
                             whileHover={{ y: -2 }}
@@ -470,13 +658,13 @@ export default function BuilderPage() {
                             View
                           </motion.button>
                         </Link>
-                        {isViable && (
+                        {canBuild && (
                           <motion.button
                             onClick={() => handleBuild(idea._id)}
                             disabled={isBuilding}
                             whileHover={!isBuilding ? { y: -2 } : {}}
                             whileTap={!isBuilding ? { scale: 0.95 } : {}}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-[#FF6803] text-white text-[10px] font-black uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#1A1A1A] transition-all disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+                            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-[#FF6803] text-white text-[10px] font-black uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#1A1A1A] transition-all disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed whitespace-nowrap"
                           >
                             {isBuilding ? (
                               <>
@@ -578,7 +766,7 @@ export default function BuilderPage() {
               {
                 step: "02",
                 title: "AI Generates Code",
-                desc: "Gemini AI analyzes your validated idea and generates full-stack code",
+                desc: "AI analyzes your validated idea and generates full-stack code",
                 icon: Bot,
                 color: "#8B5CF6",
               },
@@ -783,94 +971,6 @@ export default function BuilderPage() {
           </div>
         </motion.div>
       </div>
-
-      {/* FULL-SCREEN BUILD LOADING */}
-      {buildingId && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-100 bg-[#FAFAFA] flex items-center justify-center"
-        >
-          <div className="max-w-md w-full mx-auto px-6 text-center">
-            <motion.div
-              animate={{ y: [0, -18, 0], rotate: [0, 5, -5, 0] }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="text-6xl mb-8"
-            >
-              🚀
-            </motion.div>
-            <h2 className="text-xl font-black text-[#1A1A1A] tracking-tight mb-2">
-              Building Your MVP
-            </h2>
-            <p className="text-xs text-[#1A1A1A]/40 font-bold font-mono mb-8">
-              AI is generating your production-ready codebase
-            </p>
-            <div className="space-y-3 text-left mb-8">
-              {buildSteps.map((step, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.15 }}
-                  className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    i < buildStep
-                      ? "bg-emerald-50 border-emerald-300 shadow-[3px_3px_0_#34d399]"
-                      : i === buildStep
-                        ? "bg-orange-50 border-[#FF6803] shadow-[3px_3px_0_#FF6803]"
-                        : "bg-white border-[#1A1A1A]/10"
-                  }`}
-                >
-                  <span className="text-lg">{step.emoji}</span>
-                  <span
-                    className={`text-xs font-bold font-mono ${
-                      i < buildStep
-                        ? "text-emerald-600"
-                        : i === buildStep
-                          ? "text-[#FF6803]"
-                          : "text-[#1A1A1A]/25"
-                    }`}
-                  >
-                    {step.text}
-                  </span>
-                  {i < buildStep && (
-                    <CheckCircle2
-                      size={14}
-                      className="ml-auto text-emerald-500"
-                    />
-                  )}
-                  {i === buildStep && (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="ml-auto"
-                    >
-                      <Loader2 size={14} className="text-[#FF6803]" />
-                    </motion.div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-            <div className="w-full h-2 bg-[#1A1A1A]/5 rounded-full overflow-hidden border border-[#1A1A1A]/10">
-              <motion.div
-                className="h-full bg-linear-to-r from-[#FF6803] to-orange-400 rounded-full"
-                initial={{ width: "0%" }}
-                animate={{
-                  width: `${Math.min(((buildStep + 1) / buildSteps.length) * 100, 100)}%`,
-                }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </div>
-        </motion.div>
-      )}
 
       {/* ERROR TOAST */}
       {buildError && (
