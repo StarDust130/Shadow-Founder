@@ -197,7 +197,7 @@ export default function AssemblyPage() {
         <div key={node.name}>
           <button
             onClick={() => toggleFolder(node.name)}
-            className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-colors text-white/50 hover:text-white/70 group"
+            className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-colors text-white/50 hover:text-white/70 group cursor-pointer"
             style={{ paddingLeft: `${8 + depth * 16}px` }}
           >
             <ChevronRight
@@ -230,7 +230,7 @@ export default function AssemblyPage() {
       <button
         key={node.file.path}
         onClick={() => setSelectedFile(node.file)}
-        className={`w-full flex items-center gap-1.5 pr-2 py-1.5 transition-all text-xs font-mono ${
+        className={`w-full flex items-center gap-1.5 pr-2 py-1.5 transition-all text-xs font-mono cursor-pointer ${
           selectedFile?.path === node.file.path
             ? "bg-[#FF6803]/15 text-[#FF6803] border-l-2 border-[#FF6803]"
             : "text-white/40 hover:bg-white/5 hover:text-white/60"
@@ -286,7 +286,7 @@ export default function AssemblyPage() {
             whileTap={{ y: 0, boxShadow: "2px 2px 0 #1A1A1A" }}
             onClick={downloadZip}
             disabled={downloading}
-            className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] text-sm font-black uppercase tracking-wide hover:bg-[#FF6803] transition-colors disabled:opacity-60"
+            className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] text-sm font-black uppercase tracking-wide hover:bg-[#FF6803] transition-colors disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
           >
             {downloading ? (
               <Loader2 size={16} className="animate-spin" />
@@ -368,7 +368,7 @@ export default function AssemblyPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode("code")}
-              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded ${
+              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded cursor-pointer ${
                 viewMode === "code"
                   ? "text-[#FF6803] border-[#FF6803]/40 bg-[#FF6803]/10"
                   : "text-white/30 border-white/10 hover:text-white/50"
@@ -378,7 +378,7 @@ export default function AssemblyPage() {
             </button>
             <button
               onClick={() => setViewMode("preview")}
-              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded ${
+              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded cursor-pointer ${
                 viewMode === "preview"
                   ? "text-emerald-400 border-emerald-400/40 bg-emerald-400/10"
                   : "text-white/30 border-white/10 hover:text-white/50"
@@ -420,7 +420,7 @@ export default function AssemblyPage() {
                         onClick={() =>
                           copyCode(selectedFile.content, selectedFile.path)
                         }
-                        className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1.5 border transition-all ${
+                        className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1.5 border transition-all cursor-pointer ${
                           copiedFile === selectedFile.path
                             ? "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
                             : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20 hover:bg-white/5"
@@ -547,7 +547,7 @@ export default function AssemblyPage() {
           <motion.button
             whileHover={{ y: -2, boxShadow: "6px 6px 0 #FF6803" }}
             whileTap={{ y: 0, boxShadow: "2px 2px 0 #FF6803" }}
-            className="bg-[#FF6803] text-white px-8 py-3 border-2 border-white/20 shadow-[4px_4px_0_#FF8A3D] font-black uppercase tracking-wide text-sm hover:bg-[#FF8A3D] transition-colors"
+            className="bg-[#FF6803] text-white px-8 py-3 border-2 border-white/20 shadow-[4px_4px_0_#FF8A3D] font-black uppercase tracking-wide text-sm hover:bg-[#FF8A3D] transition-colors cursor-pointer"
           >
             Back to Interrogation
           </motion.button>

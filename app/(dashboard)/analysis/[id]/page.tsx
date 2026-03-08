@@ -532,7 +532,7 @@ export default function AnalysisPage() {
               }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setChatOpen(!chatOpen)}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] transition-all  ${
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] transition-all cursor-pointer  ${
                 chatOpen
                   ? "bg-[#FF6803] text-white shadow-[3px_3px_0_#FF6803]"
                   : "bg-white text-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#FF6803]"
@@ -876,7 +876,7 @@ export default function AnalysisPage() {
                           whileHover={{ y: -2, x: -1 }}
                           whileTap={{ scale: 0.97 }}
                           onClick={() => setChatInput(q)}
-                          className="px-4 py-2.5 bg-white border-2 border-[#1A1A1A] rounded-xl text-xs font-bold text-[#1A1A1A]/60 shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:text-[#FF6803] transition-all text-left"
+                          className="px-4 py-2.5 bg-white border-2 border-[#1A1A1A] rounded-xl text-xs font-bold text-[#1A1A1A]/60 shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:text-[#FF6803] transition-all text-left cursor-pointer"
                         >
                           {emoji} {q}
                         </motion.button>
@@ -980,7 +980,7 @@ export default function AnalysisPage() {
                     whileTap={{ scale: 0.95 }}
                     onClick={sendChatMessage}
                     disabled={!chatInput.trim() || chatLoading}
-                    className="w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center text-white disabled:opacity-30 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all"
+                    className="w-12 h-12 bg-[#FF6803] rounded-xl flex items-center justify-center text-white disabled:opacity-30 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-all cursor-pointer disabled:cursor-not-allowed"
                   >
                     <Send size={16} />
                   </motion.button>
@@ -1128,7 +1128,7 @@ export default function AnalysisPage() {
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setBuildError(null)}
-                className="text-[#1A1A1A]/30 hover:text-[#1A1A1A] shrink-0"
+                className="text-[#1A1A1A]/30 hover:text-[#1A1A1A] shrink-0 cursor-pointer"
               >
                 <X size={16} />
               </motion.button>
