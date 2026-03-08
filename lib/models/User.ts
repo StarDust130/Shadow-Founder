@@ -5,7 +5,7 @@ export interface IUser extends Document {
   email: string;
   firstName: string;
   lastName: string;
-  plan: "free" | "pro";
+  plan: "free" | "pro" | "enterprise";
   buildsUsed: number;
   maxBuilds: number;
   createdAt: Date;
@@ -18,7 +18,7 @@ const UserSchema = new Schema<IUser>(
     email: { type: String, default: "" },
     firstName: { type: String, default: "Builder" },
     lastName: { type: String, default: "" },
-    plan: { type: String, enum: ["free", "pro"], default: "free" },
+    plan: { type: String, enum: ["free", "pro", "enterprise"], default: "free" },
     buildsUsed: { type: Number, default: 0 },
     maxBuilds: { type: Number, default: 1 },
   },
