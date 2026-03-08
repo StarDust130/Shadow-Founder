@@ -155,6 +155,22 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
       analysisData.verdictColor = "#FF8A3D";
     }
 
+    // Generate a catchy app name if AI didn't provide one or just repeated the idea
+    if (!userAppName) {
+      const aiName = (analysisData.appName || "").trim();
+      const ideaLower = idea.toLowerCase().trim();
+      const aiNameLower = aiName.toLowerCase();
+      // Check if AI name is missing, too long, or just the raw idea text
+      const isBadName = !aiName || aiName.length > 20 || aiNameLower === ideaLower || aiName.split(" ").length > 3;
+      if (isBadName) {
+        // Generate a short name: take key words from the idea, capitalize, join
+        const stopWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","that","with","as","by","this","from","at","app","platform","tool","system","service","website","build","create","make"]);
+        const words = idea.split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()) && w.length > 2).slice(0, 2);
+        const generated = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
+        analysisData.appName = generated || idea.split(" ").slice(0, 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
+      }
+    }
+
     // Sanitize trend values
     const validTrends = ["up", "down"];
     const sanitizedMetrics = (analysisData.metrics || []).map(
