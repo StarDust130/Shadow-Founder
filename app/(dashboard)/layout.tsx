@@ -204,7 +204,19 @@ export default function DashboardLayout({
                 whileHover={{ y: -1 }}
                 className="hidden sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/6 rounded-full px-3 py-1.5 shadow-sm cursor-pointer hover:border-[#FF6803]/30 transition-all"
               >
-                {userCredits.plan === "pro" ? (
+                {userCredits.plan === "enterprise" ? (
+                  <>
+                    <Crown size={11} className="text-[#FF6803]" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6803] font-mono">
+                      Enterprise
+                    </span>
+                    <div className="w-px h-3 bg-[#1A1A1A]/8" />
+                    <Zap size={10} className="text-[#FF6803]/60" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#1A1A1A]/40 font-mono">
+                      ∞ builds
+                    </span>
+                  </>
+                ) : userCredits.plan === "pro" ? (
                   <>
                     <Crown size={11} className="text-[#FF6803]" />
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6803] font-mono">
@@ -259,10 +271,17 @@ export default function DashboardLayout({
             </span>
           </div>
 
-          {/* Mobile-only status dot */}
-          <div className="sm:hidden flex items-center gap-1.5 bg-white/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-[#1A1A1A]/6">
-            <Zap size={10} className="text-[#FF6803]" />
-          </div>
+          {/* Mobile credits display */}
+          {userCredits && (
+            <Link href="/profile">
+              <div className="sm:hidden flex items-center gap-1.5 bg-white/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-[#1A1A1A]/6 cursor-pointer">
+                <Coins size={10} className="text-[#FF6803]" />
+                <span className="text-[9px] font-black text-[#1A1A1A]/60 font-mono">
+                  {userCredits.plan === "enterprise" ? "∞" : Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)}
+                </span>
+              </div>
+            </Link>
+          )}
 
           {/* Mobile user avatar — click redirects to /profile */}
           <motion.div
