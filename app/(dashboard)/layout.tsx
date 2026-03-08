@@ -12,6 +12,8 @@ import {
   User,
   Zap,
   Package,
+  Coins,
+  Crown,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -37,6 +39,11 @@ export default function DashboardLayout({
   const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
   const [latestBuild, setLatestBuild] = useState<BuildSummary | null>(null);
+  const [userCredits, setUserCredits] = useState<{
+    plan: string;
+    buildsUsed: number;
+    maxBuilds: number;
+  } | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -58,6 +65,21 @@ export default function DashboardLayout({
       }
     };
     fetchBuilds();
+  }, [pathname]);
+
+  useEffect(() => {
+    const fetchCredits = async () => {
+      try {
+        const res = await fetch("/api/user");
+        if (res.ok) {
+          const data = await res.json();
+          setUserCredits(data);
+        }
+      } catch {
+        /* silent */
+      }
+    };
+    fetchCredits();
   }, [pathname]);
 
   const allNavItems = latestBuild
@@ -174,6 +196,40 @@ export default function DashboardLayout({
         </div>
 
         <div className="flex items-center gap-2.5">
+          {/* Credits Display */}
+          {userCredits && (
+            <Link href="/profile">
+              <motion.div
+                whileHover={{ y: -1 }}
+                className="hidden sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/6 rounded-full px-3 py-1.5 shadow-sm cursor-pointer hover:border-[#FF6803]/30 transition-all"
+              >
+                {userCredits.plan === "pro" ? (
+                  <>
+                    <Crown size={11} className="text-[#FF6803]" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6803] font-mono">
+                      Pro
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Coins size={11} className="text-[#FF6803]" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#1A1A1A]/60 font-mono">
+                      {Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)} credit{Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed) !== 1 ? "s" : ""}
+                    </span>
+                    {userCredits.buildsUsed >= userCredits.maxBuilds && (
+                      <>
+                        <div className="w-px h-3 bg-[#1A1A1A]/8" />
+                        <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6803] font-mono">
+                          Upgrade
+                        </span>
+                      </>
+                    )}
+                  </>
+                )}
+              </motion.div>
+            </Link>
+          )}
+
           {/* AI Engine Status — unified pill */}
           <div className="hidden sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border  border-[#1A1A1A]/6 rounded-full px-3.5 py-1.5 shadow-sm">
             😎
