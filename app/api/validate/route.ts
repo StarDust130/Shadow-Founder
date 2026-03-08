@@ -14,7 +14,7 @@ IMPORTANT: Use Indian Rupees (₹) for ALL monetary values. Show both Indian and
 When given a startup idea, analyze it and respond with ONLY valid JSON (no markdown, no code blocks) in this exact format:
 {
   "score": <number 0-100>,
-  "appName": "<REQUIRED — invent a short, catchy, memorable product name for this idea. 1-2 words max. Think like a real startup: Notion, Stripe, Figma, Canva, Loom, Arc, Linear, Vercel, Clerk, Zerodha, Razorpay, Cred, Meesho, PhonePe. Be creative and unique. Do NOT just repeat the idea description. If user provides an appName, use that instead.>",
+  "appName": "<REQUIRED — If the user provides an appName, use EXACTLY that. Otherwise, YOU MUST invent a short, catchy, memorable 1-2 word product name. Think like real startups: Notion, Stripe, Figma, Canva, Zerodha, Razorpay, Cred, Meesho. Be creative. NEVER use the raw idea text as the name. NEVER output more than 2 words.>",
   "verdict": "<one of: VIABLE, CONDITIONAL PASS, RISKY, NOT VIABLE>",
   "verdictColor": "<hex color: #22C55E for VIABLE, #FF8A3D for CONDITIONAL PASS, #FF6803 for RISKY, #EF4444 for NOT VIABLE>",
   "summary": "<2-3 sentence executive summary of the idea's potential with Indian market context>",
@@ -31,8 +31,11 @@ When given a startup idea, analyze it and respond with ONLY valid JSON (no markd
   "bigPlayers": [
     {"name": "<competitor name>", "strength": "<what they do well>", "weakness": "<their gap you can exploit>"},
     {"name": "<competitor 2>", "strength": "<...>", "weakness": "<...>"},
-    {"name": "<competitor 3>", "strength": "<...>", "weakness": "<...>"}
+    {"name": "<competitor 3>", "strength": "<...>", "weakness": "<...>"},
+    {"name": "<competitor 4>", "strength": "<...>", "weakness": "<...>"},
+    {"name": "<competitor 5>", "strength": "<...>", "weakness": "<...>"}
   ],
+  "competitiveEdge": "<1-2 sentences explaining what YOUR idea does differently that none of the competitors do — the unique moat or differentiator>",
   "failureRisks": ["<specific reason this idea could fail #1>", "<reason #2>", "<reason #3>", "<reason #4>"],
   "founderChecklist": ["<thing founder MUST do before building #1>", "<#2>", "<#3>", "<#4>", "<#5>"],
   "monetization": ["<specific monetization strategy #1>", "<strategy #2>", "<strategy #3>"],
@@ -126,7 +129,7 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
     } catch {
       analysisData = {
         score: 50,
-        appName: userAppName || idea.split(" ").slice(0, 2).join(""),
+        appName: userAppName || "",
         verdict: "RISKY",
         verdictColor: "#FF6803",
         summary:
@@ -144,6 +147,7 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
         bigPlayers: [
           { name: "Unknown", strength: "Established presence", weakness: "To be researched" },
         ],
+        competitiveEdge: "Your unique approach and fresh perspective could differentiate you in this market.",
         failureRisks: ["Market validation needed", "Competition level unclear", "Revenue model unproven", "Team capability unknown"],
         founderChecklist: ["Conduct customer interviews", "Build a landing page to test demand", "Research competitors deeply", "Define unit economics", "Find a co-founder or advisor"],
         monetization: ["Freemium model", "Subscription tiers", "Transaction-based fees"],
@@ -164,19 +168,28 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
       const aiName = (analysisData.appName || "").trim();
       const ideaLower = idea.toLowerCase().trim();
       const aiNameLower = aiName.toLowerCase();
-      // Check if AI name is missing, too long, or just the raw idea text
-      const isBadName = !aiName || aiName.length > 20 || aiNameLower === ideaLower || aiName.split(" ").length > 3 || ideaLower.includes(aiNameLower);
+      const ideaWords = ideaLower.split(/\s+/);
+      // Check if AI name is bad: missing, too long, too many words, just raw idea text, or contains 3+ idea words
+      const aiWords = aiNameLower.split(/\s+/);
+      const overlapCount = aiWords.filter((w: string) => ideaWords.includes(w)).length;
+      const isBadName = !aiName || aiName.length > 16 || aiNameLower === ideaLower || aiName.split(" ").length > 2 || overlapCount >= 2;
       if (isBadName) {
-        // Creative name gen: extract core concept words, add startup-style suffix
-        const stopWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","its","that","with","as","by","this","from","at","app","platform","tool","system","service","website","build","create","make","like","want","need","can","will","would","should","could","my","your","our","their","just","very","really","also","which","about","based","using","use","new","get","go","do","does","has","have","had","been","was","were","are","being","but","not","no","all","any","each","every","some","such","than","too","more","most","other","into","over","through","between","both","after","before","during","where","when","how","what","who","whom","why","so","then","up","out","off","down","back","only"]);
-        const words = idea.split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()) && w.length > 2);
-        const suffixes = ["ly", "ify", "io", "hub", "sync", "flow", "nest", "base", "mint", "wave", "pulse", "spark", "dock", "verse", "stack"];
+        // Creative name gen: extract the MOST SPECIFIC concept word, skip generic/business words
+        const skipWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","its","that","with","as","by","this","from","at","my","your","our","their","just","very","really","also","which","about","based","using","use","new","get","go","do","does","has","have","had","been","was","were","are","being","but","not","no","all","any","each","every","some","such","than","too","more","most","other","into","over","through","between","both","after","before","during","where","when","how","what","who","whom","why","so","then","up","out","off","down","back","only","can","will","would","should","could","want","need","like","make","build","create","app","platform","tool","system","service","website","software","application","solution","product","business","company","startup","online","digital","smart","ai","ml","web","mobile","store","shop","marketplace","ecommerce","e-commerce","sell","buy","selling","buying","market","helps","help","people","users","customers","manage","management","tracking","track","monitor","idea","simple","easy","best","good","great","better"]);
+        const words = idea.split(/\s+/).filter(w => !skipWords.has(w.toLowerCase()) && w.length > 2);
+        // Prefer LAST meaningful word (more specific) — e.g. "sell phones" → "phones"
+        const suffixes = ["ly","ify","io","Hub","Sync","Flow","Nest","Base","Mint","Wave","Pulse","Spark","Cart","Verse","Stack"];
         if (words.length >= 1) {
-          const core = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
+          const coreWord = words[words.length - 1]; // last specific word
+          // Remove trailing 's' for plural
+          const singular = coreWord.endsWith('s') && coreWord.length > 3 ? coreWord.slice(0, -1) : coreWord;
+          const core = singular.charAt(0).toUpperCase() + singular.slice(1).toLowerCase();
           const suffix = suffixes[core.charCodeAt(0) % suffixes.length];
           analysisData.appName = core + suffix;
         } else {
-          analysisData.appName = "LaunchPad";
+          // No meaningful words found — use category-based name
+          const catNames: Record<string, string> = { "SaaS": "CloudPulse", "Fintech": "PayMint", "Health": "VitalSync", "EdTech": "LearnFlow", "E-commerce": "ShopNest", "Social": "BuzzVerse", "AI/ML": "NeuralBase", "Gaming": "PlaySpark" };
+          analysisData.appName = catNames[category] || "LaunchPad";
         }
       }
     }
@@ -198,7 +211,7 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
     const analysis = await Analysis.create({
       userId,
       idea,
-      appName: userAppName || analysisData.appName || idea.split(" ").slice(0, 3).join(" "),
+      appName: userAppName || analysisData.appName || "LaunchPad",
       target,
       problem,
       revenue: revenue || "",
@@ -210,6 +223,7 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
       summary: analysisData.summary,
       metrics: sanitizedMetrics,
       bigPlayers: analysisData.bigPlayers || [],
+      competitiveEdge: analysisData.competitiveEdge || "",
       failureRisks: analysisData.failureRisks || [],
       founderChecklist: analysisData.founderChecklist || [],
       monetization: analysisData.monetization || [],
