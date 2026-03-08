@@ -142,6 +142,8 @@ function ScoreBadge({ score }: { score: number }) {
 
 const LOADING_GIFS = [
   "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
+  "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
+  "https://media.tenor.com/_n7-7ifNhhoAAAAm/azumanga-daioh-osaka.webp",
   "https://media.tenor.com/hYkRcm80JFwAAAAj/foxy-foxplushy.gif",
   "https://media.tenor.com/KOQYL00kmYEAAAAm/happy-holidays.webp",
   "https://media.tenor.com/v-eI1P9681IAAAAm/goose-dance.webp",
@@ -168,12 +170,8 @@ export default function BuilderPage() {
   const [buildStep, setBuildStep] = useState(0);
   const [buildError, setBuildError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [currentGif, setCurrentGif] = useState(
-    () => LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)],
-  );
-  const [currentWaitText, setCurrentWaitText] = useState(
-    () => waitTexts[Math.floor(Math.random() * waitTexts.length)],
-  );
+  const [currentGif, setCurrentGif] = useState(LOADING_GIFS[0]);
+  const [currentWaitText, setCurrentWaitText] = useState(waitTexts[0]);
 
   const buildSteps = [
     { emoji: "\u{1F9E0}", text: "Analyzing your idea architecture..." },
