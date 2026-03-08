@@ -102,6 +102,7 @@ const analysisSteps = [
 export default function ValidatorPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { showToast } = useToast();
 
   const initialIdea = searchParams.get("idea") || "";
   const initialTarget = searchParams.get("target") || "";
@@ -109,23 +110,72 @@ export default function ValidatorPage() {
   const initialCategory = searchParams.get("category") || "";
 
   const [formData, setFormData] = useState<Record<string, string>>(() => {
-    const data: Record<string, string> = {};
-    if (initialIdea) data.idea = initialIdea;
-    if (initialTarget) data.target = initialTarget;
-    if (initialProblem) data.problem = initialProblem;
-    return data;
+    // Priority: URL params > localStorage > empty
+    if (initialIdea || initialTarget || initialProblem) {
+      const data: Record<string, string> = {};
+      if (initialIdea) data.idea = initialIdea;
+      if (initialTarget) data.target = initialTarget;
+      if (initialProblem) data.problem = initialProblem;
+      return data;
+    }
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("sf_validator_form");
+        if (saved) return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return {};
   });
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    if (initialCategory) return initialCategory;
+    if (typeof window !== "undefined") {
+      try {
+        return localStorage.getItem("sf_validator_category") || "";
+      } catch { /* ignore */ }
+    }
+    return "";
+  });
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [analysisPhase, setAnalysisPhase] = useState(-1);
   const [showFullScreenLoader, setShowFullScreenLoader] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  // Save form data to localStorage on change
+  useEffect(() => {
+    try {
+      localStorage.setItem("sf_validator_form", JSON.stringify(formData));
+    } catch { /* ignore */ }
+  }, [formData]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("sf_validator_category", selectedCategory);
+    } catch { /* ignore */ }
+  }, [selectedCategory]);
+
+  // Scroll to top when page loads (for "new form" experience)
+  useEffect(() => {
+    topRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const handleChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
+
+  const handleClearForm = () => {
+    setFormData({});
+    setSelectedCategory("");
+    try {
+      localStorage.removeItem("sf_validator_form");
+      localStorage.removeItem("sf_validator_category");
+    } catch { /* ignore */ }
+    topRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const hasFormData = Object.values(formData).some((v) => v?.trim()) || selectedCategory;
 
   // Full-screen analysis animation
   useEffect(() => {
@@ -171,15 +221,19 @@ export default function ValidatorPage() {
       }
 
       const data = await res.json();
+      // Clear localStorage on successful submission
+      try {
+        localStorage.removeItem("sf_validator_form");
+        localStorage.removeItem("sf_validator_category");
+      } catch { /* ignore */ }
       setAnalysisPhase(analysisSteps.length);
-      // Brief pause to show completion
       setTimeout(() => {
         router.push(`/analysis/${data.id}`);
       }, 800);
     } catch (err) {
-      setSubmitError(
-        err instanceof Error ? err.message : "Something went wrong",
-      );
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      setSubmitError(msg);
+      showToast(msg, "error");
       setIsSubmitting(false);
       setShowFullScreenLoader(false);
       setAnalysisPhase(-1);
