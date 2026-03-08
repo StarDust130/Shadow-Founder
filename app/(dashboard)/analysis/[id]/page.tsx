@@ -530,7 +530,7 @@ export default function AnalysisPage() {
                   ) : (
                     <>
                       <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-[#1A1A1A] uppercase">
-                        {data.appName || verdictEmoji(data.verdict) + " VC Verdict"}
+                        {data.appName || data.idea.split(" ").filter((w: string) => w.length > 3).slice(0, 2).join(" ") || "Analysis"}
                       </h1>
                       <button
                         onClick={() => { setRenameValue(data.appName || ""); setRenaming(true); }}
