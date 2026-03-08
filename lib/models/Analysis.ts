@@ -27,6 +27,7 @@ export interface IAnalysis extends Document {
     strength: string;
     weakness: string;
   }[];
+  competitiveEdge: string;
   failureRisks: string[];
   founderChecklist: string[];
   monetization: string[];
@@ -75,6 +76,7 @@ const AnalysisSchema = new Schema<IAnalysis>(
         weakness: String,
       },
     ],
+    competitiveEdge: { type: String, default: "" },
     failureRisks: [String],
     founderChecklist: [String],
     monetization: [String],
