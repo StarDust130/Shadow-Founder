@@ -33,91 +33,136 @@ Requirements:
 - Include tailwind.config.ts and tsconfig.json
 - Code MUST compile — no syntax errors, no missing imports
 
-UI DESIGN — THIS IS CRITICAL. Make it look like a top-tier 2026 SaaS product:
-  * Use a bold, modern color system — NOT boring gray/white. Use vibrant accent colors, rich gradients (mesh gradients, radial gradients, multi-stop linear gradients)
-  * Glassmorphism: backdrop-blur-xl, bg-white/10, border-white/20 transparent cards
-  * Depth & layering: multi-level box shadows (shadow-xl shadow-2xl), overlapping elements, z-index layers
-  * Micro-interactions: hover:scale-105, hover:-translate-y-1, hover:shadow-2xl, group-hover transitions
-  * Typography: Large bold hero text (text-5xl md:text-7xl font-black), clean body text, proper hierarchy
-  * Spacing: Generous whitespace, consistent padding (p-8, p-12), gap-6 gap-8
-  * Modern patterns: Bento grid layouts, floating elements, pill-shaped badges, gradient text (bg-clip-text text-transparent)
-  * Animated gradient backgrounds using CSS @keyframes
-  * Use decorative SVG blobs or circles as background accents
-  * Responsive: mobile-first, looks incredible on all screen sizes
-  * Professional button styles: rounded-full/rounded-2xl, px-8 py-4, gradient backgrounds, hover transforms
-  * Subtle grid/dot patterns as backgrounds for sections
-  * Use emoji or Unicode symbols for icons (💡 🚀 ⚡ 🎯 ✨ 🔥 📊 🛡️)
-
-CRITICAL — LANDING PAGE PREVIEW FILE:
-You MUST include a file with the exact path "preview.html". This is the MOST IMPORTANT file. This is shown to the user as a live preview of their startup landing page.
+CRITICAL — LANDING PAGE PREVIEW FILE (preview.html):
+You MUST include a file at path "preview.html". This is the MOST IMPORTANT file — it's shown as a live preview.
 
 The preview.html MUST be:
-- A COMPLETE standalone HTML document with ALL CSS and JS inlined in <style> and <script> tags
-- ZERO external dependencies — no CDN links, no imports, no external fonts, no external scripts
-- A WORLD-CLASS landing page that looks like it was built by a top design agency
-- Must be fully functional and responsive
+- A COMPLETE standalone HTML document with ALL CSS and JS inlined
+- ZERO external dependencies — no CDN links, no imports, no external fonts
+- Use the startup's APP NAME (provided in the prompt) as the brand name throughout
 
-The preview.html MUST include these sections with STUNNING design:
-1. NAVIGATION: Fixed/sticky navbar with logo text, smooth-scroll links, gradient CTA button
-2. HERO SECTION: 
-   - Massive bold headline (80px+) with gradient text effect
-   - Compelling subtitle that sells the product
-   - Two CTA buttons (primary gradient + secondary outline)
-   - Animated background with CSS gradient animation or floating shapes
-   - Optional: Mockup/illustration using pure CSS shapes
-3. FEATURES SECTION:
-   - 3-6 feature cards in a grid layout
-   - Each card: icon (emoji/unicode), title, description
-   - Cards with glassmorphism or elevated shadow effect
-   - Hover animations (transform, shadow change)
-4. SOCIAL PROOF:
-   - Stats counters (e.g. "10,000+ Users", "99.9% Uptime", "4.9★ Rating")
-   - Optionally: short testimonial quotes
-5. PRICING SECTION:
-   - 2-3 tier pricing cards
-   - Most popular tier highlighted with badge + border + scale
-   - Feature lists with checkmarks (✓)
-   - CTA buttons on each card
-6. CTA / NEWSLETTER:
-   - Bold headline asking user to sign up
-   - Email input + submit button styled beautifully
-   - Background with gradient or pattern
-7. FOOTER:
-   - Links, branding, copyright
-   - Clean minimal design
+PREVIEW DESIGN — NEOBRUTALISM + MODERN HYBRID STYLE:
+Use a bold, striking Neobrutalism design with modern touches:
+- Thick black borders (2-4px solid #1A1A1A) on cards, buttons, sections
+- Hard box shadows (4px 4px 0 #1A1A1A, 6px 6px 0 <accent>)
+- Bold uppercase typography with tight letter-spacing  
+- Vibrant accent colors (pick ONE: #FF6803 orange, #6366F1 indigo, #22C55E green, #8B5CF6 purple)
+- White/cream backgrounds with colored accent cards
+- Rounded corners (border-radius: 16px-24px) 
+- Hover effects: cards lift up (translateY(-4px)) and shadow grows
+- Large hero text (clamp(2rem, 5vw, 3.5rem)) — NOT too massive, readable and clean
+- Professional body text (14-16px), NOT oversized
+- Clean whitespace and good spacing
 
-CSS techniques to use in preview.html:
-- @keyframes for animated gradient backgrounds
-- CSS custom properties (--primary, --accent, etc.)
-- backdrop-filter: blur() for glass effect
-- Intersection Observer for scroll-triggered fade-in animations
-- CSS Grid and Flexbox for layouts
-- @media queries for responsive design
+PREVIEW SECTIONS (7 sections, all well-designed):
+1. NAV: Sticky top bar with app name logo (bold uppercase) + "Get Started" CTA button with thick border
+2. HERO: Bold headline (not too big — max 3.5rem), subtitle (1 line), 2 CTA buttons, animated gradient background
+3. FEATURES: 3-4 cards in grid, each with emoji icon + title + short description, neobrutalism card style
+4. SOCIAL PROOF: 3 stat counters in a row (e.g. "10K+ Users", "99.9% Uptime", "4.9★ Rating")
+5. PRICING: 2-3 tier cards, popular one highlighted with accent border + scale, checkmark feature lists
+6. CTA: Sign-up section with email input + button, bold headline
+7. FOOTER: Clean minimal footer with copyright + links
+
+TEXT CONTENT RULES:
+- Use the app name (not the raw idea description) as the brand
+- Write REAL compelling copy that matches the startup idea
+- Headlines should be punchy, 3-7 words max
+- Descriptions should be 1-2 short sentences, clear and professional
+- NO filler text, NO lorem ipsum, NO "coming soon"
+- Pricing should be realistic ($0/Free, $29/mo, $99/mo)
+
+CSS RULES:
+- Use CSS custom properties for the color palette
+- @keyframes for subtle animated gradient on hero background
+- Scroll-triggered fade-in animations via IntersectionObserver
+- Responsive @media queries (mobile-first, looks great on all sizes)
 - Smooth scrolling (scroll-behavior: smooth)
-- CSS transitions on hover states (transform, box-shadow, opacity)
-- Linear-gradient, radial-gradient for backgrounds
-- Multiple box-shadows for depth (0 4px 6px rgba(), 0 20px 50px rgba())
-
-The preview.html should make users say "WOW" when they see it. It should look like a real, polished SaaS landing page, NOT a template or homework project.
+- Keep text sizes reasonable: hero h1 max 3.5rem, body 0.875-1rem, small text 0.75rem
+- Clean typography hierarchy — h1 > h2 > h3 > p
 
 DO NOT include any text outside the JSON. Only output the JSON object.`;
 
-function buildFallbackPreview(idea: string, summary: string) {
+function buildFallbackPreview(appName: string, idea: string, summary: string) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${idea}</title>
+<title>${appName}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#6366f1;--accent:#f59e0b;--dark:#0f172a;--light:#f8fafc}
-body{font-family:system-ui,-apple-system,sans-serif;color:var(--dark);scroll-behavior:smooth}
-nav{position:fixed;top:0;width:100%;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(12px);background:rgba(255,255,255,0.8);border-bottom:1px solid rgba(0,0,0,0.05);z-index:100}
-nav .logo{font-size:1.25rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-nav .cta{padding:0.5rem 1.5rem;background:var(--primary);color:#fff;border:none;border-radius:999px;font-weight:700;cursor:pointer;transition:transform 0.2s}
-nav .cta:hover{transform:scale(1.05)}
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(135deg,#eef2ff,#fef3c7,#ede9fe);position:relative;overflow:hidden}
+:root{--primary:#FF6803;--accent:#1A1A1A;--light:#FFFBF5;--dark:#1A1A1A;--shadow:4px 4px 0 #1A1A1A}
+body{font-family:system-ui,-apple-system,sans-serif;color:var(--dark);scroll-behavior:smooth;background:var(--light)}
+nav{position:fixed;top:0;width:100%;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:var(--light);border-bottom:3px solid var(--dark);z-index:100}
+nav .logo{font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:var(--dark)}
+nav .cta{padding:0.5rem 1.5rem;background:var(--primary);color:#fff;border:2px solid var(--dark);border-radius:12px;font-weight:800;font-size:0.8rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;box-shadow:var(--shadow);text-transform:uppercase;letter-spacing:0.05em}
+nav .cta:hover{transform:translateY(-2px);box-shadow:6px 6px 0 var(--dark)}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(135deg,#FFFBF5,#FFF0E0,#FFF5EB);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:20%;right:10%;width:200px;height:200px;border-radius:50%;background:var(--primary);opacity:0.06;animation:float 6s ease-in-out infinite}
+.hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.1;max-width:700px;color:var(--dark);text-transform:uppercase;letter-spacing:-0.03em}
+.hero p{margin-top:1rem;font-size:1rem;color:#64748b;max-width:500px;line-height:1.6}
+.hero .btns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
+.hero .btns a{padding:0.875rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;border:2px solid var(--dark)}
+.hero .btns .primary{background:var(--primary);color:#fff;box-shadow:var(--shadow)}
+.hero .btns .secondary{background:#fff;color:var(--dark);box-shadow:var(--shadow)}
+.hero .btns a:hover{transform:translateY(-3px);box-shadow:6px 6px 0 var(--dark)}
+section{padding:5rem 2rem}
+.features{background:#fff;border-top:3px solid var(--dark);border-bottom:3px solid var(--dark)}
+.features h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
+.features .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
+.features .card{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s,box-shadow 0.2s}
+.features .card:hover{transform:translateY(-4px);box-shadow:6px 6px 0 var(--primary)}
+.features .card .icon{font-size:1.8rem;margin-bottom:0.75rem}
+.features .card h3{font-size:1rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
+.features .card p{color:#64748b;line-height:1.5;font-size:0.875rem}
+.stats{background:var(--dark);color:#fff;text-align:center}
+.stats h2{font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase}
+.stats .row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
+.stats .stat .num{font-size:2.5rem;font-weight:900;color:var(--primary)}
+.stats .stat .label{margin-top:0.25rem;color:#94a3b8;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em}
+.pricing{background:#fff}
+.pricing h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase}
+.pricing .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:800px;margin:0 auto}
+.pricing .plan{padding:2rem;border-radius:18px;border:2px solid var(--dark);text-align:center;transition:transform 0.2s;box-shadow:var(--shadow);background:var(--light)}
+.pricing .plan:hover{transform:translateY(-4px)}
+.pricing .plan.popular{border-color:var(--primary);box-shadow:6px 6px 0 var(--primary);position:relative;transform:scale(1.03)}
+.pricing .plan.popular::before{content:"Popular";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.2rem 1rem;border-radius:99px;font-size:0.7rem;font-weight:800;border:2px solid var(--dark);text-transform:uppercase}
+.pricing .plan .price{font-size:2.5rem;font-weight:900;margin:0.75rem 0}
+.pricing .plan .price span{font-size:0.85rem;color:#94a3b8}
+.pricing .plan ul{list-style:none;margin:1.5rem 0;text-align:left}
+.pricing .plan li{padding:0.4rem 0;color:#475569;font-size:0.875rem}
+.pricing .plan li::before{content:"\\2713 ";color:var(--primary);font-weight:700}
+.pricing .plan .btn{display:inline-block;padding:0.75rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s;background:var(--primary);color:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.8rem;text-transform:uppercase}
+.pricing .plan .btn:hover{transform:translateY(-2px);box-shadow:5px 5px 0 var(--dark)}
+.cta-section{background:var(--dark);color:#fff;text-align:center;padding:5rem 2rem;border-top:3px solid var(--primary)}
+.cta-section h2{font-size:1.8rem;font-weight:900;margin-bottom:0.75rem;text-transform:uppercase}
+.cta-section p{font-size:0.95rem;opacity:0.7;margin-bottom:2rem}
+.cta-section form{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+.cta-section input{padding:0.75rem 1.5rem;border-radius:14px;border:2px solid #333;font-size:0.9rem;width:280px;max-width:100%;background:#222;color:#fff}
+.cta-section button{padding:0.75rem 2rem;border-radius:14px;background:var(--primary);color:#fff;font-weight:800;border:2px solid var(--primary);cursor:pointer;transition:transform 0.2s;font-size:0.85rem;text-transform:uppercase}
+.cta-section button:hover{transform:scale(1.05)}
+footer{background:var(--dark);color:#94a3b8;text-align:center;padding:2.5rem 2rem;font-size:0.8rem;border-top:1px solid #333}
+footer a{color:var(--primary);text-decoration:none;font-weight:700}
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+@media(max-width:640px){.hero h1{font-size:2rem}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}}
+</style>
+</head>
+<body>
+<nav><div class="logo">${appName}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
+<section class="hero"><h1>${appName}</h1><p>${summary || "The next-generation platform built for the future."}</p><div class="btns"><a href="#features" class="primary">Explore Features</a><a href="#pricing" class="secondary">View Pricing</a></div></section>
+<section class="features" id="features"><h2>Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">\u26A1</div><h3>Lightning Fast</h3><p>Built for speed and performance from the ground up.</p></div><div class="card fade-in"><div class="icon">\u{1F6E1}\uFE0F</div><h3>Secure by Default</h3><p>Enterprise-grade security built into every layer.</p></div><div class="card fade-in"><div class="icon">\u{1F680}</div><h3>Scale Effortlessly</h3><p>Grows with your business without breaking a sweat.</p></div></div></section>
+<section class="stats"><h2>Trusted by Thousands</h2><div class="row"><div class="stat fade-in"><div class="num">10,000+</div><div class="label">Active Users</div></div><div class="stat fade-in"><div class="num">99.9%</div><div class="label">Uptime</div></div><div class="stat fade-in"><div class="num">4.9\u2605</div><div class="label">Rating</div></div></div></section>
+<section class="pricing" id="pricing"><h2>Simple Pricing</h2><div class="grid"><div class="plan fade-in"><h3>Starter</h3><div class="price">Free</div><ul><li>Up to 3 projects</li><li>Basic analytics</li><li>Community support</li></ul><a href="#" class="btn">Get Started</a></div><div class="plan popular fade-in"><h3>Pro</h3><div class="price">$29<span>/mo</span></div><ul><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li><li>Custom integrations</li></ul><a href="#" class="btn">Upgrade</a></div><div class="plan fade-in"><h3>Enterprise</h3><div class="price">$99<span>/mo</span></div><ul><li>Everything in Pro</li><li>Dedicated manager</li><li>SLA guarantee</li><li>Custom deployment</li></ul><a href="#" class="btn">Contact Us</a></div></div></section>
+<section class="cta-section"><h2>Ready to Get Started?</h2><p>Join thousands building with ${appName}.</p><form onsubmit="event.preventDefault();alert('Thanks for signing up!')"><input type="email" placeholder="Enter your email" required><button type="submit">Sign Up Free</button></form></section>
+<footer><p>&copy; 2026 ${appName}. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p></footer>
+<script>
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>`;
 .hero h1{font-size:clamp(2.5rem,8vw,5rem);font-weight:900;line-height:1.1;max-width:800px;background:linear-gradient(135deg,var(--primary),#8b5cf6,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero p{margin-top:1.5rem;font-size:1.25rem;color:#475569;max-width:600px}
 .hero .btns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
@@ -238,8 +283,11 @@ export async function POST(req: Request) {
       );
     }
 
+    const appName = analysis.appName || analysis.idea.split(" ").slice(0, 3).join(" ");
+
     const userPrompt = `Build an MVP for this startup:
 
+**App Name:** ${appName}
 **Idea:** ${analysis.idea}
 **Target Audience:** ${analysis.target}
 **Problem:** ${analysis.problem}
@@ -250,7 +298,7 @@ ${analysis.revenue ? `**Revenue Model:** ${analysis.revenue}` : ""}
 **Key Strengths:** ${analysis.strengths.join(", ")}
 **Recommendations:** ${analysis.recommendations.join(", ")}
 
-Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on the core value proposition. Make it visually impressive with a modern UI.`;
+IMPORTANT: Use "${appName}" as the brand/product name throughout the preview.html and all files. Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on the core value proposition. Make it visually impressive.`;
 
     let rawContent: string;
 
@@ -297,7 +345,7 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
       if (!hasPreview) {
         generatedFiles.push({
           path: "preview.html",
-          content: buildFallbackPreview(analysis.idea, analysis.summary),
+          content: buildFallbackPreview(appName, analysis.idea, analysis.summary),
           lang: "html",
         });
       }
@@ -343,7 +391,7 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
         },
         {
           path: "preview.html",
-          content: buildFallbackPreview(analysis.idea, analysis.summary),
+          content: buildFallbackPreview(appName, analysis.idea, analysis.summary),
           lang: "html",
         },
       ];
@@ -357,12 +405,12 @@ Generate a complete Next.js MVP codebase that demonstrates this idea. Focus on t
       }),
     );
 
-    const techStack = ["Next.js 14", "TypeScript", "Tailwind CSS", "React 18"];
+    const techStack = ["Next.js 14", "TypeScript", "Tailwind CSS", "React 18", "HTML", "CSS", "JavaScript"];
 
     const build = await Build.create({
       userId,
       analysisId,
-      ideaTitle: analysis.idea,
+      ideaTitle: analysis.appName || analysis.idea,
       techStack,
       files: filesWithLines,
       status: "READY",
