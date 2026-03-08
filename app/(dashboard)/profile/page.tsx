@@ -151,8 +151,6 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [upgrading, setUpgrading] = useState(false);
-  const [upgraded, setUpgraded] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -199,30 +197,6 @@ export default function ProfilePage() {
       // QR generation failed
     }
   }, []);
-
-  const handleConfirmPayment = async () => {
-    setUpgrading(true);
-    try {
-      const res = await fetch("/api/user", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: "pro" }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUserPlan(data);
-        setUpgraded(true);
-        setTimeout(() => {
-          setShowUpgradeModal(false);
-          setUpgraded(false);
-        }, 2000);
-      }
-    } catch {
-      // silent
-    } finally {
-      setUpgrading(false);
-    }
-  };
 
   const plan = userPlan?.plan || "free";
   const isPro = plan === "pro";
@@ -778,7 +752,7 @@ export default function ProfilePage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-            onClick={() => !upgrading && setShowUpgradeModal(false)}
+            onClick={() => setShowUpgradeModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -788,7 +762,7 @@ export default function ProfilePage() {
               className="bg-white rounded-2xl border-2 border-[#1A1A1A] shadow-[8px_8px_0_#1A1A1A] p-6 max-w-lg w-full relative max-h-[90vh] overflow-y-auto"
             >
               <button
-                onClick={() => !upgrading && setShowUpgradeModal(false)}
+                onClick={() => setShowUpgradeModal(false)}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#1A1A1A]/5 transition-colors cursor-pointer"
               >
                 <X size={18} className="text-[#1A1A1A]/40" />
@@ -806,26 +780,8 @@ export default function ProfilePage() {
                 </p>
               </div>
 
-              {upgraded ? (
-                <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  className="text-center py-8"
-                >
-                  <CheckCircle2
-                    size={48}
-                    className="text-emerald-500 mx-auto mb-3"
-                  />
-                  <p className="text-lg font-black text-emerald-600 uppercase">
-                    Upgraded!
-                  </p>
-                  <p className="text-xs text-[#1A1A1A]/40 mt-1">
-                    Welcome to Pro, {firstName}!
-                  </p>
-                </motion.div>
-              ) : (
-                <>
-                  {/* What You Get */}
+              <>
+                {/* What You Get */}
                   <div className="bg-[#FAFAFA] rounded-xl border-2 border-[#1A1A1A]/8 p-4 mb-4">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.15em] text-[#1A1A1A]/30 font-mono mb-3 flex items-center gap-1.5">
                       <Star size={10} className="text-[#FF6803]" /> What you
@@ -912,27 +868,20 @@ export default function ProfilePage() {
 
                   <div className="border-t-2 border-[#1A1A1A]/5 pt-4">
                     <p className="text-[10px] text-[#1A1A1A]/30 font-bold text-center mb-3">
-                      After completing payment, click below to activate Pro
+                      After completing payment, send us an email to activate Pro
                     </p>
-                    <motion.button
-                      onClick={handleConfirmPayment}
-                      disabled={upgrading}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.97 }}
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-                    >
-                      {upgrading ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <CheckCircle2 size={16} />
-                      )}
-                      {upgrading
-                        ? "Activating..."
-                        : "I've Paid — Activate Pro"}
-                    </motion.button>
+                    <a href={`mailto:chandanbsd9@gmail.com?subject=${encodeURIComponent("I Paid — Upgrade to Pro — Shadow Founder")}&body=${encodeURIComponent(`Hi,\n\nI've completed the UPI payment of ₹1,999 for Shadow Founder Pro.\n\nPlease upgrade my account.\n\nName: ${user?.fullName || firstName}\nEmail: ${user?.primaryEmailAddress?.emailAddress || ""}\nUser ID: ${user?.id || ""}\n\nThank you!`)}`}>
+                      <motion.button
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 text-white font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow cursor-pointer"
+                      >
+                        <Mail size={16} />
+                        I&apos;ve Paid — Send Upgrade Request
+                      </motion.button>
+                    </a>
                   </div>
-                </>
-              )}
+              </>
             </motion.div>
           </motion.div>
         )}
