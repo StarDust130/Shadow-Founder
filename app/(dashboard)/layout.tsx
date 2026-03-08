@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { LayoutDashboard, Crosshair, Code2, User, Zap } from "lucide-react";
+import Image from "next/image";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -20,6 +21,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -42,25 +44,46 @@ export default function DashboardLayout({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col gap-1.5 p-2.5 bg-white/15 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+            className="fixed left-4 top-1/2 -translate-y-1/2 z-[60] flex flex-col gap-1.5 p-2.5 bg-white/15 backdrop-blur-2xl border border-white/30 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
           >
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
+              const isProfileAvatar =
+                item.href === "/profile" && !!user?.imageUrl;
               return (
                 <Link key={item.href} href={item.href}>
                   <motion.div
-                    whileHover={{ scale: 1.12 }}
+                    whileHover={
+                      isProfileAvatar
+                        ? { scale: 1.08, y: -2 }
+                        : { scale: 1.15, rotate: [0, -10, 10, -10, 0] }
+                    }
                     whileTap={{ scale: 0.9 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 12 }}
                     className="relative group"
                   >
                     <div
-                      className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-200 ${
-                        isActive
+                      className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-200 overflow-hidden ${
+                        isActive && !isProfileAvatar
                           ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
-                          : "text-[#1A1A1A]/35 hover:text-[#1A1A1A] hover:bg-white/50"
+                          : isActive && isProfileAvatar
+                            ? "border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] bg-white/30"
+                            : isProfileAvatar
+                              ? "opacity-80 hover:opacity-100 hover:shadow-lg"
+                              : "text-[#1A1A1A]/35 hover:text-[#1A1A1A] hover:bg-white/50"
                       }`}
                     >
-                      <item.icon size={20} />
+                      {isProfileAvatar ? (
+                        <Image
+                          src={user.imageUrl!}
+                          alt="Profile"
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <item.icon size={20} />
+                      )}
                     </div>
                     {/* Tooltip */}
                     <div className="absolute left-[calc(100%+14px)] top-1/2 -translate-y-1/2 px-3 py-1.5 bg-[#1A1A1A] text-white text-[11px] font-bold rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg z-50">
@@ -71,21 +94,6 @@ export default function DashboardLayout({
                 </Link>
               );
             })}
-
-            {/* Separator */}
-            <div className="w-8 h-[2px] bg-white/10 rounded-full mx-auto my-1" />
-
-            {/* User */}
-            <div className="flex justify-center">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox:
-                      "w-10 h-10 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] rounded-xl",
-                  },
-                }}
-              />
-            </div>
           </motion.nav>
         )}
       </AnimatePresence>
@@ -156,17 +164,39 @@ export default function DashboardLayout({
           <div className="flex items-center justify-around">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
+              const isProfileAvatar =
+                item.href === "/profile" && !!user?.imageUrl;
               return (
                 <Link key={item.href} href={item.href} className="flex-1">
                   <motion.div
-                    whileTap={{ scale: 0.88 }}
+                    whileHover={
+                      !isProfileAvatar
+                        ? { y: -2, rotate: [-5, 5, 0] }
+                        : { y: -2 }
+                    }
+                    whileTap={{ scale: 0.85, y: 2 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 14 }}
                     className={`flex flex-col items-center gap-0.5 py-2 mx-1 rounded-xl transition-all ${
-                      isActive
+                      isActive && !isProfileAvatar
                         ? "bg-[#FF6803] text-white border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
-                        : "text-[#1A1A1A]/35"
+                        : isActive && isProfileAvatar
+                          ? "border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] bg-white/20"
+                          : "text-[#1A1A1A]/35"
                     }`}
                   >
-                    <item.icon size={18} />
+                    {isProfileAvatar ? (
+                      <Image
+                        src={user.imageUrl!}
+                        alt="Profile"
+                        width={24}
+                        height={24}
+                        className={`w-6 h-6 rounded-md object-cover ${
+                          isActive ? "" : "opacity-60"
+                        }`}
+                      />
+                    ) : (
+                      <item.icon size={18} />
+                    )}
                     <span className="text-[8px] font-bold uppercase tracking-wider">
                       {item.label}
                     </span>
