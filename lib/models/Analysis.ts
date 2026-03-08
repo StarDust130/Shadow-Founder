@@ -22,6 +22,14 @@ export interface IAnalysis extends Document {
   strengths: string[];
   weaknesses: string[];
   recommendations: string[];
+  bigPlayers: {
+    name: string;
+    strength: string;
+    weakness: string;
+  }[];
+  failureRisks: string[];
+  founderChecklist: string[];
+  monetization: string[];
   followUpMessages: {
     role: "user" | "assistant";
     content: string;
@@ -60,6 +68,16 @@ const AnalysisSchema = new Schema<IAnalysis>(
     strengths: [String],
     weaknesses: [String],
     recommendations: [String],
+    bigPlayers: [
+      {
+        name: String,
+        strength: String,
+        weakness: String,
+      },
+    ],
+    failureRisks: [String],
+    founderChecklist: [String],
+    monetization: [String],
     followUpMessages: [
       {
         role: { type: String, enum: ["user", "assistant"] },
