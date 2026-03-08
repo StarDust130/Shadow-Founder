@@ -5,19 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import {
-  LayoutDashboard,
-  Crosshair,
-  BarChart3,
-  Code2,
-  Zap,
-} from "lucide-react";
+import { LayoutDashboard, Crosshair, Code2, User, Zap } from "lucide-react";
 
 const navItems = [
-  { label: "Hub", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Validate", href: "/validator", icon: Crosshair },
-  { label: "Analysis", href: "/analysis", icon: BarChart3 },
-  { label: "Assembly", href: "/assembly", icon: Code2 },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Validator", href: "/validator", icon: Crosshair },
+  { label: "Builder", href: "/builder", icon: Code2 },
+  { label: "Profile", href: "/profile", icon: User },
 ];
 
 export default function DashboardLayout({

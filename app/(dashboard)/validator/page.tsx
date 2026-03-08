@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Crosshair,
@@ -15,6 +15,8 @@ import {
   Sparkles,
   Terminal,
   Hash,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
 
 const categories = [
@@ -75,23 +77,61 @@ const pitchFields = [
   },
 ];
 
+const terminalSteps = [
+  { text: "Initializing Shadow Agent...", delay: 400 },
+  { text: "Parsing pitch document...", delay: 600 },
+  { text: "Scraping competitors across 12 platforms...", delay: 1200 },
+  { text: "Crawling ProductHunt, G2, Capterra...", delay: 900 },
+  { text: "Calculating TAM / SAM / SOM...", delay: 800 },
+  { text: "Analyzing unit economics model...", delay: 700 },
+  { text: "Running sentiment analysis on market fit...", delay: 1000 },
+  { text: "Evaluating defensibility & moat strength...", delay: 600 },
+  { text: "Generating viability verdict...", delay: 800 },
+  { text: "✓ Analysis complete. Viability Score: 78/100", delay: 0 },
+];
+
 export default function ValidatorPage() {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [terminalLines, setTerminalLines] = useState<string[]>([]);
+  const [terminalActive, setTerminalActive] = useState(false);
+  const [currentStep, setCurrentStep] = useState(-1);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
   const handleChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    if (!terminalActive || currentStep < 0) return;
+    if (currentStep >= terminalSteps.length) {
+      setTerminalActive(false);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const step = terminalSteps[currentStep];
+    setTerminalLines((prev) => [...prev, step.text]);
+
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+
+    if (step.delay > 0) {
+      const timer = setTimeout(() => setCurrentStep((s) => s + 1), step.delay);
+      return () => clearTimeout(timer);
+    }
+  }, [terminalActive, currentStep]);
+
+  const handleSubmit = () => {
     if (!formData.idea || !formData.target || !formData.problem) return;
     setIsSubmitting(true);
-    // TODO: Hook up to /api/validate
-    await new Promise((r) => setTimeout(r, 2000));
-    setIsSubmitting(false);
+    setTerminalActive(true);
+    setTerminalLines([]);
+    setCurrentStep(0);
   };
 
   const filledRequired = formData.idea && formData.target && formData.problem;
@@ -154,7 +194,7 @@ export default function ValidatorPage() {
         </span>
         <div className="flex-1 h-2 bg-[#1A1A1A]/5 rounded-full overflow-hidden border border-[#1A1A1A]/10">
           <motion.div
-            className="h-full bg-gradient-to-r from-[#FF6803] to-[#FF8A3D] rounded-full"
+            className="h-full bg-linear-to-r from-[#FF6803] to-[#FF8A3D] rounded-full"
             initial={{ width: 0 }}
             animate={{
               width: `${(filledCount / pitchFields.length) * 100}%`,
@@ -292,14 +332,20 @@ export default function ValidatorPage() {
         className="mt-8"
       >
         <motion.button
-          whileHover={filledRequired ? { y: -3 } : {}}
-          whileTap={filledRequired ? { scale: 0.98 } : {}}
+          whileHover={
+            filledRequired && !isSubmitting
+              ? { y: -4, x: -2, transition: { type: "spring", stiffness: 400 } }
+              : {}
+          }
+          whileTap={filledRequired && !isSubmitting ? { scale: 0.97 } : {}}
           onClick={handleSubmit}
           disabled={!filledRequired || isSubmitting}
           className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all border-2 ${
-            filledRequired
-              ? "bg-gradient-to-r from-[#FF8A3D] to-[#FF6803] text-white border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A]"
-              : "bg-[#1A1A1A]/5 text-[#1A1A1A]/25 border-[#1A1A1A]/5 cursor-not-allowed"
+            filledRequired && !isSubmitting
+              ? "bg-linear-to-r from-[#FF8A3D] to-[#FF6803] text-white border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A]"
+              : isSubmitting
+                ? "bg-[#FF6803]/60 text-white/80 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]"
+                : "bg-[#1A1A1A]/5 text-[#1A1A1A]/25 border-[#1A1A1A]/5 cursor-not-allowed"
           }`}
         >
           {isSubmitting ? (
@@ -310,18 +356,115 @@ export default function ValidatorPage() {
           ) : (
             <>
               <Send size={16} />
-              Deploy for Validation
+              Run Validation
             </>
           )}
         </motion.button>
+      </motion.div>
+
+      {/* ═══ TERMINAL MOCK ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="mt-8"
+      >
+        <div className="bg-[#1A1A1A] rounded-2xl border-2 border-[#1A1A1A] shadow-[6px_6px_0_#FF6803] overflow-hidden">
+          {/* Terminal Header */}
+          <div className="flex items-center gap-2 px-4 py-3 bg-[#111] border-b border-white/5">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+              <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+              <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+            </div>
+            <div className="flex-1 text-center">
+              <span className="text-[10px] font-bold text-white/20 font-mono uppercase tracking-widest">
+                Shadow Agent Terminal
+              </span>
+            </div>
+            <Terminal size={12} className="text-[#FF6803]/40" />
+          </div>
+
+          {/* Terminal Body */}
+          <div
+            ref={terminalRef}
+            className="p-4 font-mono text-sm min-h-[180px] max-h-[280px] overflow-y-auto"
+          >
+            {terminalLines.length === 0 && !terminalActive && (
+              <div className="flex items-center gap-2 text-white/15">
+                <span className="text-[#FF6803]">$</span>
+                <span>Waiting for pitch submission...</span>
+                <motion.span
+                  animate={{ opacity: [1, 0] }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
+                  className="inline-block w-2 h-4 bg-[#FF6803]/40"
+                />
+              </div>
+            )}
+
+            <AnimatePresence>
+              {terminalLines.map((line, i) => {
+                const isLast = i === terminalLines.length - 1;
+                const isDone = line.startsWith("✓");
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={`flex items-start gap-2 py-1 ${
+                      isDone ? "text-emerald-400" : "text-white/60"
+                    }`}
+                  >
+                    {isDone ? (
+                      <CheckCircle2
+                        size={14}
+                        className="text-emerald-400 mt-0.5 shrink-0"
+                      />
+                    ) : isLast && terminalActive ? (
+                      <Loader2
+                        size={14}
+                        className="text-[#FF6803] mt-0.5 animate-spin shrink-0"
+                      />
+                    ) : (
+                      <Circle
+                        size={14}
+                        className="text-white/15 mt-0.5 shrink-0"
+                      />
+                    )}
+                    <span className={`text-xs ${isDone ? "font-bold" : ""}`}>
+                      {line}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+
+            {terminalActive && currentStep < terminalSteps.length && (
+              <motion.div
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="flex items-center gap-2 mt-2 text-[#FF6803]/40"
+              >
+                <span className="text-[#FF6803]">$</span>
+                <span className="text-xs font-mono">processing</span>
+                <motion.span
+                  animate={{ opacity: [1, 0] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                  className="inline-block w-2 h-4 bg-[#FF6803]"
+                />
+              </motion.div>
+            )}
+          </div>
+        </div>
       </motion.div>
 
       {/* ═══ BOTTOM HINT ═══ */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="mt-6 flex items-center justify-center gap-2"
+        transition={{ delay: 0.8 }}
+        className="mt-6 mb-4 flex items-center justify-center gap-2"
       >
         <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-full px-4 py-2 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#FF6803]">
           <Terminal size={12} className="text-[#FF6803]" />
