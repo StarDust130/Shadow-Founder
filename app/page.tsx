@@ -11,6 +11,7 @@ import {
   Layers,
   CheckCircle2,
   XOctagon,
+  HelpCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
@@ -68,6 +69,7 @@ export default function LandingPage() {
             >
               Pricing
             </a>
+         
           </div>
 
           <div className="hidden lg:flex">
@@ -166,13 +168,12 @@ export default function LandingPage() {
                     Get Started
                   </button>
                   <Link
-                    href="mailto:csyadav0513@gmail.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/help"
+                   
                   >
                     <button className="bg-white/60 cursor-pointer backdrop-blur-sm text-[#1A1A1A] border border-white px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-sm hover:bg-white transition-colors w-full md:w-auto flex items-center justify-center gap-2 ">
                       {" "}
-                      Contact Us
+                      Know More
                     </button>
                   </Link>
                 </div>
@@ -337,7 +338,7 @@ export default function LandingPage() {
               </p>
               <button
                 onClick={routeToDashboard}
-                className="w-full bg-white text-[#1A1A1A] py-4 rounded-xl font-bold uppercase tracking-widest border border-white/60 hover:shadow-md transition-shadow"
+                className="w-full bg-white text-[#1A1A1A] py-4 rounded-xl font-bold uppercase tracking-widest border border-white/60 hover:shadow-md transition-shadow cursor-pointer"
               >
                 Start Free
               </button>
@@ -354,7 +355,7 @@ export default function LandingPage() {
                 Unlimited validations and full Next.js generation pipelines.
               </p>
               <Link href="upi://pay?pa=9302903537-2@ybl&pn=ShadowFounder&tr=TEST123456789&am=1999&cu=INR">
-                <button className="relative z-10 w-full bg-[#FF6803] text-white py-4 rounded-xl font-bold uppercase tracking-widest shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-transform">
+                <button className="relative z-10 w-full bg-[#FF6803] text-white py-4 rounded-xl font-bold uppercase tracking-widest shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-transform cursor-pointer">
                   Upgrade to Pro
                 </button>
               </Link>
@@ -385,7 +386,7 @@ export default function LandingPage() {
           <div className="px-6 md:px-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-16">
             <button
               onClick={routeToDashboard}
-              className="bg-[#1A1A1A] text-white px-10 py-5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-[#FF6803] transition-colors flex items-center gap-3 w-full md:w-auto justify-center shadow-xl"
+              className="bg-[#1A1A1A] text-white px-10 py-5 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-[#FF6803] transition-colors flex items-center gap-3 w-full md:w-auto justify-center shadow-xl cursor-pointer"
             >
               Initialize System <ArrowUpRight size={20} />
             </button>
@@ -425,23 +426,24 @@ export default function LandingPage() {
             </div>
             <span className="mt-4 md:mt-0">ALL LOGIC. NO FEELINGS.</span>
           </div>
-             <div className="text-center py-8 border-t border-[#1A1A1A]/6">
-                    <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
-                      Built with <span className="animate-pulse">💓</span> by Shadow
-                      Founder Team
-                    </p>
-                    <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
-                      Create by <Link href={"https://csyadav.vercel.app/"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-          
-                      
-                      className="text-[#FF6803] hover:underline">
-                        ChandraShekhar
-                      </Link>
-                      ✌️
-                    </p>
-                  </div>
+          <div className="text-center py-8 border-t border-[#1A1A1A]/6">
+            <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
+              Built with <span className="animate-pulse">💓</span> by Shadow
+              Founder Team
+            </p>
+            <p className="text-[10px] font-bold text-[#000000]/90 uppercase tracking-widest">
+              Create by{" "}
+              <Link
+                href={"https://csyadav.vercel.app/"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#FF6803] hover:underline"
+              >
+                ChandraShekhar
+              </Link>
+              ✌️
+            </p>
+          </div>
         </footer>
       </div>
     </div>
