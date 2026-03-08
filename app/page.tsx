@@ -229,7 +229,7 @@ export default function LandingPage() {
             {[...Array(6)].map((_, i) => (
               <React.Fragment key={i}>
                 <span className="hover:text-[#FF6803] transition-colors">
-                  Powered by Gemini Pro
+                  Powered by Shadow AI
                 </span>{" "}
                 <span className="text-[#FF6803]">•</span>
                 <span className="hover:text-[#FF6803] transition-colors">
