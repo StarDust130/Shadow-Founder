@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models/User";
 
@@ -12,9 +12,17 @@ export async function GET() {
 
     await connectDB();
 
+    // Get Clerk user data to save name
+    const clerkUser = await currentUser();
+    const updateFields: Record<string, string> = {};
+    if (clerkUser?.firstName) updateFields.firstName = clerkUser.firstName;
+    if (clerkUser?.lastName) updateFields.lastName = clerkUser.lastName;
+    if (clerkUser?.emailAddresses?.[0]?.emailAddress)
+      updateFields.email = clerkUser.emailAddresses[0].emailAddress;
+
     const user = await User.findOneAndUpdate(
       { clerkId: userId },
-      { clerkId: userId },
+      { $set: { clerkId: userId, ...updateFields } },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     );
 
@@ -22,6 +30,7 @@ export async function GET() {
       plan: user.plan,
       buildsUsed: user.buildsUsed,
       maxBuilds: user.maxBuilds,
+      firstName: user.firstName,
       createdAt: user.createdAt,
     });
   } catch (error) {
