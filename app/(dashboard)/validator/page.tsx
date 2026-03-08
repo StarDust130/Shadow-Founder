@@ -170,7 +170,7 @@ export default function ValidatorPage() {
           The Interrogation<span className="text-[#FF6803]">.</span>
         </h1>
         <p className="text-sm text-[#1A1A1A]/40 font-bold mt-2">
-          Pitch your idea. We break it down.
+          Pitch your idea. We break it down with zero sugar-coating.
         </p>
       </motion.div>
 
@@ -179,17 +179,17 @@ export default function ValidatorPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex items-start gap-3 bg-white rounded-xl p-4 mb-8 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
+        className="flex items-center gap-3 bg-white rounded-xl px-4 py-3 mb-8 border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A]"
       >
-        <div className="w-8 h-8 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A]">
-          <Shield size={14} className="text-white" />
+        <div className="w-8 h-8 bg-[#FF6803]/10 rounded-lg flex items-center justify-center shrink-0 border-2 border-[#FF6803]/20">
+          <Shield size={14} className="text-[#FF6803]" />
         </div>
         <div>
           <p className="text-xs font-black text-[#1A1A1A] uppercase tracking-wide">
-            The Shadow Founder is brutally honest.
+            Brutally honest AI analysis
           </p>
-          <p className="text-[11px] text-[#1A1A1A]/40 font-bold mt-0.5">
-            Market viability, competition & unit economics — zero sugar-coating.
+          <p className="text-[11px] text-[#1A1A1A]/35 font-bold mt-0.5">
+            Market viability, competition & unit economics — no sugar-coating.
           </p>
         </div>
       </motion.div>
@@ -411,7 +411,7 @@ export default function ValidatorPage() {
             className="p-4 font-mono text-sm min-h-45 max-h-70 overflow-y-auto bg-[#FAFAFA]/50"
           >
             {terminalLines.length === 0 && !terminalActive && (
-              <div className="flex items-center gap-2 text-[#1A1A1A]/20">
+              <div className="flex items-center gap-2 text-[#1A1A1A]/15">
                 <span className="text-[#FF6803] font-bold">$</span>
                 <span className="font-bold">
                   Waiting for pitch submission...
@@ -444,7 +444,7 @@ export default function ValidatorPage() {
                   {isDone ? (
                     <CheckCircle2
                       size={14}
-                      className="text-emerald-600 mt-0.5 shrink-0"
+                      className="text-emerald-500 mt-0.5 shrink-0"
                     />
                   ) : isLast && terminalActive ? (
                     <Loader2
@@ -454,7 +454,7 @@ export default function ValidatorPage() {
                   ) : (
                     <Circle
                       size={14}
-                      className="text-[#1A1A1A]/15 mt-0.5 shrink-0"
+                      className="text-[#1A1A1A]/10 mt-0.5 shrink-0"
                     />
                   )}
                   <span className="font-bold">{line}</span>
@@ -466,8 +466,8 @@ export default function ValidatorPage() {
           {/* Terminal Footer */}
           <div className="px-4 py-2 bg-[#FAFAFA] border-t-2 border-[#1A1A1A]/5 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap size={10} className="text-[#FF6803]/40" />
-              <span className="text-[9px] font-black text-[#1A1A1A]/20 uppercase tracking-widest font-mono">
+              <Zap size={10} className="text-[#FF6803]/30" />
+              <span className="text-[9px] font-black text-[#1A1A1A]/15 uppercase tracking-widest font-mono">
                 Shadow Engine v3.0
               </span>
             </div>
@@ -475,9 +475,9 @@ export default function ValidatorPage() {
               <motion.div
                 animate={{ scale: [1, 1.3, 1] }}
                 transition={{ duration: 2, repeat: Infinity, type: "tween" }}
-                className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
+                className="w-1.5 h-1.5 bg-emerald-500/50 rounded-full"
               />
-              <span className="text-[9px] font-black text-[#1A1A1A]/20 uppercase tracking-widest font-mono">
+              <span className="text-[9px] font-black text-[#1A1A1A]/15 uppercase tracking-widest font-mono">
                 Ready
               </span>
             </div>

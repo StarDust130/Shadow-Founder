@@ -109,8 +109,8 @@ export default function ProfilePage() {
       >
         <div className="bg-white rounded-2xl border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] p-5 relative overflow-hidden">
           <motion.div
-            className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[#FF6803]/8"
-            animate={{ scale: [1, 1.15, 1] }}
+            className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[#FF6803]/5"
+            animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 4, repeat: Infinity, type: "tween" }}
           />
           <div className="relative z-10 flex items-center gap-4">
@@ -124,15 +124,15 @@ export default function ProfilePage() {
                 Hey, {firstName}
                 <span className="text-[#FF6803]">!</span>
               </h2>
-              <p className="text-xs font-bold text-[#1A1A1A]/35">
+              <p className="text-xs font-bold text-[#1A1A1A]/30">
                 {user?.primaryEmailAddress?.emailAddress ||
                   "Manage your account below"}
               </p>
             </div>
             <div className="flex-1" />
             <div className="hidden sm:flex items-center gap-2 bg-emerald-500/8 rounded-lg px-3 py-1.5 border border-emerald-500/15">
-              <Shield size={12} className="text-emerald-600" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60 font-mono">
+              <Shield size={12} className="text-emerald-500" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 font-mono">
                 Free Plan
               </span>
             </div>
@@ -190,9 +190,9 @@ export default function ProfilePage() {
           className="bg-[#FF6803] border-2 border-[#1A1A1A] rounded-2xl p-6 shadow-[6px_6px_0_#1A1A1A] hover:shadow-[8px_8px_0_#1A1A1A] transition-all relative overflow-hidden"
         >
           <motion.div
-            className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent"
-            animate={{ x: ["-100%", "100%"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 bg-linear-to-br from-white/10 via-transparent to-white/5"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 3, repeat: Infinity, type: "tween" }}
           />
 
           <div className="relative z-10">
@@ -206,7 +206,7 @@ export default function ProfilePage() {
             </div>
 
             <h3 className="text-xl font-black text-white tracking-tight mb-1">
-              Go <span className="text-[#1A1A1A]">Pro</span>
+              Go Pro
             </h3>
             <p className="text-[11px] text-white/60 font-bold mb-5">
               Unlimited validations, priority AI analysis, and advanced code
@@ -220,9 +220,9 @@ export default function ProfilePage() {
                 transition: { type: "spring", stiffness: 400 },
               }}
               whileTap={{ scale: 0.97 }}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-white text-[#1A1A1A] font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-shadow"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-white text-[#FF6803] font-black text-sm uppercase tracking-wider rounded-xl border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[4px_4px_0_#1A1A1A] transition-shadow"
             >
-              <Sparkles size={14} className="text-[#FF6803]" />
+              <Sparkles size={14} />
               Upgrade Now
               <ArrowRight size={14} />
             </motion.button>
@@ -269,8 +269,8 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 + i * 0.05 }}
-            whileHover={{ y: -3 }}
-            className="bg-white border-2 border-[#1A1A1A]/10 rounded-xl p-4 hover:border-[#1A1A1A] hover:shadow-[3px_3px_0_#1A1A1A] transition-all cursor-default"
+            whileHover={{ y: -4, x: -2 }}
+            className="bg-white border-2 border-[#1A1A1A] rounded-2xl p-4 shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#FF6803] transition-all cursor-default"
           >
             <stat.icon
               size={16}
