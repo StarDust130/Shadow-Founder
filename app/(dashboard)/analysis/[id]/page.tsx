@@ -67,6 +67,7 @@ interface AnalysisData {
   weaknesses: string[];
   recommendations: string[];
   bigPlayers?: BigPlayer[];
+  competitiveEdge?: string;
   failureRisks?: string[];
   founderChecklist?: string[];
   monetization?: string[];
@@ -851,28 +852,48 @@ export default function AnalysisPage() {
               </div>
               <div>
                 <h3 className="text-sm font-black uppercase tracking-tight text-[#1A1A1A]">
-                  {"\u{1F3C6}"} Big Players
+                  {"\u{1F3C6}"} Competitive Landscape
                 </h3>
                 <p className="text-[9px] text-[#1A1A1A]/30 font-bold uppercase tracking-widest font-mono">
-                  Know Your Competition
+                  {data.bigPlayers.length} Competitors Identified
                 </p>
               </div>
             </div>
-            <div className="space-y-3">
+
+            {/* Competitive Edge Banner */}
+            {data.competitiveEdge && (
+              <div className="mb-4 p-3 bg-[#FF6803]/5 rounded-xl border-2 border-[#FF6803]/30">
+                <div className="flex items-start gap-2">
+                  <Zap size={14} className="text-[#FF6803] mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#FF6803] mb-0.5">Your Competitive Edge</p>
+                    <p className="text-xs font-medium text-[#1A1A1A]/70">{data.competitiveEdge}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {data.bigPlayers.map((player, i) => (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row sm:items-start gap-3 p-4 bg-[#FAFAFA] rounded-xl border-2 border-[#1A1A1A]/10"
+                  className="flex flex-col gap-2 p-4 bg-[#FAFAFA] rounded-xl border-2 border-[#1A1A1A]/10 hover:border-[#1A1A1A]/30 transition-colors"
                 >
-                  <div className="w-10 h-10 bg-[#1A1A1A] rounded-xl flex items-center justify-center text-white font-black text-sm shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#FF6803]">
-                    {player.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight mb-1">{player.name}</h4>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-[11px] text-emerald-600 font-bold"><span className="text-[#1A1A1A]/30 font-mono mr-1">STR</span> {player.strength}</p>
-                      <p className="text-[11px] text-red-500 font-bold"><span className="text-[#1A1A1A]/30 font-mono mr-1">GAP</span> {player.weakness}</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 bg-[#1A1A1A] rounded-xl flex items-center justify-center text-white font-black text-sm shrink-0 border-2 border-[#1A1A1A] shadow-[2px_2px_0_#FF6803]">
+                      {player.name.charAt(0)}
                     </div>
+                    <h4 className="text-sm font-black text-[#1A1A1A] uppercase tracking-tight">{player.name}</h4>
+                  </div>
+                  <div className="flex flex-col gap-1.5 pl-1">
+                    <p className="text-[11px] font-bold flex items-start gap-1.5">
+                      <span className="w-4 h-4 min-w-4 bg-emerald-100 rounded flex items-center justify-center text-[8px] text-emerald-600 mt-0.5">+</span>
+                      <span className="text-emerald-600">{player.strength}</span>
+                    </p>
+                    <p className="text-[11px] font-bold flex items-start gap-1.5">
+                      <span className="w-4 h-4 min-w-4 bg-red-100 rounded flex items-center justify-center text-[8px] text-red-500 mt-0.5">-</span>
+                      <span className="text-red-500">{player.weakness}</span>
+                    </p>
                   </div>
                 </div>
               ))}
