@@ -199,19 +199,19 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-const LOADING_GIFS = [
+const BUILD_GIFS = [
   "https://media.tenor.com/KeqbuC5yrgUAAAAm/deal-with-it-trailblazer.webp",
   "https://media.tenor.com/hYkRcm80JFwAAAAj/foxy-foxplushy.gif",
   "https://media.tenor.com/KOQYL00kmYEAAAAm/happy-holidays.webp",
   "https://media.tenor.com/v-eI1P9681IAAAAm/goose-dance.webp",
 ];
 
-const waitTexts = [
+const buildWaitTexts = [
   "Crunching the data...",
   "Analyzing market signals...",
-  "Consulting the startup gods...",
+  "Generating your MVP...",
   "Almost there, hang tight!",
-  "Loading your analysis...",
+  "Assembling the code...",
 ];
 
 export default function AnalysisPage() {
@@ -230,12 +230,9 @@ export default function AnalysisPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState("");
-  const [elapsedTime, setElapsedTime] = useState(0);
   const [buildElapsed, setBuildElapsed] = useState(0);
-  const [currentGif, setCurrentGif] = useState(LOADING_GIFS[0]);
-  const [currentWaitText, setCurrentWaitText] = useState(waitTexts[0]);
-  const [buildGif, setBuildGif] = useState(LOADING_GIFS[0]);
-  const [buildWaitText, setBuildWaitText] = useState(waitTexts[0]);
+  const [buildGif, setBuildGif] = useState(BUILD_GIFS[0]);
+  const [buildWaitText, setBuildWaitText] = useState(buildWaitTexts[0]);
 
   const {
     messages: chatMessages,
@@ -269,23 +266,6 @@ export default function AnalysisPage() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Timer for loading screen
-  useEffect(() => {
-    if (!loading) return;
-    const timer = setInterval(() => setElapsedTime((t) => t + 1), 1000);
-    return () => clearInterval(timer);
-  }, [loading]);
-
-  // GIF & text rotation for loading screen
-  useEffect(() => {
-    if (!loading) return;
-    const rotator = setInterval(() => {
-      setCurrentGif(LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
-      setCurrentWaitText(waitTexts[Math.floor(Math.random() * waitTexts.length)]);
-    }, 4000);
-    return () => clearInterval(rotator);
-  }, [loading]);
-
   // Timer for build loading
   useEffect(() => {
     if (!building) { setBuildElapsed(0); return; }
@@ -297,8 +277,8 @@ export default function AnalysisPage() {
   useEffect(() => {
     if (!building) return;
     const rotator = setInterval(() => {
-      setBuildGif(LOADING_GIFS[Math.floor(Math.random() * LOADING_GIFS.length)]);
-      setBuildWaitText(waitTexts[Math.floor(Math.random() * waitTexts.length)]);
+      setBuildGif(BUILD_GIFS[Math.floor(Math.random() * BUILD_GIFS.length)]);
+      setBuildWaitText(buildWaitTexts[Math.floor(Math.random() * buildWaitTexts.length)]);
     }, 5000);
     return () => clearInterval(rotator);
   }, [building]);
@@ -389,40 +369,13 @@ export default function AnalysisPage() {
   const isIllegal = data && data.score === 0;
 
   if (loading) {
-    const mins = Math.floor(elapsedTime / 60);
-    const secs = elapsedTime % 60;
-    const timeStr = mins > 0 ? `${mins}m ${secs.toString().padStart(2, "0")}s` : `${secs}s`;
     return (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-6 p-8 max-w-sm text-center">
-          <motion.div
-            key={currentGif}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="w-32 h-32 flex items-center justify-center"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={currentGif}
-              alt="Loading"
-              className="w-28 h-28 object-contain rounded-2xl"
-            />
-          </motion.div>
-          <div>
-            <p className="text-sm font-black text-[#1A1A1A] uppercase tracking-wide mb-1">
-              {currentWaitText}
-            </p>
-            <p className="text-xs text-[#1A1A1A]/40 font-mono font-bold">
-              {timeStr}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Loader2 size={14} className="animate-spin text-[#FF6803]" />
-            <span className="text-[11px] font-bold text-[#1A1A1A]/50">
-              Loading analysis
-            </span>
-          </div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={24} className="animate-spin text-[#FF6803]" />
+          <span className="text-xs font-bold text-[#1A1A1A]/40 uppercase tracking-wider">
+            Loading analysis...
+          </span>
         </div>
       </div>
     );
