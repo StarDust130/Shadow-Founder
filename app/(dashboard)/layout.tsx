@@ -225,14 +225,28 @@ export default function DashboardLayout({
                     <div className="w-px h-3 bg-[#1A1A1A]/8" />
                     <Code2 size={10} className="text-[#FF6803]/60" />
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#1A1A1A]/40 font-mono">
-                      {Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)} builds
+                      {Math.max(
+                        0,
+                        userCredits.maxBuilds - userCredits.buildsUsed,
+                      )}{" "}
+                      builds
                     </span>
                   </>
                 ) : (
                   <>
                     <Coins size={11} className="text-[#FF6803]" />
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#1A1A1A]/60 font-mono">
-                      {Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)} build{Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed) !== 1 ? "s" : ""}
+                      {Math.max(
+                        0,
+                        userCredits.maxBuilds - userCredits.buildsUsed,
+                      )}{" "}
+                      build
+                      {Math.max(
+                        0,
+                        userCredits.maxBuilds - userCredits.buildsUsed,
+                      ) !== 1
+                        ? "s"
+                        : ""}
                     </span>
                     {userCredits.buildsUsed >= userCredits.maxBuilds && (
                       <>
@@ -255,21 +269,30 @@ export default function DashboardLayout({
               whileTap={{ scale: 0.9 }}
               className="w-8 h-8 flex items-center justify-center bg-white/60 backdrop-blur-sm border border-[#1A1A1A]/6 rounded-full shadow-sm cursor-pointer hover:border-[#FF6803]/30 transition-all"
             >
-              <HelpCircle size={14} className="text-[#1A1A1A]/40 hover:text-[#FF6803]" />
+              <HelpCircle
+                size={14}
+                className="text-[#1A1A1A]/40 hover:text-[#FF6803]"
+              />
             </motion.div>
           </Link>
 
           {/* AI Engine Status — unified pill */}
-          <div className="hidden sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border  border-[#1A1A1A]/6 rounded-full px-3.5 py-1.5 shadow-sm">
-            😎
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#050505]/90 font-mono">
-              BE COOL
-            </span>
-            <div className="w-px h-3 bg-[#1a1a1a]/8" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-orange-600/90 font-mono">
-              STAY COOL
-            </span>
-          </div>
+          <Link
+            href="https://youtu.be/EH9yR6T4ePI?si=jeK1Y21FULNEZQNG&t=62"
+            target="_blank"
+            
+          >
+            <div className="hidden cursor-pointer sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border  border-[#1A1A1A]/6 rounded-full px-3.5 py-1.5 shadow-sm">
+              😎
+              <span className="text-[9px] font-bold uppercase tracking-wider text-[#050505]/90 font-mono">
+                BE COOL
+              </span>
+              <div className="w-px h-3 bg-[#1a1a1a]/8" />
+              <span className="text-[9px] font-bold uppercase tracking-wider text-orange-600/90 font-mono">
+                STAY COOL
+              </span>
+            </div>
+          </Link>
 
           {/* Mobile credits display */}
           {userCredits && (
@@ -277,7 +300,12 @@ export default function DashboardLayout({
               <div className="sm:hidden flex items-center gap-1.5 bg-white/60 backdrop-blur-sm rounded-full px-2.5 py-1 border border-[#1A1A1A]/6 cursor-pointer">
                 <Coins size={10} className="text-[#FF6803]" />
                 <span className="text-[9px] font-black text-[#1A1A1A]/60 font-mono">
-                  {userCredits.plan === "enterprise" ? "∞" : Math.max(0, userCredits.maxBuilds - userCredits.buildsUsed)}
+                  {userCredits.plan === "enterprise"
+                    ? "∞"
+                    : Math.max(
+                        0,
+                        userCredits.maxBuilds - userCredits.buildsUsed,
+                      )}
                 </span>
               </div>
             </Link>
