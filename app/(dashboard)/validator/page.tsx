@@ -18,7 +18,9 @@ import {
   Shield,
   Sparkles,
   ArrowRight,
+  Trash2,
 } from "lucide-react";
+import { useToast } from "@/lib/toast-context";
 
 const categories = [
   "SaaS",
