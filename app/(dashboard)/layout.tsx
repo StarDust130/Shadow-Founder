@@ -5,8 +5,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { LayoutDashboard, Crosshair, Code2, User, Zap } from "lucide-react";
+import {
+  LayoutDashboard,
+  Crosshair,
+  Code2,
+  User,
+  Zap,
+  Package,
+} from "lucide-react";
 import Image from "next/image";
+
+interface BuildSummary {
+  _id: string;
+  ideaTitle: string;
+}
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -24,6 +36,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
+  const [latestBuild, setLatestBuild] = useState<BuildSummary | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -32,8 +45,35 @@ export default function DashboardLayout({
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  useEffect(() => {
+    const fetchBuilds = async () => {
+      try {
+        const res = await fetch("/api/builds");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) setLatestBuild(data[0]);
+        }
+      } catch {
+        /* silent */
+      }
+    };
+    fetchBuilds();
+  }, [pathname]);
+
+  const allNavItems = latestBuild
+    ? [
+        ...navItems.slice(0, 3),
+        {
+          label: "Assembly",
+          href: `/assembly/${latestBuild._id}`,
+          icon: Package,
+        },
+        navItems[3],
+      ]
+    : navItems;
+
   const currentPage =
-    navItems.find((item) => pathname.startsWith(item.href))?.label || "Hub";
+    allNavItems.find((item) => pathname.startsWith(item.href))?.label || "Hub";
 
   return (
     <div className="min-h-screen bg-[#E5E4E2] font-sans selection:bg-[#FF6803] selection:text-white">
@@ -47,7 +87,7 @@ export default function DashboardLayout({
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
             className="fixed left-4 top-1/2 -translate-y-1/2 z-60 flex flex-col gap-2 p-2.5 bg-white/20 backdrop-blur-2xl border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
           >
-            {navItems.map((item) => {
+            {allNavItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
               const isProfileAvatar =
                 item.href === "/profile" && !!user?.imageUrl;
@@ -195,7 +235,7 @@ export default function DashboardLayout({
       {isMobile && (
         <nav className="fixed bottom-0 left-0 right-0 z-60 bg-white/80 backdrop-blur-2xl border-t border-[#1A1A1A]/8 px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),6px)]">
           <div className="flex items-center justify-around">
-            {navItems.map((item) => {
+            {allNavItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
               const isProfileAvatar =
                 item.href === "/profile" && !!user?.imageUrl;

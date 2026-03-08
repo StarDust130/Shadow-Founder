@@ -194,7 +194,19 @@ export default function AnalysisPage() {
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [building, setBuilding] = useState(false);
+  const [buildStep, setBuildStep] = useState(0);
+  const [buildError, setBuildError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  const buildSteps = [
+    { emoji: "\u{1F9E0}", text: "Analyzing your idea architecture..." },
+    { emoji: "\u{1F4DD}", text: "Generating database schemas..." },
+    { emoji: "\u26A1", text: "Building API routes & endpoints..." },
+    { emoji: "\u{1F3A8}", text: "Crafting frontend components..." },
+    { emoji: "\u{1F527}", text: "Setting up TypeScript config..." },
+    { emoji: "\u{1F4E6}", text: "Bundling Next.js project..." },
+    { emoji: "\u2705", text: "Finalizing your MVP codebase..." },
+  ];
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -221,8 +233,13 @@ export default function AnalysisPage() {
   }, [id]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]);
+    if (chatOpen) {
+      setTimeout(
+        () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }),
+        100,
+      );
+    }
+  }, [chatMessages, chatLoading, chatOpen]);
 
   const sendChatMessage = useCallback(async () => {
     if (!chatInput.trim() || chatLoading) return;
@@ -257,6 +274,13 @@ export default function AnalysisPage() {
 
   const handleBuildMVP = async () => {
     setBuilding(true);
+    setBuildStep(0);
+    setBuildError(null);
+
+    const stepInterval = setInterval(() => {
+      setBuildStep((prev) => (prev < 6 ? prev + 1 : prev));
+    }, 3000);
+
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -264,18 +288,26 @@ export default function AnalysisPage() {
         body: JSON.stringify({ analysisId: id }),
       });
       const result = await res.json();
+      clearInterval(stepInterval);
       if (!res.ok) {
         if (result.error === "BUILD_LIMIT_REACHED") {
-          alert(result.message);
+          setBuildError(
+            result.message ||
+              "Free plan allows only 1 MVP build. Upgrade to Pro for unlimited builds.",
+          );
         } else {
-          alert(result.error || "Build failed");
+          setBuildError(result.error || "Build failed. Please try again.");
         }
         setBuilding(false);
         return;
       }
-      router.push(`/assembly/${result.id}`);
+      setBuildStep(6);
+      setTimeout(() => router.push(`/assembly/${result.id}`), 800);
     } catch {
-      alert("Failed to start build. Try again.");
+      clearInterval(stepInterval);
+      setBuildError(
+        "Network error. Please check your connection and try again.",
+      );
       setBuilding(false);
     }
   };
@@ -857,6 +889,153 @@ export default function AnalysisPage() {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* FULL-SCREEN BUILD LOADING */}
+      <AnimatePresence>
+        {building && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-100 bg-[#E5E4E2] flex items-center justify-center"
+          >
+            <div className="flex flex-col items-center gap-8 px-6 max-w-md w-full">
+              {/* Animated rocket */}
+              <motion.div
+                animate={{ y: [0, -20, 0] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="relative"
+              >
+                <div className="w-24 h-24 bg-[#FF6803] rounded-2xl flex items-center justify-center border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A]">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <Rocket size={40} className="text-white" />
+                  </motion.div>
+                </div>
+                <motion.div
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.1, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-[#1A1A1A]/10 rounded-full blur-sm"
+                />
+              </motion.div>
+
+              <div className="text-center">
+                <h2 className="text-2xl font-black text-[#1A1A1A] uppercase tracking-tight mb-2">
+                  Building Your MVP
+                </h2>
+                <p className="text-sm text-[#1A1A1A]/40 font-bold">
+                  AI is generating production-ready code
+                </p>
+              </div>
+
+              {/* Progress steps */}
+              <div className="w-full space-y-2">
+                {buildSteps.map((step, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{
+                      opacity: i <= buildStep ? 1 : 0.3,
+                      x: 0,
+                    }}
+                    transition={{ delay: i * 0.1, duration: 0.3 }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all ${
+                      i < buildStep
+                        ? "bg-emerald-50 border-emerald-500/30"
+                        : i === buildStep
+                          ? "bg-white border-[#FF6803] shadow-[3px_3px_0_#FF6803]"
+                          : "bg-white/50 border-[#1A1A1A]/10"
+                    }`}
+                  >
+                    <span className="text-lg">
+                      {i < buildStep ? "\u2705" : step.emoji}
+                    </span>
+                    <span
+                      className={`text-xs font-bold ${
+                        i < buildStep
+                          ? "text-emerald-600"
+                          : i === buildStep
+                            ? "text-[#1A1A1A]"
+                            : "text-[#1A1A1A]/30"
+                      }`}
+                    >
+                      {step.text}
+                    </span>
+                    {i === buildStep && (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="ml-auto"
+                      >
+                        <Loader2 size={14} className="text-[#FF6803]" />
+                      </motion.div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full bg-[#1A1A1A]/5 rounded-full h-2 border border-[#1A1A1A]/10 overflow-hidden">
+                <motion.div
+                  className="h-full bg-[#FF6803] rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{
+                    width: `${Math.min(((buildStep + 1) / buildSteps.length) * 100, 100)}%`,
+                  }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* BUILD ERROR TOAST */}
+      <AnimatePresence>
+        {buildError && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-101 max-w-md w-[calc(100%-2rem)]"
+          >
+            <div className="bg-white border-2 border-red-500 rounded-2xl p-4 shadow-[4px_4px_0_#EF4444] flex items-start gap-3">
+              <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center shrink-0 border-2 border-red-500/20">
+                <XOctagon size={14} className="text-red-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-red-600 uppercase mb-0.5">
+                  Build Failed
+                </p>
+                <p className="text-xs text-[#1A1A1A]/60 font-medium">
+                  {buildError}
+                </p>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setBuildError(null)}
+                className="text-[#1A1A1A]/30 hover:text-[#1A1A1A] shrink-0"
+              >
+                <X size={16} />
+              </motion.button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
