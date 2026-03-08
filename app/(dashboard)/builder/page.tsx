@@ -270,7 +270,7 @@ export default function BuilderPage() {
   };
 
   const viableIdeas = analyses.filter(
-    (a) => a.verdict === "VIABLE" || a.verdict === "PASS",
+    (a) => a.verdict === "VIABLE" || a.verdict === "CONDITIONAL PASS",
   );
 
   // Full-screen build loading overlay
@@ -607,7 +607,7 @@ export default function BuilderPage() {
             >
               {analyses.map((idea) => {
                 const isViable = idea.verdict === "VIABLE";
-                const isPass = idea.verdict === "PASS";
+                const isPass = idea.verdict === "CONDITIONAL PASS";
                 const canBuild = isViable || isPass;
                 const isBuilding = buildingId === idea._id;
                 return (
