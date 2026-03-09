@@ -174,22 +174,43 @@ Provide your analysis as JSON. Use Indian Rupees (₹) for monetary values. Incl
       const overlapCount = aiWords.filter((w: string) => ideaWords.includes(w)).length;
       const isBadName = !aiName || aiName.length > 16 || aiNameLower === ideaLower || aiName.split(" ").length > 2 || overlapCount >= 2;
       if (isBadName) {
-        // Creative name gen: extract the MOST SPECIFIC concept word, skip generic/business words
-        const skipWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","its","that","with","as","by","this","from","at","my","your","our","their","just","very","really","also","which","about","based","using","use","new","get","go","do","does","has","have","had","been","was","were","are","being","but","not","no","all","any","each","every","some","such","than","too","more","most","other","into","over","through","between","both","after","before","during","where","when","how","what","who","whom","why","so","then","up","out","off","down","back","only","can","will","would","should","could","want","need","like","make","build","create","app","platform","tool","system","service","website","software","application","solution","product","business","company","startup","online","digital","smart","ai","ml","web","mobile","store","shop","marketplace","ecommerce","e-commerce","sell","buy","selling","buying","market","helps","help","people","users","customers","manage","management","tracking","track","monitor","idea","simple","easy","best","good","great","better"]);
-        const words = idea.split(/\s+/).filter(w => !skipWords.has(w.toLowerCase()) && w.length > 2);
-        // Prefer LAST meaningful word (more specific) — e.g. "sell phones" → "phones"
-        const suffixes = ["ly","ify","io","Hub","Sync","Flow","Nest","Base","Mint","Wave","Pulse","Spark","Cart","Verse","Stack"];
-        if (words.length >= 1) {
-          const coreWord = words[words.length - 1]; // last specific word
-          // Remove trailing 's' for plural
-          const singular = coreWord.endsWith('s') && coreWord.length > 3 ? coreWord.slice(0, -1) : coreWord;
-          const core = singular.charAt(0).toUpperCase() + singular.slice(1).toLowerCase();
-          const suffix = suffixes[core.charCodeAt(0) % suffixes.length];
-          analysisData.appName = core + suffix;
-        } else {
-          // No meaningful words found — use category-based name
-          const catNames: Record<string, string> = { "SaaS": "CloudPulse", "Fintech": "PayMint", "Health": "VitalSync", "EdTech": "LearnFlow", "E-commerce": "ShopNest", "Social": "BuzzVerse", "AI/ML": "NeuralBase", "Gaming": "PlaySpark" };
-          analysisData.appName = catNames[category] || "LaunchPad";
+        // Try AI name generation with openai/gpt-oss-120b for best creative names
+        let aiNameGenerated = false;
+        try {
+          const nameResult = await groq.chat.completions.create({
+            model: "openai/gpt-oss-120b",
+            messages: [
+              { role: "system", content: "You are a startup naming expert. Respond with ONLY the name — 1 or 2 words, nothing else. No quotes, no explanation, no punctuation. Think like: Notion, Stripe, Figma, Canva, Zerodha, Razorpay, Cred, Meesho, Zomato." },
+              { role: "user", content: `Invent a short, catchy, memorable startup name for: "${idea}". Category: ${category || "Tech"}. Just the name.` },
+            ],
+            temperature: 0.9,
+            max_completion_tokens: 20,
+          });
+          const suggested = (nameResult.choices[0]?.message?.content || "").trim().replace(/[^a-zA-Z0-9 ]/g, "").trim();
+          const suggestedWords = suggested.split(/\s+/);
+          const suggestedOverlap = suggestedWords.filter((w: string) => ideaWords.includes(w.toLowerCase())).length;
+          if (suggested && suggested.length >= 2 && suggested.length <= 20 && suggestedWords.length <= 2 && suggestedOverlap < 2) {
+            analysisData.appName = suggested;
+            aiNameGenerated = true;
+          }
+        } catch {
+          // AI name gen failed, will use deterministic fallback
+        }
+        if (!aiNameGenerated) {
+          // Deterministic fallback: extract most specific word + suffix
+          const skipWords = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","its","that","with","as","by","this","from","at","my","your","our","their","just","very","really","also","which","about","based","using","use","new","get","go","do","does","has","have","had","been","was","were","are","being","but","not","no","all","any","each","every","some","such","than","too","more","most","other","into","over","through","between","both","after","before","during","where","when","how","what","who","whom","why","so","then","up","out","off","down","back","only","can","will","would","should","could","want","need","like","make","build","create","app","platform","tool","system","service","website","software","application","solution","product","business","company","startup","online","digital","smart","ai","ml","web","mobile","store","shop","marketplace","ecommerce","e-commerce","sell","buy","selling","buying","market","helps","help","people","users","customers","manage","management","tracking","track","monitor","idea","simple","easy","best","good","great","better"]);
+          const nameWords = idea.split(/\s+/).filter(w => !skipWords.has(w.toLowerCase()) && w.length > 2);
+          const suffixes = ["ly","ify","io","Hub","Sync","Flow","Nest","Base","Mint","Wave","Pulse","Spark","Cart","Verse","Stack"];
+          if (nameWords.length >= 1) {
+            const coreWord = nameWords[nameWords.length - 1];
+            const singular = coreWord.endsWith('s') && coreWord.length > 3 ? coreWord.slice(0, -1) : coreWord;
+            const core = singular.charAt(0).toUpperCase() + singular.slice(1).toLowerCase();
+            const suffix = suffixes[core.charCodeAt(0) % suffixes.length];
+            analysisData.appName = core + suffix;
+          } else {
+            const catNames: Record<string, string> = { "SaaS": "CloudPulse", "Fintech": "PayMint", "Health": "VitalSync", "EdTech": "LearnFlow", "E-commerce": "ShopNest", "Social": "BuzzVerse", "AI/ML": "NeuralBase", "Gaming": "PlaySpark" };
+            analysisData.appName = catNames[category] || "LaunchPad";
+          }
         }
       }
     }
