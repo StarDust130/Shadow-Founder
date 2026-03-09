@@ -106,7 +106,9 @@ export default function AssemblyPage() {
         const data = await res.json();
         setBuild(data);
         if (data.files?.length > 0) {
-          const preview = data.files.find((f: BuildFile) => f.path === "preview.html");
+          const preview = data.files.find(
+            (f: BuildFile) => f.path === "preview.html",
+          );
           if (preview) {
             setSelectedFile(preview);
             setViewMode("preview");
@@ -271,7 +273,9 @@ export default function AssemblyPage() {
         className="mb-8"
       >
         <Link
-          href={build.analysisId ? `/analysis/${build.analysisId}` : "/dashboard"}
+          href={
+            build.analysisId ? `/analysis/${build.analysisId}` : "/dashboard"
+          }
           className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#1A1A1A]/40 hover:text-[#FF6803] transition-colors mb-4"
         >
           <ArrowLeft size={14} />
@@ -338,13 +342,17 @@ export default function AssemblyPage() {
                 Want Real Production Code?
               </h3>
               <p className="text-[11px] text-white/70 font-bold mt-0.5">
-                Upgrade now for production-ready codebases, premium designs & priority AI generation
+                Upgrade now for production-ready codebases, premium designs &
+                priority AI generation
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 bg-white text-[#FF6803] px-3 py-2 rounded-xl border-2 border-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] font-black text-[10px] uppercase tracking-wider shrink-0 group-hover:shadow-[3px_3px_0_#1A1A1A] transition-shadow">
               <Crown size={12} /> Upgrade Now
             </div>
-            <ArrowRight size={18} className="text-white/50 sm:hidden shrink-0 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight
+              size={18}
+              className="text-white/50 sm:hidden shrink-0 group-hover:translate-x-1 transition-transform"
+            />
           </div>
         </motion.div>
       </Link>
@@ -538,7 +546,9 @@ export default function AssemblyPage() {
                     Preview not available
                   </p>
                   <p className="text-xs text-center max-w-sm">
-                    This build doesn&apos;t include a preview file. Try rebuilding your MVP from the Code Builder to generate a live landing page preview.
+                    This build doesn&apos;t include a preview file. Try
+                    rebuilding your MVP from the Code Builder to generate a live
+                    landing page preview.
                   </p>
                   <Link href="/builder">
                     <motion.button
@@ -574,9 +584,21 @@ export default function AssemblyPage() {
         </div>
         <div className="space-y-3">
           {[
-            { step: "1", text: "Download the ZIP using the button above", emoji: "📦" },
-            { step: "2", text: "Extract the files and open preview.html in your browser", emoji: "🌐" },
-            { step: "3", text: "Customize the code files to build your full app", emoji: "🚀" },
+            {
+              step: "1",
+              text: "Download the ZIP using the button above",
+              emoji: "📦",
+            },
+            {
+              step: "2",
+              text: "Extract the files and open preview.html in your browser",
+              emoji: "🌐",
+            },
+            {
+              step: "3",
+              text: "Customize the code files to build your full app",
+              emoji: "🚀",
+            },
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -586,7 +608,9 @@ export default function AssemblyPage() {
               className="flex items-center gap-3 p-3 bg-[#FFFBF5] border-2 border-[#1A1A1A]/10 rounded-xl"
             >
               <span className="text-lg">{item.emoji}</span>
-              <span className="text-sm font-bold text-[#1A1A1A]/70">{item.text}</span>
+              <span className="text-sm font-bold text-[#1A1A1A]/70">
+                {item.text}
+              </span>
             </motion.div>
           ))}
         </div>
@@ -645,7 +669,9 @@ export default function AssemblyPage() {
                 Pro Feature
               </h2>
               <p className="text-sm text-[#1A1A1A]/60 font-bold mb-6 leading-relaxed">
-                Code editing is a Pro feature. Upgrade to unlock inline code editing, real-time preview updates, and make your MVP even better.
+                Code editing is a Pro feature. Upgrade to unlock inline code
+                editing, real-time preview updates, and make your MVP even
+                better.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/profile">
