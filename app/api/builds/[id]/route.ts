@@ -21,6 +21,16 @@ export async function GET(
       return NextResponse.json({ error: "Build not found" }, { status: 404 });
     }
 
+    // Sanitize file contents — fix double-escaped newlines from AI JSON
+    if (build.files && Array.isArray(build.files)) {
+      build.files = build.files.map((f: { path: string; content: string; lang: string; lines: number }) => ({
+        ...f,
+        content: typeof f.content === 'string'
+          ? f.content.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '')
+          : f.content,
+      }));
+    }
+
     return NextResponse.json(build);
   } catch (error) {
     console.error("Build fetch error:", error);
