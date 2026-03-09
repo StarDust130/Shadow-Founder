@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 /* ===== SHADOW FOUNDER THEME ===== */
+
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   /* Core palette */
   --sf-bg: #e5e4e2;
