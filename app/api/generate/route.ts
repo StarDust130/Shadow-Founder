@@ -82,7 +82,173 @@ CSS RULES (MUST FOLLOW):
 
 DO NOT output anything except the JSON object.`;
 
-function buildFallbackPreview(appName: string, idea: string, summary: string) {
+interface AnalysisData {
+  idea: string;
+  appName: string;
+  target: string;
+  problem: string;
+  category: string;
+  summary: string;
+  strengths: string[];
+  recommendations: string[];
+  revenue?: string;
+}
+
+function buildFallbackPreview(analysis: AnalysisData) {
+  const { appName, idea, target, problem, category, summary, strengths, recommendations, revenue } = analysis;
+
+  // Category-specific color themes
+  const themes: Record<string, { primary: string; gradient1: string; gradient2: string; gradient3: string; accent: string }> = {
+    "SaaS": { primary: "#6366F1", gradient1: "#EEF2FF", gradient2: "#E0E7FF", gradient3: "#C7D2FE", accent: "#4F46E5" },
+    "Fintech": { primary: "#059669", gradient1: "#ECFDF5", gradient2: "#D1FAE5", gradient3: "#A7F3D0", accent: "#047857" },
+    "Health": { primary: "#0D9488", gradient1: "#F0FDFA", gradient2: "#CCFBF1", gradient3: "#99F6E4", accent: "#0F766E" },
+    "EdTech": { primary: "#7C3AED", gradient1: "#F5F3FF", gradient2: "#EDE9FE", gradient3: "#DDD6FE", accent: "#6D28D9" },
+    "E-commerce": { primary: "#FF6803", gradient1: "#FFFBF5", gradient2: "#FFF0E0", gradient3: "#FFE8CC", accent: "#EA580C" },
+    "Social": { primary: "#EC4899", gradient1: "#FDF2F8", gradient2: "#FCE7F3", gradient3: "#FBCFE8", accent: "#DB2777" },
+    "AI/ML": { primary: "#2563EB", gradient1: "#EFF6FF", gradient2: "#DBEAFE", gradient3: "#BFDBFE", accent: "#1D4ED8" },
+    "Gaming": { primary: "#DC2626", gradient1: "#FEF2F2", gradient2: "#FEE2E2", gradient3: "#FECACA", accent: "#B91C1C" },
+    "Food": { primary: "#D97706", gradient1: "#FFFBEB", gradient2: "#FEF3C7", gradient3: "#FDE68A", accent: "#B45309" },
+    "Travel": { primary: "#0EA5E9", gradient1: "#F0F9FF", gradient2: "#E0F2FE", gradient3: "#BAE6FD", accent: "#0284C7" },
+    "Other": { primary: "#FF6803", gradient1: "#FFFBF5", gradient2: "#FFF0E0", gradient3: "#FFE8CC", accent: "#EA580C" },
+  };
+
+  const theme = themes[category] || themes["Other"];
+  const { primary, gradient1, gradient2, gradient3, accent } = theme;
+
+  // Category-specific emojis for features
+  const categoryEmojis: Record<string, string[]> = {
+    "SaaS": ["\u2601\uFE0F", "\u{1F504}", "\u{1F4CA}", "\u{1F512}"],
+    "Fintech": ["\u{1F4B3}", "\u{1F4C8}", "\u{1F6E1}\uFE0F", "\u26A1"],
+    "Health": ["\u{1F3E5}", "\u{1F4CA}", "\u{1F48A}", "\u2764\uFE0F"],
+    "EdTech": ["\u{1F4DA}", "\u{1F3AF}", "\u{1F9E0}", "\u{1F4F1}"],
+    "E-commerce": ["\u{1F6D2}", "\u{1F4E6}", "\u{1F4B0}", "\u{1F680}"],
+    "Social": ["\u{1F4AC}", "\u{1F310}", "\u{1F465}", "\u2728"],
+    "AI/ML": ["\u{1F916}", "\u{1F9E0}", "\u26A1", "\u{1F52E}"],
+    "Gaming": ["\u{1F3AE}", "\u{1F3C6}", "\u{1F525}", "\u{1F680}"],
+    "Food": ["\u{1F37D}\uFE0F", "\u{1F4E6}", "\u{1F552}", "\u2B50"],
+    "Travel": ["\u2708\uFE0F", "\u{1F5FA}\uFE0F", "\u{1F3D6}\uFE0F", "\u{1F4B3}"],
+    "Other": ["\u26A1", "\u{1F6E1}\uFE0F", "\u{1F680}", "\u{1F4CA}"],
+  };
+
+  const emojis = categoryEmojis[category] || categoryEmojis["Other"];
+
+  // Generate dynamic feature cards from strengths + idea
+  const featureNames: string[] = [];
+  const featureDescs: string[] = [];
+  const s = strengths || [];
+  const r = recommendations || [];
+  // Combine strengths and recs for feature inspiration
+  const sourceTexts = [...s, ...r].slice(0, 4);
+  while (sourceTexts.length < 4) sourceTexts.push(summary);
+  for (let i = 0; i < 4; i++) {
+    const text = sourceTexts[i];
+    // Extract first 3-4 meaningful words as title
+    const words = text.split(/\s+/).filter((w: string) => w.length > 2).slice(0, 3);
+    featureNames.push(words.join(" "));
+    // Truncate desc to ~10 words
+    featureDescs.push(text.split(/\s+/).slice(0, 10).join(" ") + (text.split(/\s+/).length > 10 ? "." : ""));
+  }
+
+  // Dynamic subtitle based on problem/idea
+  const subtitleOptions = [
+    `Solving ${problem.split(/\s+/).slice(0, 3).join(" ")}.`,
+    `Built for ${target.split(/\s+/).slice(0, 3).join(" ")}.`,
+    `${category}. Reimagined. For India.`,
+    `The future of ${category.toLowerCase()}.`,
+  ];
+  const subtitle = subtitleOptions[appName.charCodeAt(0) % subtitleOptions.length];
+
+  // Dynamic badge text
+  const badgeOptions = [
+    `\u{1F680} <span>#1 ${category} Platform</span>`,
+    `\u2B50 <span>Trusted by 10K+</span> founders`,
+    `\u{1F525} <span>Fastest Growing</span> in India`,
+    `\u{1F4A1} <span>AI-Powered</span> ${category}`,
+  ];
+  const badge = badgeOptions[appName.length % badgeOptions.length];
+
+  // Dynamic stats
+  const statSets: Record<string, { nums: string[]; labels: string[] }> = {
+    "SaaS": { nums: ["25K+", "99.9%", "4.8\u2605", "\u20B91.5Cr+"], labels: ["Active Teams", "Uptime SLA", "App Rating", "Revenue Saved"] },
+    "Fintech": { nums: ["\u20B950Cr+", "1M+", "0.1s", "4.9\u2605"], labels: ["Transactions", "Users", "Processing", "Trust Score"] },
+    "Health": { nums: ["500K+", "50K+", "98%", "24/7"], labels: ["Patients Helped", "Doctors", "Accuracy", "Support"] },
+    "EdTech": { nums: ["2M+", "10K+", "4.7\u2605", "95%"], labels: ["Students", "Courses", "Rating", "Completion"] },
+    "E-commerce": { nums: ["1M+", "\u20B930Cr+", "4.8\u2605", "30min"], labels: ["Products", "GMV", "Rating", "Delivery"] },
+    "Social": { nums: ["5M+", "100M+", "4.6\u2605", "<1s"], labels: ["Users", "Posts", "Rating", "Load Time"] },
+    "AI/ML": { nums: ["10M+", "99.5%", "50ms", "4.9\u2605"], labels: ["Predictions", "Accuracy", "Latency", "Rating"] },
+    "Gaming": { nums: ["3M+", "500K+", "4.8\u2605", "\u20B910Cr+"], labels: ["Players", "Daily Active", "Rating", "Prizes Won"] },
+    "Other": { nums: ["50K+", "99.9%", "4.9\u2605", "\u20B92Cr+"], labels: ["Users", "Uptime", "Rating", "Processed"] },
+  };
+  const stats = statSets[category] || statSets["Other"];
+
+  // Dynamic testimonials with varying Indian names
+  const testimonialSets = [
+    [
+      { text: `${appName} completely changed how we approach ${category.toLowerCase()}. Saved us months of work and lakhs in cost.`, name: "Priya Sharma", role: "Founder, TechVentures Mumbai" },
+      { text: `Best ${category.toLowerCase()} tool I've found. The UX is incredible and the results speak for themselves.`, name: "Arjun Mehta", role: "CTO, DataSync Bangalore" },
+      { text: `We went from concept to launch in weeks using ${appName}. Our investors were impressed.`, name: "Sneha Patel", role: "CEO, GrowthPilot Delhi" },
+    ],
+    [
+      { text: `${appName} is exactly what the Indian ${category.toLowerCase()} ecosystem needed. 10x productivity boost.`, name: "Rahul Verma", role: "VP Engineering, NovaTech Pune" },
+      { text: `Switched from 3 different tools to just ${appName}. Everything in one place, brilliantly designed.`, name: "Ananya Krishnan", role: "Product Lead, FinFirst Chennai" },
+      { text: `The ROI was visible from day one. ${appName} paid for itself within the first month.`, name: "Vikram Singh", role: "Co-founder, ScaleUp Gurugram" },
+    ],
+    [
+      { text: `Our team's efficiency doubled after adopting ${appName}. Can't imagine going back.`, name: "Meera Joshi", role: "Director, CloudNine Hyderabad" },
+      { text: `${appName} understands the Indian market like no other. The localization is perfect.`, name: "Karthik Rajan", role: "Head of Growth, PixelCraft Bangalore" },
+      { text: `From a skeptic to an evangelist — ${appName} won me over with its simplicity and power.`, name: "Deepika Nair", role: "CTO, BrightMinds Kochi" },
+    ],
+  ];
+  const testimonials = testimonialSets[appName.charCodeAt(0) % testimonialSets.length];
+
+  // Dynamic How It Works
+  const howSteps: Record<string, { titles: string[]; descs: string[] }> = {
+    "SaaS": { titles: ["Sign Up", "Connect", "Automate"], descs: ["Create your workspace in 30 seconds.", "Integrate with your existing tools seamlessly.", "Set up workflows and watch productivity soar."] },
+    "Fintech": { titles: ["Verify", "Link", "Transact"], descs: ["Complete KYC in under 2 minutes.", "Connect your bank accounts securely.", "Start sending and receiving money instantly."] },
+    "Health": { titles: ["Register", "Consult", "Track"], descs: ["Create your health profile quickly.", "Connect with certified doctors online.", "Monitor your health metrics in real-time."] },
+    "EdTech": { titles: ["Enroll", "Learn", "Certify"], descs: ["Pick from 10,000+ courses.", "Learn at your own pace with AI tutoring.", "Earn industry-recognized certificates."] },
+    "E-commerce": { titles: ["Browse", "Order", "Receive"], descs: ["Discover products curated for you.", "Checkout in 2 taps with UPI.", "Get doorstep delivery across India."] },
+    "Other": { titles: ["Sign Up", "Setup", "Launch"], descs: ["Create your account in seconds.", "Configure everything with guided onboarding.", "Go live and see results from day one."] },
+  };
+  const steps = howSteps[category] || howSteps["Other"];
+
+  // Dynamic FAQ
+  const faqItems = [
+    { q: `What makes ${appName} different?`, a: summary.split(/\s+/).slice(0, 25).join(" ") + "." },
+    { q: `Is ${appName} available across India?`, a: `Yes! ${appName} works nationwide with support for UPI, all major banks, and localized experiences for every state.` },
+    { q: "Can I upgrade or downgrade anytime?", a: "Absolutely. Switch plans whenever you want. Changes are instant with prorated billing." },
+    { q: "Is my data secure?", a: "We use bank-grade encryption, comply with Indian data protection laws, and your data never leaves our secure servers." },
+  ];
+
+  // Dynamic pricing names based on category
+  const pricingNames: Record<string, string[]> = {
+    "SaaS": ["Starter", "Growth", "Enterprise"],
+    "Fintech": ["Basic", "Business", "Enterprise"],
+    "EdTech": ["Student", "Professional", "Institution"],
+    "E-commerce": ["Seller", "Business", "Enterprise"],
+    "Other": ["Starter", "Pro", "Enterprise"],
+  };
+  const plans = pricingNames[category] || pricingNames["Other"];
+
+  // Revenue-aware pricing
+  const priceValues = revenue?.toLowerCase().includes("free")
+    ? ["\u20B90", "\u20B9499", "\u20B92,499"]
+    : ["\u20B90", "\u20B9999", "\u20B94,999"];
+
+  // Unique hero shapes per category (different sizes & positions)
+  const shapeVariant = appName.length % 3;
+
+  // Dynamic CTA
+  const ctaTexts = [
+    `Start building with ${appName} today.`,
+    `Join thousands already using ${appName}.`,
+    `Your ${category.toLowerCase()} journey starts here.`,
+  ];
+  const ctaText = ctaTexts[appName.charCodeAt(0) % ctaTexts.length];
+
+  // Avatar colors from theme
+  const avatarColors = [primary, accent, "#22C55E", "#1A1A1A"];
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,37 +257,38 @@ function buildFallbackPreview(appName: string, idea: string, summary: string) {
 <title>${appName}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:#FF6803;--accent:#1A1A1A;--light:#FFFBF5;--dark:#1A1A1A;--shadow:4px 4px 0 #1A1A1A}
+:root{--primary:${primary};--accent:${accent};--light:${gradient1};--dark:#1A1A1A;--shadow:4px 4px 0 #1A1A1A;--g1:${gradient1};--g2:${gradient2};--g3:${gradient3}}
 body{font-family:system-ui,-apple-system,sans-serif;color:var(--dark);scroll-behavior:smooth;background:var(--light)}
 nav{position:fixed;top:0;width:100%;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:var(--light);border-bottom:3px solid var(--dark);z-index:100}
 nav .logo{font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:var(--dark)}
+nav .logo span{color:var(--primary)}
 nav .cta{padding:0.5rem 1.5rem;background:var(--primary);color:#fff;border:2px solid var(--dark);border-radius:12px;font-weight:800;font-size:0.8rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;box-shadow:var(--shadow);text-transform:uppercase;letter-spacing:0.05em}
 nav .cta:hover{transform:translateY(-2px);box-shadow:6px 6px 0 var(--dark)}
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(135deg,#FFFBF5,#FFF0E0,#FFE8CC,#FFFBF5);background-size:400% 400%;animation:heroGradient 8s ease infinite;position:relative;overflow:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(${135 + shapeVariant * 30}deg,var(--g1),var(--g2),var(--g3),var(--g1));background-size:400% 400%;animation:heroGradient ${7 + shapeVariant * 2}s ease infinite;position:relative;overflow:hidden}
 @keyframes heroGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.hero .shape{position:absolute;border:3px solid var(--primary);opacity:0.07;animation:float 6s ease-in-out infinite}
-.hero .shape-1{width:180px;height:180px;border-radius:50%;top:10%;right:8%;animation-delay:0s}
-.hero .shape-2{width:100px;height:100px;border-radius:18px;transform:rotate(45deg);bottom:15%;left:6%;animation-delay:1.5s}
-.hero .shape-3{width:60px;height:60px;border-radius:50%;top:30%;left:12%;background:var(--primary);opacity:0.04;animation-delay:3s}
-.hero .shape-4{width:120px;height:120px;border-radius:24px;transform:rotate(12deg);bottom:20%;right:12%;border-color:var(--dark);opacity:0.04;animation-delay:2s}
+.hero .shape{position:absolute;border:3px solid var(--primary);opacity:0.08;animation:float 6s ease-in-out infinite}
+.hero .shape-1{width:${150 + shapeVariant * 40}px;height:${150 + shapeVariant * 40}px;border-radius:50%;top:${8 + shapeVariant * 5}%;right:${6 + shapeVariant * 4}%}
+.hero .shape-2{width:${80 + shapeVariant * 30}px;height:${80 + shapeVariant * 30}px;border-radius:18px;transform:rotate(${45 + shapeVariant * 15}deg);bottom:${12 + shapeVariant * 6}%;left:${5 + shapeVariant * 3}%;animation-delay:1.5s}
+.hero .shape-3{width:${50 + shapeVariant * 20}px;height:${50 + shapeVariant * 20}px;border-radius:50%;top:${25 + shapeVariant * 8}%;left:${10 + shapeVariant * 5}%;background:var(--primary);opacity:0.05;animation-delay:3s}
+.hero .shape-4{width:${100 + shapeVariant * 25}px;height:${100 + shapeVariant * 25}px;border-radius:24px;transform:rotate(${12 + shapeVariant * 10}deg);bottom:${18 + shapeVariant * 4}%;right:${10 + shapeVariant * 5}%;border-color:var(--accent);opacity:0.05;animation-delay:2s}
 .hero .badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1.2rem;border-radius:99px;background:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1.5rem;color:var(--dark)}
 .hero .badge span{color:var(--primary)}
-.hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;line-height:1.05;max-width:700px;text-transform:uppercase;letter-spacing:-0.03em;background:linear-gradient(135deg,var(--dark),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
-.hero h1::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:60%;height:4px;border-radius:4px;background:linear-gradient(90deg,transparent,var(--primary),transparent)}
-.hero .glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,104,3,0.12) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pulseGlow 4s ease-in-out infinite}
-@keyframes pulseGlow{0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}}
-.hero .mockup{margin-top:3rem;width:min(90%,500px);background:#fff;border:3px solid var(--dark);border-radius:16px;box-shadow:8px 8px 0 var(--dark);overflow:hidden;animation:floatMockup 4s ease-in-out infinite}
-@keyframes floatMockup{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.05;max-width:700px;text-transform:uppercase;letter-spacing:-0.03em;background:linear-gradient(135deg,var(--dark) 30%,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.hero h1::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:50%;height:5px;border-radius:5px;background:linear-gradient(90deg,transparent,var(--primary),transparent)}
+.hero .glow{position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,${primary}1a 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pulseGlow 4s ease-in-out infinite}
+@keyframes pulseGlow{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}}
+.hero .mockup{margin-top:2.5rem;width:min(90%,480px);background:#fff;border:3px solid var(--dark);border-radius:16px;box-shadow:8px 8px 0 var(--dark);overflow:hidden;animation:floatMockup 4s ease-in-out infinite}
+@keyframes floatMockup{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .hero .mockup-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--dark);border-bottom:2px solid var(--dark)}
-.hero .mockup-bar span{width:10px;height:10px;border-radius:50%;border:1.5px solid #555}
-.hero .mockup-bar span:nth-child(1){background:#FF5F57;border-color:#E0443E}
-.hero .mockup-bar span:nth-child(2){background:#FEBC2E;border-color:#DEA123}
-.hero .mockup-bar span:nth-child(3){background:#28C840;border-color:#1AAB29}
-.hero .mockup-body{padding:1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hero .mockup-body .mock-card{background:var(--light);border:2px solid var(--dark);border-radius:10px;padding:12px;text-align:left}
+.hero .mockup-bar span{width:10px;height:10px;border-radius:50%}
+.hero .mockup-bar span:nth-child(1){background:#FF5F57}
+.hero .mockup-bar span:nth-child(2){background:#FEBC2E}
+.hero .mockup-bar span:nth-child(3){background:#28C840}
+.hero .mockup-body{padding:1rem;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hero .mockup-body .mock-card{background:var(--g1);border:2px solid var(--dark);border-radius:10px;padding:12px;text-align:left}
 .hero .mockup-body .mock-card .mock-val{font-size:1.1rem;font-weight:900;color:var(--primary)}
 .hero .mockup-body .mock-card .mock-label{font-size:0.55rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-top:2px}
-.hero p{margin-top:1rem;font-size:1.05rem;color:#64748b;max-width:500px;line-height:1.6}
+.hero p{margin-top:1rem;font-size:1rem;color:#64748b;max-width:500px;line-height:1.6}
 .hero .btns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
 .hero .btns a{padding:0.875rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;border:2px solid var(--dark)}
 .hero .btns .primary{background:var(--primary);color:#fff;box-shadow:var(--shadow)}
@@ -132,22 +299,25 @@ nav .cta:hover{transform:translateY(-2px);box-shadow:6px 6px 0 var(--dark)}
 .hero .trust .avatars span{width:28px;height:28px;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff}
 .hero .trust .avatars span:first-child{margin-left:0}
 section{padding:5rem 2rem}
+.section-tag{display:inline-block;padding:0.3rem 1rem;border-radius:99px;background:${primary}15;color:var(--primary);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;border:1.5px solid ${primary}30}
 .features{background:#fff;border-top:3px solid var(--dark);border-bottom:3px solid var(--dark)}
-.features h2,.how-it-works h2,.stats h2,.testimonials h2,.pricing h2,.faq h2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
+.sh2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
 .features .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
 .features .card{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s,box-shadow 0.2s}
 .features .card:hover{transform:translateY(-4px);box-shadow:6px 6px 0 var(--primary)}
-.features .card .icon{font-size:1.8rem;margin-bottom:0.75rem}
-.features .card h3{font-size:1rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
-.features .card p{color:#64748b;line-height:1.5;font-size:0.875rem}
+.features .card .icon{font-size:1.8rem;margin-bottom:0.75rem;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:${primary}12;border:2px solid ${primary}25}
+.features .card h3{font-size:0.95rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
+.features .card p{color:#64748b;line-height:1.5;font-size:0.85rem}
 .how-it-works{background:var(--light)}
 .how-it-works .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;max-width:900px;margin:0 auto}
-.how-it-works .step{text-align:center;padding:2rem 1.5rem;border-radius:18px;background:#fff;border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s}
+.how-it-works .step{text-align:center;padding:2rem 1.5rem;border-radius:18px;background:#fff;border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s;position:relative}
 .how-it-works .step:hover{transform:translateY(-4px)}
-.how-it-works .step .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem;margin-bottom:1rem;border:2px solid var(--dark);box-shadow:2px 2px 0 var(--dark)}
+.how-it-works .step .num{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem;margin-bottom:1rem;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark)}
 .how-it-works .step h3{font-size:0.95rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
 .how-it-works .step p{color:#64748b;font-size:0.8rem;line-height:1.5}
+.how-it-works .step:not(:last-child)::after{content:'\\2192';position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-size:1.5rem;color:var(--primary);font-weight:900}
 .stats{background:var(--dark);color:#fff;text-align:center}
+.stats h2{color:#fff}
 .stats .row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
 .stats .stat .num{font-size:2.5rem;font-weight:900;color:var(--primary)}
 .stats .stat .label{margin-top:0.25rem;color:#94a3b8;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em}
@@ -155,18 +325,20 @@ section{padding:5rem 2rem}
 .testimonials .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
 .testimonials .quote{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);position:relative}
 .testimonials .quote::before{content:'\\201C';font-size:3rem;color:var(--primary);opacity:0.3;position:absolute;top:10px;left:16px;font-family:Georgia,serif}
-.testimonials .quote p{font-size:0.875rem;color:#475569;line-height:1.6;margin-bottom:1rem;padding-top:1rem}
-.testimonials .quote .author{font-size:0.8rem;font-weight:800;color:var(--dark);text-transform:uppercase}.testimonials .quote .role{font-size:0.7rem;color:#94a3b8;font-weight:600}
+.testimonials .quote p{font-size:0.85rem;color:#475569;line-height:1.6;margin-bottom:1rem;padding-top:1rem}
+.testimonials .quote .author{font-size:0.8rem;font-weight:800;color:var(--dark);text-transform:uppercase}
+.testimonials .quote .role{font-size:0.7rem;color:#94a3b8;font-weight:600}
+.testimonials .stars{color:var(--primary);font-size:0.75rem;margin-bottom:0.5rem}
 .pricing{background:var(--light)}
 .pricing .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:850px;margin:0 auto}
 .pricing .plan{padding:2rem;border-radius:18px;border:2px solid var(--dark);text-align:center;transition:transform 0.2s;box-shadow:var(--shadow);background:#fff}
 .pricing .plan:hover{transform:translateY(-4px)}
 .pricing .plan.popular{border-color:var(--primary);box-shadow:6px 6px 0 var(--primary);position:relative;transform:scale(1.03)}
 .pricing .plan.popular::before{content:"Popular";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.2rem 1rem;border-radius:99px;font-size:0.7rem;font-weight:800;border:2px solid var(--dark);text-transform:uppercase}
-.pricing .plan .price{font-size:2.5rem;font-weight:900;margin:0.75rem 0}
+.pricing .plan .price{font-size:2.5rem;font-weight:900;margin:0.75rem 0;color:var(--dark)}
 .pricing .plan .price span{font-size:0.85rem;color:#94a3b8}
 .pricing .plan ul{list-style:none;margin:1.5rem 0;text-align:left}
-.pricing .plan li{padding:0.4rem 0;color:#475569;font-size:0.875rem}
+.pricing .plan li{padding:0.4rem 0;color:#475569;font-size:0.85rem}
 .pricing .plan li::before{content:"\\2713 ";color:var(--primary);font-weight:700}
 .pricing .plan .btn{display:inline-block;padding:0.75rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s;background:var(--primary);color:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.8rem;text-transform:uppercase}
 .pricing .plan .btn:hover{transform:translateY(-2px);box-shadow:5px 5px 0 var(--dark)}
@@ -178,7 +350,7 @@ section{padding:5rem 2rem}
 .faq .item[open] summary::after{transform:rotate(45deg)}
 .faq .item .answer{padding:0 1.5rem 1rem;font-size:0.85rem;color:#64748b;line-height:1.6}
 .cta-section{background:var(--dark);color:#fff;text-align:center;padding:5rem 2rem;border-top:3px solid var(--primary)}
-.cta-section h2{font-size:1.8rem;font-weight:900;margin-bottom:0.75rem;text-transform:uppercase}
+.cta-section h2{font-size:1.8rem;font-weight:900;margin-bottom:0.75rem;text-transform:uppercase;color:#fff}
 .cta-section p{font-size:0.95rem;opacity:0.7;margin-bottom:2rem}
 .cta-section form{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
 .cta-section input{padding:0.75rem 1.5rem;border-radius:14px;border:2px solid #333;font-size:0.9rem;width:280px;max-width:100%;background:#222;color:#fff}
@@ -188,34 +360,35 @@ footer{background:var(--dark);color:#94a3b8;text-align:center;padding:2.5rem 2re
 footer a{color:var(--primary);text-decoration:none;font-weight:700}
 .fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
 .fade-in.visible{opacity:1;transform:translateY(0)}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
-@media(max-width:640px){.hero h1{font-size:2rem}.hero .mockup{width:95%}.hero .mockup-body{grid-template-columns:1fr 1fr}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}.how-it-works .steps{grid-template-columns:1fr}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-20px) rotate(var(--r,0deg))}}
+@media(max-width:768px){.how-it-works .step::after{display:none}}
+@media(max-width:640px){.hero h1{font-size:2rem}.hero .mockup{width:95%}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}.how-it-works .steps{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<nav><div class="logo">${appName}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
+<nav><div class="logo"><span>${appName.charAt(0)}</span>${appName.slice(1)}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
 
-<section class="hero"><div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div><div class="shape shape-4"></div><div class="glow"></div><div class="badge">\u{1F680} <span>#1 Platform</span> in India</div><h1>${appName}</h1><p>Build. Launch. Scale. Faster than ever.</p><div class="btns"><a href="#features" class="primary">Get Started Free</a><a href="#pricing" class="secondary">View Pricing</a></div><div class="trust"><div class="avatars"><span style="background:#FF6803">P</span><span style="background:#6366F1">A</span><span style="background:#22C55E">S</span><span style="background:#1A1A1A">R</span></div>Trusted by 10,000+ founders</div><div class="mockup"><div class="mockup-bar"><span></span><span></span><span></span></div><div class="mockup-body"><div class="mock-card"><div class="mock-val">50K+</div><div class="mock-label">Active Users</div></div><div class="mock-card"><div class="mock-val">99.9%</div><div class="mock-label">Uptime</div></div><div class="mock-card"><div class="mock-val">\u20B92Cr+</div><div class="mock-label">Processed</div></div><div class="mock-card"><div class="mock-val">4.9\u2605</div><div class="mock-label">Rating</div></div></div></div></section>
+<section class="hero"><div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div><div class="shape shape-4"></div><div class="glow"></div><div class="badge">${badge}</div><h1>${appName}</h1><p>${subtitle}</p><div class="btns"><a href="#features" class="primary">Get Started Free</a><a href="#pricing" class="secondary">View Pricing</a></div><div class="trust"><div class="avatars"><span style="background:${avatarColors[0]}">P</span><span style="background:${avatarColors[1]}">A</span><span style="background:${avatarColors[2]}">S</span><span style="background:${avatarColors[3]}">R</span></div>Trusted by 10,000+ founders</div><div class="mockup"><div class="mockup-bar"><span></span><span></span><span></span></div><div class="mockup-body"><div class="mock-card"><div class="mock-val">${stats.nums[0]}</div><div class="mock-label">${stats.labels[0]}</div></div><div class="mock-card"><div class="mock-val">${stats.nums[1]}</div><div class="mock-label">${stats.labels[1]}</div></div><div class="mock-card"><div class="mock-val">${stats.nums[2]}</div><div class="mock-label">${stats.labels[2]}</div></div><div class="mock-card"><div class="mock-val">${stats.nums[3]}</div><div class="mock-label">${stats.labels[3]}</div></div></div></div></section>
 
-<section class="features" id="features"><h2>Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">\u26A1</div><h3>Lightning Fast</h3><p>Built for speed and performance from the ground up.</p></div><div class="card fade-in"><div class="icon">\u{1F6E1}\uFE0F</div><h3>Secure by Default</h3><p>Enterprise-grade security built into every layer.</p></div><div class="card fade-in"><div class="icon">\u{1F680}</div><h3>Scale Effortlessly</h3><p>Grows with your business without breaking a sweat.</p></div><div class="card fade-in"><div class="icon">\u{1F4CA}</div><h3>Smart Analytics</h3><p>Real-time insights and data-driven decisions.</p></div></div></section>
+<section class="features" id="features"><div style="text-align:center"><span class="section-tag">Features</span></div><h2 class="sh2">Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">${emojis[0]}</div><h3>${featureNames[0]}</h3><p>${featureDescs[0]}</p></div><div class="card fade-in"><div class="icon">${emojis[1]}</div><h3>${featureNames[1]}</h3><p>${featureDescs[1]}</p></div><div class="card fade-in"><div class="icon">${emojis[2]}</div><h3>${featureNames[2]}</h3><p>${featureDescs[2]}</p></div><div class="card fade-in"><div class="icon">${emojis[3]}</div><h3>${featureNames[3]}</h3><p>${featureDescs[3]}</p></div></div></section>
 
-<section class="how-it-works" id="how-it-works"><h2>How It Works</h2><div class="steps"><div class="step fade-in"><div class="num">1</div><h3>Sign Up</h3><p>Create your free account in under 30 seconds.</p></div><div class="step fade-in"><div class="num">2</div><h3>Setup</h3><p>Configure your workspace with our guided onboarding.</p></div><div class="step fade-in"><div class="num">3</div><h3>Launch</h3><p>Go live and start seeing results from day one.</p></div></div></section>
+<section class="how-it-works" id="how-it-works"><div style="text-align:center"><span class="section-tag">How It Works</span></div><h2 class="sh2">Three Simple Steps</h2><div class="steps"><div class="step fade-in"><div class="num">1</div><h3>${steps.titles[0]}</h3><p>${steps.descs[0]}</p></div><div class="step fade-in"><div class="num">2</div><h3>${steps.titles[1]}</h3><p>${steps.descs[1]}</p></div><div class="step fade-in"><div class="num">3</div><h3>${steps.titles[2]}</h3><p>${steps.descs[2]}</p></div></div></section>
 
-<section class="stats"><h2>Trusted Across India</h2><div class="row"><div class="stat fade-in"><div class="num">50K+</div><div class="label">Users Across India</div></div><div class="stat fade-in"><div class="num">99.9%</div><div class="label">Uptime</div></div><div class="stat fade-in"><div class="num">4.9\u2605</div><div class="label">Rating</div></div></div></section>
+<section class="stats"><div style="text-align:center"><span class="section-tag" style="background:rgba(255,255,255,0.1);color:var(--primary);border-color:rgba(255,255,255,0.15)">By The Numbers</span></div><h2 class="sh2" style="color:#fff">Trusted Across India</h2><div class="row"><div class="stat fade-in"><div class="num">${stats.nums[0]}</div><div class="label">${stats.labels[0]}</div></div><div class="stat fade-in"><div class="num">${stats.nums[1]}</div><div class="label">${stats.labels[1]}</div></div><div class="stat fade-in"><div class="num">${stats.nums[2]}</div><div class="label">${stats.labels[2]}</div></div></div></section>
 
-<section class="testimonials"><h2>What Our Users Say</h2><div class="grid"><div class="quote fade-in"><p>This platform completely transformed how we operate. We saved over \u20B920L in the first year alone.</p><div class="author">Priya Sharma</div><div class="role">Founder, TechVentures Mumbai</div></div><div class="quote fade-in"><p>The best tool I\u2019ve used for my startup. Clean UI, fast performance, and incredible support.</p><div class="author">Arjun Mehta</div><div class="role">CTO, DataSync Bangalore</div></div><div class="quote fade-in"><p>We went from idea to launch in weeks. Highly recommend for any Indian startup founder.</p><div class="author">Sneha Patel</div><div class="role">CEO, GrowthPilot Delhi</div></div></div></section>
+<section class="testimonials"><div style="text-align:center"><span class="section-tag">Testimonials</span></div><h2 class="sh2">Loved by Founders</h2><div class="grid"><div class="quote fade-in"><div class="stars">\u2605\u2605\u2605\u2605\u2605</div><p>${testimonials[0].text}</p><div class="author">${testimonials[0].name}</div><div class="role">${testimonials[0].role}</div></div><div class="quote fade-in"><div class="stars">\u2605\u2605\u2605\u2605\u2605</div><p>${testimonials[1].text}</p><div class="author">${testimonials[1].name}</div><div class="role">${testimonials[1].role}</div></div><div class="quote fade-in"><div class="stars">\u2605\u2605\u2605\u2605\u2605</div><p>${testimonials[2].text}</p><div class="author">${testimonials[2].name}</div><div class="role">${testimonials[2].role}</div></div></div></section>
 
-<section class="pricing" id="pricing"><h2>Simple Pricing</h2><div class="grid"><div class="plan fade-in"><h3>Starter</h3><div class="price">\u20B90</div><ul><li>Up to 3 projects</li><li>Basic analytics</li><li>Community support</li></ul><a href="#" class="btn">Get Started</a></div><div class="plan popular fade-in"><h3>Pro</h3><div class="price">\u20B9999<span>/mo</span></div><ul><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li><li>Custom integrations</li></ul><a href="#" class="btn">Upgrade</a></div><div class="plan fade-in"><h3>Enterprise</h3><div class="price">\u20B94,999<span>/mo</span></div><ul><li>Everything in Pro</li><li>Dedicated manager</li><li>SLA guarantee</li><li>Custom deployment</li></ul><a href="#" class="btn">Contact Us</a></div></div></section>
+<section class="pricing" id="pricing"><div style="text-align:center"><span class="section-tag">Pricing</span></div><h2 class="sh2">Simple, Transparent Pricing</h2><div class="grid"><div class="plan fade-in"><h3>${plans[0]}</h3><div class="price">${priceValues[0]}</div><ul><li>Up to 3 projects</li><li>Basic analytics</li><li>Community support</li></ul><a href="#" class="btn">Get Started</a></div><div class="plan popular fade-in"><h3>${plans[1]}</h3><div class="price">${priceValues[1]}<span>/mo</span></div><ul><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li><li>Custom integrations</li></ul><a href="#" class="btn">Upgrade</a></div><div class="plan fade-in"><h3>${plans[2]}</h3><div class="price">${priceValues[2]}<span>/mo</span></div><ul><li>Everything in ${plans[1]}</li><li>Dedicated manager</li><li>SLA guarantee</li><li>Custom deployment</li></ul><a href="#" class="btn">Contact Us</a></div></div></section>
 
-<section class="faq" id="faq"><h2>Got Questions?</h2><div class="items"><details class="item"><summary>How do I get started?</summary><div class="answer">Simply create a free account and follow our guided onboarding. You\u2019ll be up and running in minutes.</div></details><details class="item"><summary>Can I upgrade or downgrade anytime?</summary><div class="answer">Yes! You can switch plans at any time. Changes take effect immediately with prorated billing.</div></details><details class="item"><summary>Is my data secure?</summary><div class="answer">Absolutely. We use bank-grade encryption and comply with all Indian data protection regulations.</div></details><details class="item"><summary>Do you offer refunds?</summary><div class="answer">We offer a 14-day money-back guarantee. No questions asked.</div></details></div></section>
+<section class="faq" id="faq"><div style="text-align:center"><span class="section-tag">FAQ</span></div><h2 class="sh2">Got Questions?</h2><div class="items"><details class="item"><summary>${faqItems[0].q}</summary><div class="answer">${faqItems[0].a}</div></details><details class="item"><summary>${faqItems[1].q}</summary><div class="answer">${faqItems[1].a}</div></details><details class="item"><summary>${faqItems[2].q}</summary><div class="answer">${faqItems[2].a}</div></details><details class="item"><summary>${faqItems[3].q}</summary><div class="answer">${faqItems[3].a}</div></details></div></section>
 
-<section class="cta-section"><h2>Ready to Get Started?</h2><p>Join 50,000+ founders building with ${appName}.</p><form onsubmit="event.preventDefault();alert('Thanks for signing up!')"><input type="email" placeholder="Enter your email" required><button type="submit">Sign Up Free</button></form></section>
+<section class="cta-section"><h2>Ready to Get Started?</h2><p>${ctaText}</p><form onsubmit="event.preventDefault()"><input type="email" placeholder="Enter your email" required><button type="submit">Sign Up Free</button></form></section>
 
 <footer><p>&copy; 2026 ${appName}. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p></footer>
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
 document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
-document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){var h=a.getAttribute('href');if(h&&h!=='#'&&h.startsWith('#')){e.preventDefault();var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}else{e.preventDefault()}}});
+document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h&&h.startsWith('#')&&h.length>1){var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}}});
 </script>
 </body>
 </html>`;
@@ -366,7 +539,7 @@ CRITICAL INSTRUCTIONS:
       );
       generatedFiles.push({
         path: "preview.html",
-        content: buildFallbackPreview(appName, analysis.idea, analysis.summary),
+        content: buildFallbackPreview({ idea: analysis.idea, appName, target: analysis.target, problem: analysis.problem, category: analysis.category || "Other", summary: analysis.summary, strengths: analysis.strengths || [], recommendations: analysis.recommendations || [], revenue: analysis.revenue }),
         lang: "html",
       });
     } catch {
@@ -411,7 +584,7 @@ CRITICAL INSTRUCTIONS:
         },
         {
           path: "preview.html",
-          content: buildFallbackPreview(appName, analysis.idea, analysis.summary),
+          content: buildFallbackPreview({ idea: analysis.idea, appName, target: analysis.target, problem: analysis.problem, category: analysis.category || "Other", summary: analysis.summary, strengths: analysis.strengths || [], recommendations: analysis.recommendations || [], revenue: analysis.revenue }),
           lang: "html",
         },
       ];

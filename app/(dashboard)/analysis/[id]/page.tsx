@@ -234,6 +234,7 @@ export default function AnalysisPage() {
   const [buildElapsed, setBuildElapsed] = useState(0);
   const [buildGif, setBuildGif] = useState(BUILD_GIFS[0]);
   const [buildWaitText, setBuildWaitText] = useState(buildWaitTexts[0]);
+  const [showPivotPopup, setShowPivotPopup] = useState(false);
 
   const {
     messages: chatMessages,
@@ -567,22 +568,36 @@ export default function AnalysisPage() {
           <div className="flex items-center gap-2 max-w-5xl mx-auto">
             <motion.button
               whileHover={{
-                y: -3,
-                x: -1,
-                transition: { type: "spring", stiffness: 400, damping: 15 },
+                y: -4,
+                x: -2,
+                scale: 1.02,
+                transition: { type: "spring", stiffness: 400, damping: 12 },
               }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleBuildMVP}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                if (data.score < 40) {
+                  setShowPivotPopup(true);
+                } else {
+                  handleBuildMVP();
+                }
+              }}
               disabled={building}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#FF6803] text-white py-2.5 px-5 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] hover:shadow-[5px_5px_0_#1A1A1A] transition-all disabled:opacity-60 cursor-pointer"
+              className="group relative flex-1 sm:flex-none flex items-center justify-center gap-2 bg-linear-to-r from-[#FF6803] to-[#FF8A3D] text-white py-3 px-6 rounded-xl font-black text-[10px] md:text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] hover:shadow-[6px_6px_0_#1A1A1A] transition-all disabled:opacity-60 cursor-pointer overflow-hidden"
             >
+              <span className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
               {building ? (
                 <>
                   <Loader2 size={14} className="animate-spin" /> Building...
                 </>
               ) : (
                 <>
-                  <Rocket size={14} /> Build MVP
+                  <motion.span
+                    animate={{ rotate: [0, -10, 10, -10, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 3 }}
+                  >
+                    <Rocket size={15} />
+                  </motion.span>
+                  Build MVP
                 </>
               )}
             </motion.button>
@@ -1332,6 +1347,83 @@ export default function AnalysisPage() {
                 />
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* LOW SCORE PIVOT POPUP */}
+      <AnimatePresence>
+        {showPivotPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={() => setShowPivotPopup(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
+              className="bg-white rounded-2xl border-2 border-[#1A1A1A] shadow-[6px_6px_0_#1A1A1A] max-w-sm w-full p-6 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowPivotPopup(false)}
+                className="absolute top-3 right-3 text-[#1A1A1A]/25 hover:text-[#1A1A1A] transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="flex flex-col items-center text-center">
+                <motion.div
+                  animate={{ scale: [1, 1.15, 1], rotate: [0, -5, 5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center border-2 border-red-200 shadow-[3px_3px_0_#FECACA] mb-4"
+                >
+                  <AlertTriangle size={28} className="text-red-500" />
+                </motion.div>
+
+                <h3 className="text-lg font-black text-[#1A1A1A] uppercase tracking-tight mb-1">
+                  Low Score Alert
+                </h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl font-black font-mono" style={{ color: scoreColor(data.score) }}>
+                    {data.score}/100
+                  </span>
+                  <span className="text-xs font-bold text-[#1A1A1A]/40 uppercase">
+                    {data.verdict}
+                  </span>
+                </div>
+
+                <p className="text-sm text-[#1A1A1A]/60 font-medium leading-relaxed mb-5">
+                  Your idea scored <span className="font-black text-red-500">{data.score}</span> — building an MVP now might be a waste of time &amp; resources.
+                  Consider pivoting to a stronger idea first.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-2.5 w-full">
+                  <Link href="/validator" className="flex-1">
+                    <motion.button
+                      whileHover={{ y: -3, boxShadow: "5px 5px 0 #1A1A1A" }}
+                      whileTap={{ scale: 0.96 }}
+                      className="w-full flex items-center justify-center gap-2 bg-[#1A1A1A] text-white py-3 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] cursor-pointer transition-all"
+                    >
+                      <RefreshCw size={14} /> Pivot Idea
+                    </motion.button>
+                  </Link>
+
+                  <motion.button
+                    whileHover={{ y: -3, boxShadow: "5px 5px 0 #FF6803" }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => { setShowPivotPopup(false); handleBuildMVP(); }}
+                    className="flex-1 flex items-center justify-center gap-2 bg-linear-to-r from-[#FF6803] to-[#FF8A3D] text-white py-3 px-5 rounded-xl font-black text-xs uppercase tracking-wider border-2 border-[#1A1A1A] shadow-[3px_3px_0_#FF6803] cursor-pointer transition-all"
+                  >
+                    <Rocket size={14} /> Build Anyway
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
