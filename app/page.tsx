@@ -805,7 +805,7 @@ export default function LandingPage() {
               Core Features
             </motion.h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 icon: Zap,
@@ -850,38 +850,43 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="group relative bg-white/60 backdrop-blur-sm p-8 rounded-[1.5rem] border border-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                whileHover={{
+                  y: -5,
+                  boxShadow: `6px 6px 0px 0px ${feature.color}`,
+                  transition: { duration: 0.2 },
+                }}
+                className="group relative bg-white p-7 rounded-xl border-2 border-[#1A1A1A]/10 shadow-[4px_4px_0px_0px_#1A1A1A10] hover:border-[#1A1A1A] transition-all duration-300 cursor-default"
               >
-                {/* Hover glow */}
+                {/* Left accent bar */}
                 <div
-                  className="absolute inset-0 bg-gradient-to-br from-transparent to-transparent group-hover:from-[color:var(--glow)]/[0.04] group-hover:to-transparent transition-all duration-500 rounded-[1.5rem]"
-                  style={{ "--glow": feature.color } as React.CSSProperties}
+                  className="absolute top-4 left-0 w-1 h-8 rounded-r-full transition-all duration-300 group-hover:h-12"
+                  style={{ backgroundColor: feature.color }}
                 />
                 <div className="relative z-10">
+                  {/* Icon box */}
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 shadow-md transition-transform group-hover:scale-110 duration-300"
-                    style={{ backgroundColor: feature.color }}
+                    className="w-12 h-12 rounded-lg border-2 flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-[-3deg]"
+                    style={{
+                      borderColor: feature.color,
+                      backgroundColor: `${feature.color}12`,
+                    }}
                   >
-                    <feature.icon size={22} className="text-white" />
+                    <feature.icon size={22} style={{ color: feature.color }} />
                   </div>
-                  <h4 className="text-lg font-black uppercase tracking-tight mb-2 text-[#1A1A1A]">
+                  <h4
+                    className="text-base font-black uppercase tracking-tight mb-2 text-[#1A1A1A] group-hover:text-[color:var(--accent)] transition-colors duration-300"
+                    style={{ "--accent": feature.color } as React.CSSProperties}
+                  >
                     {feature.title}
                   </h4>
-                  <p className="text-[#1A1A1A]/60 text-sm font-medium leading-relaxed">
+                  <p className="text-[#1A1A1A]/50 text-sm font-medium leading-relaxed group-hover:text-[#1A1A1A]/70 transition-colors duration-300">
                     {feature.desc}
                   </p>
                 </div>
-                {/* Corner accent */}
-                <motion.div
-                  className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full opacity-[0.06]"
+                {/* Corner dot */}
+                <div
+                  className="absolute bottom-4 right-4 w-2 h-2 rounded-full opacity-30 group-hover:opacity-80 group-hover:scale-150 transition-all duration-300"
                   style={{ backgroundColor: feature.color }}
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{
-                    duration: 4 + i,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
                 />
               </motion.div>
             ))}
