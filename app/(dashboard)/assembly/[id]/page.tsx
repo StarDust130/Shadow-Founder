@@ -534,10 +534,17 @@ export default function AssemblyPage() {
             <div className="flex-1 min-h-[500px] bg-white">
               {previewFile ? (
                 <iframe
-                  srcDoc={previewFile.content}
+                  srcDoc={
+                    previewFile.content.includes('addEventListener')
+                      ? previewFile.content
+                      : previewFile.content.replace(
+                          '</body>',
+                          `<script>document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h&&h.startsWith('#')&&h.length>1){var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}}});document.addEventListener('submit',function(e){e.preventDefault()});</script></body>`
+                        )
+                  }
                   title="Landing Page Preview"
                   className="w-full h-full min-h-[500px] border-0"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-scripts"
                 />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center min-h-[500px] text-[#1A1A1A]/30 gap-4 p-8">
