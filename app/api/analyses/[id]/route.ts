@@ -3,6 +3,19 @@ import { auth } from "@clerk/nextjs/server";
 import { connectDB } from "@/lib/mongodb";
 import { Analysis } from "@/lib/models/Analysis";
 
+function generateName(idea: string): string {
+  const skip = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","that","with","as","by","this","from","at","my","your","our","just","very","really","also","about","based","using","use","new","get","app","platform","tool","system","service","website","software","build","create","make","like","want","need","can","will","would","should","could","online","digital","smart","ai","store","shop","marketplace","ecommerce","sell","buy","selling","buying","market","help","helps","people","users","manage","simple","easy","best","good","great"]);
+  const words = idea.split(/\s+/).filter(w => !skip.has(w.toLowerCase()) && w.length > 2);
+  const suffixes = ["ly","ify","io","Hub","Sync","Flow","Nest","Base","Mint","Wave","Pulse","Spark","Cart","Verse","Stack"];
+  if (words.length >= 1) {
+    const cw = words[words.length - 1];
+    const s = cw.endsWith('s') && cw.length > 3 ? cw.slice(0, -1) : cw;
+    const core = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    return core + suffixes[core.charCodeAt(0) % suffixes.length];
+  }
+  return "LaunchPad";
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -22,6 +35,13 @@ export async function GET(
         { error: "Analysis not found" },
         { status: 404 },
       );
+    }
+
+    // Backfill appName if missing — generate and persist to DB
+    if (!analysis.appName) {
+      const generatedName = generateName(analysis.idea);
+      await Analysis.updateOne({ _id: id }, { $set: { appName: generatedName } });
+      analysis.appName = generatedName;
     }
 
     return NextResponse.json(analysis);
