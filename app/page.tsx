@@ -69,7 +69,6 @@ export default function LandingPage() {
             >
               Pricing
             </a>
-         
           </div>
 
           <div className="hidden lg:flex">
@@ -167,10 +166,7 @@ export default function LandingPage() {
                   >
                     Get Started
                   </button>
-                  <Link
-                    href="/help"
-                   
-                  >
+                  <Link href="/help">
                     <button className="bg-white/60 cursor-pointer backdrop-blur-sm text-[#1A1A1A] border border-white px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-sm hover:bg-white transition-colors w-full md:w-auto flex items-center justify-center gap-2 ">
                       {" "}
                       Know More
@@ -354,7 +350,7 @@ export default function LandingPage() {
               <p className="text-white/60 font-medium mb-8 flex-grow relative z-10">
                 Unlimited validations and full Next.js generation pipelines.
               </p>
-              <Link href="upi://pay?pa=9302903537-2@ybl&pn=ShadowFounder&tr=TEST123456789&am=1999&cu=INR">
+              <Link href="/profile">
                 <button className="relative z-10 w-full bg-[#FF6803] text-white py-4 rounded-xl font-bold uppercase tracking-widest shadow-[0_10px_20px_rgba(255,104,3,0.3)] hover:-translate-y-0.5 transition-transform cursor-pointer">
                   Upgrade to Pro
                 </button>
