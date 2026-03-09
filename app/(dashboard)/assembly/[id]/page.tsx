@@ -22,6 +22,8 @@ import {
   Crown,
   ArrowRight,
   Pencil,
+  Maximize2,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -98,68 +100,60 @@ export default function AssemblyPage() {
   const [downloading, setDownloading] = useState(false);
   const [viewMode, setViewMode] = useState<"code" | "preview">("code");
   const [showEditPopup, setShowEditPopup] = useState(false);
+  const [fullscreenPreview, setFullscreenPreview] = useState(false);
   const confettiFired = useRef(false);
 
-  // Fire confetti when build loads successfully
+  // Fire confetti ONLY the very first time user visits this build
   useEffect(() => {
     if (build && !loading && !error && !confettiFired.current) {
       confettiFired.current = true;
-      const duration = 3000;
+      const storageKey = `confetti-shown-${id}`;
+      if (localStorage.getItem(storageKey)) return;
+      localStorage.setItem(storageKey, "1");
+
+      const colors = [
+        "#FF6803",
+        "#FFD93D",
+        "#6BCB77",
+        "#4D96FF",
+        "#FF6B6B",
+        "#C084FC",
+        "#F472B6",
+        "#34D399",
+        "#FBBF24",
+        "#A78BFA",
+        "#FB923C",
+        "#22D3EE",
+      ];
+      const duration = 4000;
       const end = Date.now() + duration;
 
-      // Left side cannon
-      const leftCannon = () => {
-        confetti({
-          particleCount: 4,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0, y: 0.65 },
-          colors: [
-            "#FF6803",
-            "#FFD93D",
-            "#6BCB77",
-            "#4D96FF",
-            "#FF6B6B",
-            "#C084FC",
-          ],
-        });
-      };
-
-      // Right side cannon
-      const rightCannon = () => {
-        confetti({
-          particleCount: 4,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1, y: 0.65 },
-          colors: [
-            "#FF6803",
-            "#FFD93D",
-            "#6BCB77",
-            "#4D96FF",
-            "#FF6B6B",
-            "#C084FC",
-          ],
-        });
-      };
-
-      // Initial big burst from center
+      // Big center burst
       confetti({
-        particleCount: 100,
-        spread: 100,
-        origin: { x: 0.5, y: 0.4 },
-        colors: [
-          "#FF6803",
-          "#FFD93D",
-          "#6BCB77",
-          "#4D96FF",
-          "#FF6B6B",
-          "#C084FC",
-        ],
-        startVelocity: 35,
-        gravity: 0.8,
-        ticks: 100,
+        particleCount: 150,
+        spread: 120,
+        origin: { x: 0.5, y: 0.35 },
+        colors,
+        startVelocity: 45,
+        gravity: 0.7,
+        ticks: 120,
+        shapes: ["circle", "square"],
+        scalar: 1.2,
       });
+
+      // Delayed second burst slightly lower
+      setTimeout(() => {
+        confetti({
+          particleCount: 80,
+          spread: 90,
+          origin: { x: 0.5, y: 0.5 },
+          colors,
+          startVelocity: 30,
+          gravity: 0.8,
+          ticks: 100,
+          shapes: ["circle"],
+        });
+      }, 300);
 
       // Continuous side cannons
       const interval = setInterval(() => {
@@ -167,13 +161,31 @@ export default function AssemblyPage() {
           clearInterval(interval);
           return;
         }
-        leftCannon();
-        rightCannon();
-      }, 80);
+        // Left cannon
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0, y: 0.6 },
+          colors,
+          shapes: ["circle", "square"],
+          scalar: 1.1,
+        });
+        // Right cannon
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 60,
+          origin: { x: 1, y: 0.6 },
+          colors,
+          shapes: ["circle", "square"],
+          scalar: 1.1,
+        });
+      }, 60);
 
       return () => clearInterval(interval);
     }
-  }, [build, loading, error]);
+  }, [build, loading, error, id]);
 
   useEffect(() => {
     const fetchBuild = async () => {
@@ -364,15 +376,15 @@ export default function AssemblyPage() {
               <motion.div
                 initial={{ rotate: -10 }}
                 animate={{ rotate: 0 }}
-                className="w-12 h-12 bg-[#FF6803] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] flex items-center justify-center"
+                className="w-10 h-10 sm:w-12 sm:h-12 bg-[#FF6803] border-2 border-[#1A1A1A] shadow-[4px_4px_0_#1A1A1A] flex items-center justify-center"
               >
-                <Code2 size={24} className="text-white" />
+                <Code2 size={20} className="text-white" />
               </motion.div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter text-[#1A1A1A] uppercase">
                   The Vault
                 </h1>
-                <p className="text-xs text-[#1A1A1A]/40 font-mono truncate max-w-[300px]">
+                <p className="text-[10px] sm:text-xs text-[#1A1A1A]/40 font-mono truncate max-w-[180px] sm:max-w-[300px]">
                   {build.ideaTitle}
                 </p>
               </div>
@@ -383,7 +395,7 @@ export default function AssemblyPage() {
             whileTap={{ y: 0, boxShadow: "2px 2px 0 #1A1A1A" }}
             onClick={downloadZip}
             disabled={downloading}
-            className="flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] text-sm font-black uppercase tracking-wide hover:bg-[#FF6803] transition-colors disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-[#1A1A1A] text-white px-4 sm:px-6 py-2.5 sm:py-3 border-2 border-[#1A1A1A] shadow-[4px_4px_0_#FF6803] text-xs sm:text-sm font-black uppercase tracking-wide hover:bg-[#FF6803] transition-colors disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
             {downloading ? (
               <Loader2 size={16} className="animate-spin" />
@@ -439,7 +451,7 @@ export default function AssemblyPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="grid grid-cols-3 gap-3 mb-6"
+        className="grid grid-cols-3 gap-2 sm:gap-3 mb-6"
       >
         {[
           { label: "Files", value: allFiles, icon: Layers },
@@ -449,12 +461,17 @@ export default function AssemblyPage() {
           <motion.div
             key={stat.label}
             whileHover={{ y: -2 }}
-            className="bg-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] p-3 flex items-center gap-3"
+            className="bg-white border-2 border-[#1A1A1A] shadow-[3px_3px_0_#1A1A1A] p-2 sm:p-3 flex items-center gap-2 sm:gap-3"
           >
-            <stat.icon size={18} className="text-[#FF6803]" />
-            <div>
-              <p className="text-xl font-black text-[#1A1A1A]">{stat.value}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]/40">
+            <stat.icon
+              size={16}
+              className="text-[#FF6803] shrink-0 sm:w-[18px] sm:h-[18px]"
+            />
+            <div className="min-w-0">
+              <p className="text-base sm:text-xl font-black text-[#1A1A1A]">
+                {stat.value}
+              </p>
+              <p className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider sm:tracking-widest text-[#1A1A1A]/40">
                 {stat.label}
               </p>
             </div>
@@ -475,7 +492,7 @@ export default function AssemblyPage() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 + i * 0.05 }}
-            className="px-3 py-1.5 bg-white border-2 border-[#1A1A1A] text-xs font-black uppercase tracking-wider text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:-translate-y-0.5 transition-all cursor-default"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-white border-2 border-[#1A1A1A] text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A1A1A] shadow-[2px_2px_0_#1A1A1A] hover:shadow-[3px_3px_0_#FF6803] hover:-translate-y-0.5 transition-all cursor-default"
           >
             {tech}
           </motion.span>
@@ -489,50 +506,63 @@ export default function AssemblyPage() {
         transition={{ delay: 0.15 }}
         className="bg-[#1A1A1A] border-2 border-[#1A1A1A] shadow-[6px_6px_0_#FF6803] overflow-hidden"
       >
-        <div className="flex items-center justify-between px-4 py-3 bg-[#111] border-b-2 border-[#2A2A2A]">
-          <div className="flex items-center gap-3">
-            <div className="flex gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#FF5F57] border border-[#E04B4B]" />
-              <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#E5A829]" />
-              <div className="w-3 h-3 rounded-full bg-[#28C840] border border-[#23B339]" />
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-[#111] border-b-2 border-[#2A2A2A]">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FF5F57] border border-[#E04B4B]" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FFBD2E] border border-[#E5A829]" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#28C840] border border-[#23B339]" />
             </div>
-            <div className="h-4 w-px bg-white/10" />
-            <span className="text-[11px] font-mono font-bold text-white/30 uppercase tracking-wider">
+            <div className="h-4 w-px bg-white/10 hidden sm:block" />
+            <span className="text-[11px] font-mono font-bold text-white/30 uppercase tracking-wider hidden sm:inline">
               shadow-vault
             </span>
-            <div className="h-4 w-px bg-white/10" />
+            <div className="h-4 w-px bg-white/10 hidden md:block" />
             <button
               onClick={() => setShowEditPopup(true)}
-              className="flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border border-[#FF6803]/40 text-[#FF6803] bg-[#FF6803]/10 rounded hover:bg-[#FF6803]/20 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 text-[10px] font-mono font-bold px-2 sm:px-3 py-1.5 border border-[#FF6803]/40 text-[#FF6803] bg-[#FF6803]/10 rounded hover:bg-[#FF6803]/20 transition-all cursor-pointer"
             >
-              <Pencil size={11} /> Edit Code
+              <Pencil size={11} />{" "}
+              <span className="hidden sm:inline">Edit Code</span>
+              <span className="sm:hidden">Edit</span>
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => setViewMode("code")}
-              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 text-[10px] font-mono font-bold px-2 sm:px-3 py-1.5 border transition-all rounded cursor-pointer ${
                 viewMode === "code"
                   ? "text-[#FF6803] border-[#FF6803]/40 bg-[#FF6803]/10"
                   : "text-white/30 border-white/10 hover:text-white/50"
               }`}
             >
-              <Code2 size={12} /> Code
+              <Code2 size={12} /> <span className="hidden sm:inline">Code</span>
             </button>
             <button
               onClick={() => setViewMode("preview")}
-              className={`flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 border transition-all rounded cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 text-[10px] font-mono font-bold px-2 sm:px-3 py-1.5 border transition-all rounded cursor-pointer ${
                 viewMode === "preview"
                   ? "text-emerald-400 border-emerald-400/40 bg-emerald-400/10"
                   : "text-white/30 border-white/10 hover:text-white/50"
               }`}
             >
-              <Eye size={12} /> Preview
+              <Eye size={12} />{" "}
+              <span className="hidden sm:inline">Preview</span>
             </button>
+            {previewFile && (
+              <button
+                onClick={() => setFullscreenPreview(true)}
+                className="flex items-center gap-1 sm:gap-1.5 text-[10px] font-mono font-bold px-2 sm:px-3 py-1.5 border border-white/10 text-white/30 hover:text-white/50 hover:border-white/20 hover:bg-white/5 transition-all rounded cursor-pointer"
+                title="Fullscreen Preview"
+              >
+                <Maximize2 size={12} />{" "}
+                <span className="hidden sm:inline">Fullscreen</span>
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row min-h-[500px] max-h-[70vh]">
+        <div className="flex flex-col md:flex-row min-h-[400px] sm:min-h-[500px] max-h-[60vh] sm:max-h-[70vh]">
           {viewMode === "code" ? (
             <>
               {/* File Tree */}
@@ -547,13 +577,16 @@ export default function AssemblyPage() {
               <div className="flex-1 flex flex-col overflow-hidden">
                 {selectedFile ? (
                   <>
-                    <div className="flex items-center justify-between px-4 py-2.5 bg-[#1E1E1E] border-b-2 border-[#2A2A2A]">
-                      <div className="flex items-center gap-2">
-                        <FileCode size={14} className="text-[#FF6803]" />
-                        <span className="text-xs font-mono font-bold text-white/70">
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#1E1E1E] border-b-2 border-[#2A2A2A]">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <FileCode
+                          size={14}
+                          className="text-[#FF6803] shrink-0"
+                        />
+                        <span className="text-[10px] sm:text-xs font-mono font-bold text-white/70 truncate">
                           {selectedFile.path}
                         </span>
-                        <span className="text-[10px] font-mono font-bold text-[#FF6803] bg-[#FF6803]/10 px-2 py-0.5 border border-[#FF6803]/20">
+                        <span className="text-[10px] font-mono font-bold text-[#FF6803] bg-[#FF6803]/10 px-1.5 sm:px-2 py-0.5 border border-[#FF6803]/20 shrink-0 hidden sm:inline">
                           {selectedFile.lang}
                         </span>
                       </div>
@@ -563,7 +596,7 @@ export default function AssemblyPage() {
                         onClick={() =>
                           copyCode(selectedFile.content, selectedFile.path)
                         }
-                        className={`flex items-center gap-1.5 text-xs font-mono font-bold px-3 py-1.5 border transition-all cursor-pointer ${
+                        className={`flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-mono font-bold px-2 sm:px-3 py-1.5 border transition-all cursor-pointer shrink-0 ${
                           copiedFile === selectedFile.path
                             ? "text-emerald-400 border-emerald-400/30 bg-emerald-400/10"
                             : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20 hover:bg-white/5"
@@ -571,17 +604,19 @@ export default function AssemblyPage() {
                       >
                         {copiedFile === selectedFile.path ? (
                           <>
-                            <Check size={12} /> Copied!
+                            <Check size={12} />{" "}
+                            <span className="hidden sm:inline">Copied!</span>
                           </>
                         ) : (
                           <>
-                            <Copy size={12} /> Copy
+                            <Copy size={12} />{" "}
+                            <span className="hidden sm:inline">Copy</span>
                           </>
                         )}
                       </motion.button>
                     </div>
-                    <div className="flex-1 overflow-auto p-4">
-                      <pre className="text-sm font-mono text-white/80 leading-relaxed whitespace-pre">
+                    <div className="flex-1 overflow-auto p-2 sm:p-4">
+                      <pre className="text-[11px] sm:text-sm font-mono text-white/80 leading-relaxed whitespace-pre">
                         {selectedFile.content?.split("\n").map((line, i) => (
                           <div
                             key={i}
@@ -608,7 +643,7 @@ export default function AssemblyPage() {
             </>
           ) : (
             /* Live Preview via iframe */
-            <div className="flex-1 min-h-[500px] bg-white">
+            <div className="flex-1 min-h-[400px] sm:min-h-[500px] bg-white">
               {previewFile ? (
                 <iframe
                   srcDoc={
@@ -620,11 +655,11 @@ export default function AssemblyPage() {
                         )
                   }
                   title="Landing Page Preview"
-                  className="w-full h-full min-h-[500px] border-0"
+                  className="w-full h-full min-h-[400px] sm:min-h-[500px] border-0"
                   sandbox="allow-scripts"
                 />
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center min-h-[500px] text-[#1A1A1A]/30 gap-4 p-8">
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] sm:min-h-[500px] text-[#1A1A1A]/30 gap-4 p-4 sm:p-8">
                   <Eye size={40} className="text-[#FF6803]/30" />
                   <p className="text-sm font-black uppercase tracking-wider text-center">
                     Preview not available
@@ -727,6 +762,52 @@ export default function AssemblyPage() {
           </motion.button>
         </Link>
       </motion.div>
+
+      {/* FULLSCREEN PREVIEW */}
+      <AnimatePresence>
+        {fullscreenPreview && previewFile && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black flex flex-col"
+          >
+            <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 bg-[#111] border-b border-[#2A2A2A] shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-3">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#FF6803] rounded-lg flex items-center justify-center shrink-0">
+                  <Eye size={14} className="text-white sm:w-4 sm:h-4" />
+                </div>
+                <span className="text-xs sm:text-sm font-black text-white/80 uppercase tracking-wider truncate">
+                  Preview — {build.ideaTitle}
+                </span>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setFullscreenPreview(false)}
+                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-red-500/80 flex items-center justify-center text-white/60 hover:text-white transition-all cursor-pointer border border-white/10 hover:border-red-500"
+              >
+                <X size={18} />
+              </motion.button>
+            </div>
+            <div className="flex-1 bg-white">
+              <iframe
+                srcDoc={
+                  previewFile.content.includes("addEventListener")
+                    ? previewFile.content
+                    : previewFile.content.replace(
+                        "</body>",
+                        `<script>document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h&&h.startsWith('#')&&h.length>1){var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}}});document.addEventListener('submit',function(e){e.preventDefault()});</script></body>`,
+                      )
+                }
+                title="Fullscreen Landing Page Preview"
+                className="w-full h-full border-0"
+                sandbox="allow-scripts"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* EDIT CODE UPGRADE POPUP */}
       <AnimatePresence>
