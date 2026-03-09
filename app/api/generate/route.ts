@@ -45,11 +45,12 @@ REQUIRED 10 SECTIONS in preview.html:
    - Full viewport height, centered content
    - Animated gradient background using @keyframes (shifting warm colors)
    - A small pill/badge above headline: "🚀 #1 Platform in India" with border, rounded-full, small text
-   - App name as BIG headline with gradient text (background-clip: text, -webkit-text-fill-color: transparent) using orange-to-dark gradient
-   - 1-line subtitle below (gray, max 50 chars)
+   - App name as the ONLY headline text — just the brand name, nothing else, max 2 words
+   - 1 short subtitle below — MAX 6 WORDS (e.g. "Build. Launch. Scale. Faster.")
    - 2 CTA buttons side by side (primary orange + secondary white, both with thick borders + shadows)
-   - 3-4 floating geometric shapes (circles, squares rotated 45deg) using position:absolute + @keyframes float animation, low opacity (0.06-0.1), different sizes and positions
-   - A "Trusted by 10,000+ founders" text with small avatar circles below buttons
+   - Floating geometric shapes (circles, rotated squares) with @keyframes float, low opacity
+   - "Trusted by 10,000+ founders" text with small avatar circles
+   - DO NOT write long sentences in the hero. Keep it ultra-minimal.
 3. FEATURES — 4 feature cards in 2x2 grid. Each: emoji icon + bold title + 1 sentence. White cards, thick borders, shadow.
 4. HOW IT WORKS — 3 numbered steps. Each step: number in orange circle + title + 1 sentence. Clean centered layout.
 5. STATS — Dark bg (#1A1A1A). 3-4 big stat numbers in orange. Labels below. "50K+ Users" / "99.9% Uptime" / "4.9★ Rating" / "₹2Cr+ Processed".
@@ -61,10 +62,12 @@ REQUIRED 10 SECTIONS in preview.html:
 
 TEXT RULES:
 - Use the APP NAME (provided in prompt) as brand name everywhere — nav, hero, CTA, footer. NEVER use the raw idea description as display text.
-- Headlines: 3-6 words, punchy, uppercase
-- Descriptions: 1 sentence, max 15 words
-- NO lorem ipsum. NO filler. NO "coming soon". Write REAL startup copy relevant to the idea.
-- Keep it SHORT and DIRECT
+- Hero headline: ONLY the app name. Nothing else. No tagline in the h1.
+- Hero subtitle: MAX 6 words. Short. Punchy. e.g. "Build. Launch. Scale." or "Your phone marketplace."
+- Section headlines: 3-5 words, punchy, uppercase
+- Card descriptions: 1 sentence, max 12 words
+- NO lorem ipsum. NO filler. NO "coming soon". Write REAL startup copy.
+- KEEP EVERYTHING SHORT. Less text = better design.
 
 CSS RULES (MUST FOLLOW):
 - Use :root { --primary: #FF6803; --dark: #1A1A1A; --light: #FFFBF5; --shadow: 4px 4px 0 #1A1A1A; }
@@ -192,7 +195,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700}
 <body>
 <nav><div class="logo">${appName}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
 
-<section class="hero"><div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div><div class="shape shape-4"></div><div class="glow"></div><div class="badge">\u{1F680} <span>#1 Platform</span> in India</div><h1>${appName}</h1><p>${summary || "The next-generation platform built for the future."}</p><div class="btns"><a href="#features" class="primary">Explore Features</a><a href="#pricing" class="secondary">View Pricing</a></div><div class="trust"><div class="avatars"><span style="background:#FF6803">P</span><span style="background:#6366F1">A</span><span style="background:#22C55E">S</span><span style="background:#1A1A1A">R</span></div>Trusted by 10,000+ founders</div><div class="mockup"><div class="mockup-bar"><span></span><span></span><span></span></div><div class="mockup-body"><div class="mock-card"><div class="mock-val">50K+</div><div class="mock-label">Active Users</div></div><div class="mock-card"><div class="mock-val">99.9%</div><div class="mock-label">Uptime</div></div><div class="mock-card"><div class="mock-val">\u20B92Cr+</div><div class="mock-label">Processed</div></div><div class="mock-card"><div class="mock-val">4.9\u2605</div><div class="mock-label">Rating</div></div></div></div></section>
+<section class="hero"><div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div><div class="shape shape-4"></div><div class="glow"></div><div class="badge">\u{1F680} <span>#1 Platform</span> in India</div><h1>${appName}</h1><p>Build. Launch. Scale. Faster than ever.</p><div class="btns"><a href="#features" class="primary">Get Started Free</a><a href="#pricing" class="secondary">View Pricing</a></div><div class="trust"><div class="avatars"><span style="background:#FF6803">P</span><span style="background:#6366F1">A</span><span style="background:#22C55E">S</span><span style="background:#1A1A1A">R</span></div>Trusted by 10,000+ founders</div><div class="mockup"><div class="mockup-bar"><span></span><span></span><span></span></div><div class="mockup-body"><div class="mock-card"><div class="mock-val">50K+</div><div class="mock-label">Active Users</div></div><div class="mock-card"><div class="mock-val">99.9%</div><div class="mock-label">Uptime</div></div><div class="mock-card"><div class="mock-val">\u20B92Cr+</div><div class="mock-label">Processed</div></div><div class="mock-card"><div class="mock-val">4.9\u2605</div><div class="mock-label">Rating</div></div></div></div></section>
 
 <section class="features" id="features"><h2>Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">\u26A1</div><h3>Lightning Fast</h3><p>Built for speed and performance from the ground up.</p></div><div class="card fade-in"><div class="icon">\u{1F6E1}\uFE0F</div><h3>Secure by Default</h3><p>Enterprise-grade security built into every layer.</p></div><div class="card fade-in"><div class="icon">\u{1F680}</div><h3>Scale Effortlessly</h3><p>Grows with your business without breaking a sweat.</p></div><div class="card fade-in"><div class="icon">\u{1F4CA}</div><h3>Smart Analytics</h3><p>Real-time insights and data-driven decisions.</p></div></div></section>
 
@@ -290,7 +293,7 @@ ${analysis.revenue ? `**Revenue Model:** ${analysis.revenue}` : ""}
 
 CRITICAL INSTRUCTIONS:
 1. The brand name is "${appName}" — use "${appName}" as the product name EVERYWHERE in the preview.html and all files. Do NOT use the raw idea description as text. The hero headline should be "${appName}", the nav logo should say "${appName}", etc.
-2. Write SHORT, punchy marketing copy — not long descriptions. Headlines: 3-6 words. Subtitles: 1 sentence max.
+2. Write ULTRA SHORT copy. Hero subtitle: MAX 6 words. Card descriptions: 1 sentence max. Headlines: 3-5 words. LESS TEXT = BETTER.
 3. The preview.html MUST have FULL CSS inlined in <style> tags. It must look beautiful with neobrutalism design, proper colors, proper spacing, hover effects, animations.
 4. Include 8-10 sections: Nav, Hero, Features (4 cards), How It Works (3 steps), Stats, Testimonials (Indian names), Pricing (\u20b9 values), FAQ, CTA, Footer.
 5. ALL pricing in Indian Rupees (\u20b9). No dollar signs.
