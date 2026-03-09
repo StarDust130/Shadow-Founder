@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Code2,
@@ -97,6 +98,82 @@ export default function AssemblyPage() {
   const [downloading, setDownloading] = useState(false);
   const [viewMode, setViewMode] = useState<"code" | "preview">("code");
   const [showEditPopup, setShowEditPopup] = useState(false);
+  const confettiFired = useRef(false);
+
+  // Fire confetti when build loads successfully
+  useEffect(() => {
+    if (build && !loading && !error && !confettiFired.current) {
+      confettiFired.current = true;
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      // Left side cannon
+      const leftCannon = () => {
+        confetti({
+          particleCount: 4,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.65 },
+          colors: [
+            "#FF6803",
+            "#FFD93D",
+            "#6BCB77",
+            "#4D96FF",
+            "#FF6B6B",
+            "#C084FC",
+          ],
+        });
+      };
+
+      // Right side cannon
+      const rightCannon = () => {
+        confetti({
+          particleCount: 4,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.65 },
+          colors: [
+            "#FF6803",
+            "#FFD93D",
+            "#6BCB77",
+            "#4D96FF",
+            "#FF6B6B",
+            "#C084FC",
+          ],
+        });
+      };
+
+      // Initial big burst from center
+      confetti({
+        particleCount: 100,
+        spread: 100,
+        origin: { x: 0.5, y: 0.4 },
+        colors: [
+          "#FF6803",
+          "#FFD93D",
+          "#6BCB77",
+          "#4D96FF",
+          "#FF6B6B",
+          "#C084FC",
+        ],
+        startVelocity: 35,
+        gravity: 0.8,
+        ticks: 100,
+      });
+
+      // Continuous side cannons
+      const interval = setInterval(() => {
+        if (Date.now() > end) {
+          clearInterval(interval);
+          return;
+        }
+        leftCannon();
+        rightCannon();
+      }, 80);
+
+      return () => clearInterval(interval);
+    }
+  }, [build, loading, error]);
 
   useEffect(() => {
     const fetchBuild = async () => {
@@ -535,11 +612,11 @@ export default function AssemblyPage() {
               {previewFile ? (
                 <iframe
                   srcDoc={
-                    previewFile.content.includes('addEventListener')
+                    previewFile.content.includes("addEventListener")
                       ? previewFile.content
                       : previewFile.content.replace(
-                          '</body>',
-                          `<script>document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h&&h.startsWith('#')&&h.length>1){var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}}});document.addEventListener('submit',function(e){e.preventDefault()});</script></body>`
+                          "</body>",
+                          `<script>document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h&&h.startsWith('#')&&h.length>1){var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}}});document.addEventListener('submit',function(e){e.preventDefault()});</script></body>`,
                         )
                   }
                   title="Landing Page Preview"
