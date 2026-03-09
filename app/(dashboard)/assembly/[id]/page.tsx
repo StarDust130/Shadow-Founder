@@ -103,13 +103,13 @@ export default function AssemblyPage() {
   const [fullscreenPreview, setFullscreenPreview] = useState(false);
   const confettiFired = useRef(false);
 
-  // Fire confetti ONLY the very first time user visits this build
+  // Fire confetti ONLY once per session when user visits this build
   useEffect(() => {
     if (build && !loading && !error && !confettiFired.current) {
       confettiFired.current = true;
       const storageKey = `confetti-shown-${id}`;
-      if (localStorage.getItem(storageKey)) return;
-      localStorage.setItem(storageKey, "1");
+      if (sessionStorage.getItem(storageKey)) return;
+      sessionStorage.setItem(storageKey, "1");
 
       const colors = [
         "#FF6803",
