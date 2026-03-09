@@ -215,6 +215,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700}
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
 document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){var h=a.getAttribute('href');if(h&&h!=='#'&&h.startsWith('#')){e.preventDefault();var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}else{e.preventDefault()}}});
 </script>
 </body>
 </html>`;
@@ -276,7 +277,22 @@ export async function POST(req: Request) {
       );
     }
 
-    const appName = analysis.appName || analysis.idea.split(" ").filter((w: string) => w.length > 3).pop() || "LaunchPad";
+    // Ensure appName is set and persisted
+    if (!analysis.appName) {
+      const skip = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","that","with","as","by","this","from","at","my","your","our","just","very","really","also","about","based","using","use","new","get","app","platform","tool","system","service","website","software","build","create","make","like","want","need","can","will","would","should","could","online","digital","smart","ai","store","shop","marketplace","ecommerce","sell","buy","selling","buying","market","help","helps","people","users","manage","simple","easy","best","good","great"]);
+      const w = analysis.idea.split(/\s+/).filter((w: string) => !skip.has(w.toLowerCase()) && w.length > 2);
+      const suffixes = ["ly","ify","io","Hub","Sync","Flow","Nest","Base","Mint","Wave","Pulse","Spark","Cart","Verse","Stack"];
+      if (w.length >= 1) {
+        const cw = w[w.length - 1];
+        const s = cw.endsWith('s') && cw.length > 3 ? cw.slice(0, -1) : cw;
+        const core = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+        analysis.appName = core + suffixes[core.charCodeAt(0) % suffixes.length];
+      } else {
+        analysis.appName = "LaunchPad";
+      }
+      await Analysis.updateOne({ _id: analysisId }, { $set: { appName: analysis.appName } });
+    }
+    const appName = analysis.appName;
 
     const userPrompt = `Build an MVP for this startup:
 
