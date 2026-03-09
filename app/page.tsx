@@ -395,15 +395,97 @@ export default function LandingPage() {
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             className="absolute top-[20%] left-[50%] w-40 h-40 md:w-72 md:h-72 rounded-full bg-[#FF6803] blur-[80px] pointer-events-none z-0"
           />
+          {/* Floating rotating orange square — bottom right */}
           <motion.div
             animate={{ y: [0, -40, 0], rotate: [0, 90, 0] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
             className="absolute bottom-[10%] right-[5%] w-8 h-8 md:w-14 md:h-14 border-2 border-[#FF6803]/25 rounded-lg pointer-events-none z-0"
           />
+          {/* Spinning blue square — left side */}
           <motion.div
             animate={{ y: [0, 30, 0], x: [0, -20, 0], rotate: [0, -180, -360] }}
             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
             className="absolute top-[40%] left-[3%] w-6 h-6 md:w-10 md:h-10 border-2 border-[#4D96FF]/20 rounded-md pointer-events-none z-0"
+          />
+          {/* Pulsing orange ring — top right */}
+          <motion.div
+            animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.35, 0.15] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[8%] right-[12%] w-10 h-10 md:w-20 md:h-20 border-[3px] border-[#FF6803]/30 rounded-full pointer-events-none z-0"
+          />
+          {/* Drifting green circle — mid left */}
+          <motion.div
+            animate={{ y: [0, -25, 0], x: [0, 18, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[55%] left-[12%] w-4 h-4 md:w-7 md:h-7 bg-[#6BCB77]/30 rounded-full pointer-events-none z-0"
+          />
+          {/* Floating purple diamond — center right */}
+          <motion.div
+            animate={{
+              rotate: [45, 135, 225, 315, 405],
+              y: [0, -30, 10, -20, 0],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[25%] right-[25%] w-5 h-5 md:w-9 md:h-9 border-2 border-[#C084FC]/25 pointer-events-none z-0"
+          />
+          {/* Bouncing orange dot — top left area */}
+          <motion.div
+            animate={{
+              y: [0, -35, 0],
+              scale: [1, 1.5, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[15%] left-[20%] w-3 h-3 md:w-5 md:h-5 bg-[#FF6803] rounded-full pointer-events-none z-0"
+          />
+          {/* Large slow rotating dashed circle — center */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+            className="absolute top-[30%] left-[40%] w-24 h-24 md:w-44 md:h-44 border-2 border-dashed border-[#FF6803]/15 rounded-full pointer-events-none z-0"
+          />
+          {/* Tiny blue dot cluster */}
+          <motion.div
+            animate={{ y: [0, -20, 0], opacity: [0.2, 0.5, 0.2] }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5,
+            }}
+            className="absolute top-[70%] right-[30%] w-2.5 h-2.5 md:w-4 md:h-4 bg-[#4D96FF]/40 rounded-full pointer-events-none z-0"
+          />
+          <motion.div
+            animate={{ y: [0, -15, 0], opacity: [0.15, 0.4, 0.15] }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1,
+            }}
+            className="absolute top-[68%] right-[28%] w-2 h-2 md:w-3 md:h-3 bg-[#4D96FF]/35 rounded-full pointer-events-none z-0"
+          />
+          {/* Slow floating cross/plus — right mid */}
+          <motion.div
+            animate={{ rotate: [0, 180, 360], y: [0, -20, 0] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[45%] right-[8%] pointer-events-none z-0"
+          >
+            <div className="relative w-6 h-6 md:w-10 md:h-10">
+              <div className="absolute top-1/2 left-0 w-full h-[2px] md:h-[3px] bg-[#FF6803]/25 -translate-y-1/2 rounded-full" />
+              <div className="absolute top-0 left-1/2 w-[2px] md:w-[3px] h-full bg-[#FF6803]/25 -translate-x-1/2 rounded-full" />
+            </div>
+          </motion.div>
+          {/* Purple glow blob — bottom left */}
+          <motion.div
+            animate={{ scale: [1, 1.4, 1], opacity: [0.08, 0.18, 0.08] }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2,
+            }}
+            className="absolute bottom-[5%] left-[25%] w-32 h-32 md:w-52 md:h-52 rounded-full bg-[#C084FC] blur-[70px] pointer-events-none z-0"
           />
           {/* MASSIVE BACKGROUND TEXT (Hidden on Mobile, Kinetic on PC) */}
           <div className="absolute inset-0 hidden lg:flex flex-col items-center justify-center pointer-events-none z-0">
