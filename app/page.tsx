@@ -1,17 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
   ArrowUpRight,
+  ArrowUp,
   Menu,
   X as XIcon,
-  ChevronDown,
   MousePointer2,
   Layers,
   CheckCircle2,
   XOctagon,
-  HelpCircle,
   Zap,
   Shield,
   BarChart3,
@@ -83,6 +82,27 @@ function FAQItem({
 export default function LandingPage() {
   const { isSignedIn } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Scroll progress bar
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
@@ -93,7 +113,30 @@ export default function LandingPage() {
 
   return (
     // Outer Canvas
-    <div className="min-h-screen bg-[#D1D1D1] p-4 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center">
+    <div className="min-h-screen bg-[#D1D1D1] p-4 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center scroll-smooth">
+      {/* SCROLL PROGRESS BAR */}
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[3px] bg-linear-to-r from-[#FF6803] via-[#FF8C42] to-[#FF6803] origin-left z-[100]"
+      />
+
+      {/* BACK TO TOP BUTTON */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[99] w-12 h-12 md:w-14 md:h-14 bg-[#1A1A1A] hover:bg-[#FF6803] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_8px_25px_rgba(255,104,3,0.4)] hover:-translate-y-1 transition-all cursor-pointer group"
+            aria-label="Back to top"
+          >
+            <ArrowUp size={20} className="group-hover:animate-bounce" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* GLOBAL ANIMATED BACKGROUND ELEMENTS */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Floating gradient orbs */}
@@ -1035,7 +1078,80 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 9. KINETIC FOOTER */}
+        {/* 9. FINAL CTA BANNER */}
+        <section className="px-6 md:px-16 mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative bg-[#1A1A1A] rounded-[2rem] p-10 md:p-16 text-center overflow-hidden"
+          >
+            {/* CTA bg accents */}
+            <div className="absolute inset-0 pointer-events-none">
+              <motion.div
+                animate={{ scale: [1, 1.5, 1], opacity: [0.08, 0.15, 0.08] }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute top-0 left-[20%] w-64 h-64 bg-[#FF6803] rounded-full blur-[80px]"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.3, 1], opacity: [0.05, 0.12, 0.05] }}
+                transition={{
+                  duration: 7,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1,
+                }}
+                className="absolute bottom-0 right-[15%] w-48 h-48 bg-[#4D96FF] rounded-full blur-[70px]"
+              />
+            </div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-xs font-bold uppercase tracking-[0.3em] text-[#FF6803] mb-4 relative z-10"
+            >
+              Stop Dreaming. Start Validating.
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter text-white mb-6 relative z-10"
+            >
+              Your Idea Deserves
+              <br />
+              <span className="text-[#FF6803]">The Truth</span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-white/50 font-medium max-w-lg mx-auto mb-8 relative z-10"
+            >
+              Join founders who validate before they build. Get AI-powered
+              analysis, instant MVP generation, and brutally honest feedback —
+              all in one place.
+            </motion.p>
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              onClick={routeToDashboard}
+              className="relative z-10 bg-[#FF6803] text-white px-10 py-4 rounded-full text-sm font-bold uppercase tracking-widest shadow-[0_10px_30px_rgba(255,104,3,0.4)] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(255,104,3,0.5)] transition-all cursor-pointer"
+            >
+              {isSignedIn ? "Go to Dashboard" : "Get Started Free"} →
+            </motion.button>
+          </motion.div>
+        </section>
+
+        {/* 10. KINETIC FOOTER */}
         <footer className="w-full bg-[#D1D1D1]/20 border-t border-black/5 flex flex-col pt-12 relative overflow-hidden">
           {/* Footer floating accents */}
           <motion.div
