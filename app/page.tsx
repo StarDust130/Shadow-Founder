@@ -12,9 +12,73 @@ import {
   CheckCircle2,
   XOctagon,
   HelpCircle,
+  Zap,
+  Shield,
+  BarChart3,
+  Cpu,
+  Rocket,
+  Globe,
+  Plus,
+  Minus,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+
+function FAQItem({
+  question,
+  answer,
+  index,
+}: {
+  question: string;
+  answer: string;
+  index: number;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.06 }}
+      className="bg-white/60 backdrop-blur-sm border border-white rounded-2xl overflow-hidden hover:shadow-md transition-shadow"
+    >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-5 md:p-6 text-left cursor-pointer group"
+      >
+        <span className="text-sm md:text-base font-bold text-[#1A1A1A] pr-4 group-hover:text-[#FF6803] transition-colors">
+          {question}
+        </span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="shrink-0 w-8 h-8 rounded-full bg-[#1A1A1A]/5 flex items-center justify-center group-hover:bg-[#FF6803]/10 transition-colors"
+        >
+          {isOpen ? (
+            <Minus size={16} className="text-[#FF6803]" />
+          ) : (
+            <Plus size={16} className="text-[#1A1A1A]/50" />
+          )}
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <p className="px-5 md:px-6 pb-5 md:pb-6 text-sm text-[#1A1A1A]/60 font-medium leading-relaxed">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 export default function LandingPage() {
   const { isSignedIn } = useAuth();
@@ -30,8 +94,215 @@ export default function LandingPage() {
   return (
     // Outer Canvas
     <div className="min-h-screen bg-[#D1D1D1] p-4 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center">
+      {/* GLOBAL ANIMATED BACKGROUND ELEMENTS */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Floating gradient orbs */}
+        <motion.div
+          animate={{
+            x: [0, 80, -40, 0],
+            y: [0, -60, 40, 0],
+            scale: [1, 1.2, 0.9, 1],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[10%] left-[5%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full bg-[#FF6803]/[0.04] blur-[100px]"
+        />
+        <motion.div
+          animate={{
+            x: [0, -60, 30, 0],
+            y: [0, 50, -80, 0],
+            scale: [1, 0.8, 1.15, 1],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[40%] right-[5%] w-[250px] h-[250px] md:w-[450px] md:h-[450px] rounded-full bg-[#4D96FF]/[0.04] blur-[100px]"
+        />
+        <motion.div
+          animate={{ x: [0, 40, -60, 0], y: [0, -40, 60, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[15%] left-[20%] w-[200px] h-[200px] md:w-[400px] md:h-[400px] rounded-full bg-[#6BCB77]/[0.03] blur-[100px]"
+        />
+        <motion.div
+          animate={{ x: [0, -30, 50, 0], y: [0, 70, -30, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[60%] left-[60%] w-[180px] h-[180px] md:w-[350px] md:h-[350px] rounded-full bg-[#C084FC]/[0.03] blur-[100px]"
+        />
+
+        {/* Floating geometric shapes */}
+        <motion.div
+          animate={{ rotate: 360, y: [0, -20, 0] }}
+          transition={{
+            rotate: { duration: 40, repeat: Infinity, ease: "linear" },
+            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="absolute top-[15%] right-[15%] w-16 h-16 md:w-24 md:h-24 border-2 border-[#FF6803]/[0.08] rounded-2xl"
+        />
+        <motion.div
+          animate={{ rotate: -360, x: [0, 15, 0] }}
+          transition={{
+            rotate: { duration: 35, repeat: Infinity, ease: "linear" },
+            x: { duration: 8, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="absolute top-[45%] left-[8%] w-12 h-12 md:w-20 md:h-20 border-2 border-[#1A1A1A]/[0.05] rounded-full"
+        />
+        <motion.div
+          animate={{ rotate: 180, y: [0, 25, 0] }}
+          transition={{
+            rotate: { duration: 50, repeat: Infinity, ease: "linear" },
+            y: { duration: 7, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="absolute bottom-[25%] right-[10%] w-10 h-10 md:w-16 md:h-16 border-2 border-[#FF6803]/[0.06]"
+        />
+        <motion.div
+          animate={{ rotate: -180, x: [0, -20, 0] }}
+          transition={{
+            rotate: { duration: 45, repeat: Infinity, ease: "linear" },
+            x: { duration: 9, repeat: Infinity, ease: "easeInOut" },
+          }}
+          className="absolute top-[70%] left-[35%] w-8 h-8 md:w-14 md:h-14 border-2 border-[#4D96FF]/[0.06] rounded-xl"
+        />
+
+        {/* Small floating dots */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              y: [0, -30 - i * 10, 0],
+              x: [0, i % 2 === 0 ? 15 : -15, 0],
+              opacity: [0.3, 0.7, 0.3],
+            }}
+            transition={{
+              duration: 5 + i * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.8,
+            }}
+            className="absolute rounded-full bg-[#FF6803]"
+            style={{
+              width: 4 + (i % 3) * 2,
+              height: 4 + (i % 3) * 2,
+              top: `${15 + i * 14}%`,
+              left: `${10 + i * 15}%`,
+              opacity: 0.15,
+            }}
+          />
+        ))}
+
+        {/* Grid pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `radial-gradient(circle, #1A1A1A 1px, transparent 1px)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
+
       {/* INNER FRAME - The Main App Window */}
-      <div className="relative w-full max-w-[1800px] bg-[#E3E3E3] rounded-[2rem] md:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col border border-white/50">
+      <div className="relative z-10 w-full max-w-[1800px] bg-[#E3E3E3] rounded-[2rem] md:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col border border-white/50">
+        {/* INNER ANIMATED BG ELEMENTS */}
+        <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+          {/* Slow-moving gradient blobs inside the frame */}
+          <motion.div
+            animate={{
+              x: [0, 100, -50, 0],
+              y: [0, -80, 60, 0],
+              scale: [1, 1.3, 0.85, 1],
+            }}
+            transition={{ duration: 35, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[5%] right-[10%] w-[300px] h-[300px] md:w-[600px] md:h-[600px] rounded-full bg-[#FF6803]/15 blur-[100px]"
+          />
+          <motion.div
+            animate={{
+              x: [0, -70, 40, 0],
+              y: [0, 60, -90, 0],
+              scale: [1, 0.9, 1.2, 1],
+            }}
+            transition={{ duration: 40, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[35%] left-[5%] w-[250px] h-[250px] md:w-[500px] md:h-[500px] rounded-full bg-[#4D96FF]/10 blur-[100px]"
+          />
+          <motion.div
+            animate={{ x: [0, 50, -30, 0], y: [0, -50, 70, 0] }}
+            transition={{ duration: 45, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-[20%] right-[15%] w-[200px] h-[200px] md:w-[400px] md:h-[400px] rounded-full bg-[#6BCB77]/10 blur-[100px]"
+          />
+          <motion.div
+            animate={{ x: [0, -40, 60, 0], y: [0, 80, -40, 0] }}
+            transition={{ duration: 50, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[65%] left-[40%] w-[200px] h-[200px] md:w-[350px] md:h-[350px] rounded-full bg-[#C084FC]/10 blur-[100px]"
+          />
+
+          {/* Floating geometric outlines */}
+          <motion.div
+            animate={{ rotate: 360, y: [0, -30, 0], x: [0, 15, 0] }}
+            transition={{
+              rotate: { duration: 60, repeat: Infinity, ease: "linear" },
+              y: { duration: 8, repeat: Infinity, ease: "easeInOut" },
+              x: { duration: 12, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute top-[20%] right-[20%] w-20 h-20 md:w-32 md:h-32 border-2 border-[#FF6803]/20 rounded-3xl"
+          />
+          <motion.div
+            animate={{ rotate: -360, y: [0, 20, 0] }}
+            transition={{
+              rotate: { duration: 50, repeat: Infinity, ease: "linear" },
+              y: { duration: 10, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute top-[50%] left-[6%] w-14 h-14 md:w-24 md:h-24 border-2 border-[#1A1A1A]/10 rounded-full"
+          />
+          <motion.div
+            animate={{ rotate: 180, x: [0, -20, 0], y: [0, 25, 0] }}
+            transition={{
+              rotate: { duration: 70, repeat: Infinity, ease: "linear" },
+              x: { duration: 9, repeat: Infinity, ease: "easeInOut" },
+              y: { duration: 11, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute bottom-[30%] right-[8%] w-10 h-10 md:w-20 md:h-20 border-2 border-[#4D96FF]/15 rotate-45"
+          />
+          <motion.div
+            animate={{ rotate: -90, y: [0, -15, 0] }}
+            transition={{
+              rotate: { duration: 55, repeat: Infinity, ease: "linear" },
+              y: { duration: 7, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute top-[75%] left-[25%] w-8 h-8 md:w-16 md:h-16 border-2 border-[#FF6803]/15 rounded-xl"
+          />
+
+          {/* Floating sparkle dots */}
+          {[...Array(10)].map((_, i) => (
+            <motion.div
+              key={`inner-dot-${i}`}
+              animate={{
+                y: [0, -(20 + i * 8), 0],
+                x: [0, i % 2 === 0 ? 12 : -12, 0],
+                opacity: [0.08, 0.25, 0.08],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 6 + i * 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.6,
+              }}
+              className="absolute rounded-full bg-[#FF6803]"
+              style={{
+                width: 5 + (i % 4) * 3,
+                height: 5 + (i % 4) * 3,
+                top: `${8 + i * 9}%`,
+                left: `${5 + i * 9}%`,
+                opacity: 0.3,
+              }}
+            />
+          ))}
+
+          {/* Subtle grid dot pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: `radial-gradient(circle, #1A1A1A 1px, transparent 1px)`,
+              backgroundSize: "50px 50px",
+            }}
+          />
+        </div>
+
         {/* STATIC PERSISTENT NAVIGATION */}
         <nav className="sticky top-0 z-[100] w-full px-6 md:px-10 py-4 flex justify-between items-center bg-[#E3E3E3]/90 backdrop-blur-xl border-b border-white/50 rounded-t-[2rem] md:rounded-t-[3rem]">
           <div className="font-bold text-xl md:text-2xl tracking-tight flex items-center gap-2 text-[#1A1A1A]">
@@ -118,6 +389,22 @@ export default function LandingPage() {
         </AnimatePresence>
         {/* 1. HERO SECTION */}
         <main className="relative w-full min-h-[auto] md:min-h-[85vh] flex overflow-hidden pt-6 md:pt-16">
+          {/* Hero section animated accents */}
+          <motion.div
+            animate={{ scale: [1, 1.5, 1], opacity: [0.12, 0.25, 0.12] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[20%] left-[50%] w-40 h-40 md:w-72 md:h-72 rounded-full bg-[#FF6803] blur-[80px] pointer-events-none z-0"
+          />
+          <motion.div
+            animate={{ y: [0, -40, 0], rotate: [0, 90, 0] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-[10%] right-[5%] w-8 h-8 md:w-14 md:h-14 border-2 border-[#FF6803]/25 rounded-lg pointer-events-none z-0"
+          />
+          <motion.div
+            animate={{ y: [0, 30, 0], x: [0, -20, 0], rotate: [0, -180, -360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[40%] left-[3%] w-6 h-6 md:w-10 md:h-10 border-2 border-[#4D96FF]/20 rounded-md pointer-events-none z-0"
+          />
           {/* MASSIVE BACKGROUND TEXT (Hidden on Mobile, Kinetic on PC) */}
           <div className="absolute inset-0 hidden lg:flex flex-col items-center justify-center pointer-events-none z-0">
             <motion.h1
@@ -238,7 +525,29 @@ export default function LandingPage() {
         </div>
 
         {/* 3. MISSION SECTION */}
-        <section id="mission" className="px-6 md:px-16 mb-20 scroll-mt-32">
+        <section
+          id="mission"
+          className="px-6 md:px-16 mb-20 scroll-mt-32 relative"
+        >
+          {/* Mission floating decorations */}
+          <motion.div
+            animate={{ rotate: 360, scale: [1, 1.15, 1] }}
+            transition={{
+              rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+              scale: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute -top-8 -left-4 w-20 h-20 md:w-28 md:h-28 border-2 border-dashed border-[#FF6803]/25 rounded-full pointer-events-none"
+          />
+          <motion.div
+            animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/2 -right-3 w-6 h-6 md:w-10 md:h-10 bg-[#FF6803]/20 rounded-full blur-sm pointer-events-none"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.4, 1], opacity: [0.1, 0.2, 0.1] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-0 left-[30%] w-32 h-32 md:w-48 md:h-48 bg-[#4D96FF]/10 rounded-full blur-[60px] pointer-events-none"
+          />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-[#D1D1D1]/50 p-10 md:p-14 rounded-[2rem] border border-white/50 relative overflow-hidden group">
               <XOctagon
@@ -272,7 +581,29 @@ export default function LandingPage() {
         </section>
 
         {/* 4. ARCHITECTURE / BENTO GRID */}
-        <section id="architecture" className="px-6 md:px-16 mb-20 scroll-mt-32">
+        <section
+          id="architecture"
+          className="px-6 md:px-16 mb-20 scroll-mt-32 relative"
+        >
+          {/* Architecture bg accents */}
+          <motion.div
+            animate={{ rotate: -360 }}
+            transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-10 right-[10%] w-24 h-24 md:w-40 md:h-40 border-2 border-[#4D96FF]/20 rounded-2xl pointer-events-none"
+          />
+          <motion.div
+            animate={{ y: [0, 15, 0], opacity: [0.15, 0.3, 0.15] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-10 left-[5%] w-12 h-12 md:w-20 md:h-20 bg-[#6BCB77]/20 rounded-full blur-md pointer-events-none"
+          />
+          <motion.div
+            animate={{ rotate: 360, x: [0, 15, 0] }}
+            transition={{
+              rotate: { duration: 40, repeat: Infinity, ease: "linear" },
+              x: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute top-1/2 right-[3%] w-8 h-8 md:w-12 md:h-12 border-2 border-[#FF6803]/20 rounded-md pointer-events-none"
+          />
           <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#1A1A1A] mb-10 text-center">
             Execution Flow
           </h2>
@@ -319,8 +650,271 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 5. PRICING */}
-        <section id="pricing" className="px-6 md:px-16 mb-24 scroll-mt-32">
+        {/* 5. FEATURES */}
+        <section
+          id="features"
+          className="px-6 md:px-16 mb-20 scroll-mt-32 relative"
+        >
+          {/* Section bg accent */}
+          <motion.div
+            animate={{ rotate: [0, 5, 0, -5, 0] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-20 -right-20 w-64 h-64 bg-[#FF6803]/[0.03] rounded-full blur-3xl pointer-events-none"
+          />
+          <div className="text-center mb-12">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-xs font-bold uppercase tracking-[0.3em] text-[#FF6803] mb-3 block"
+            >
+              What You Get
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#1A1A1A]"
+            >
+              Core Features
+            </motion.h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                icon: Zap,
+                title: "Instant Validation",
+                desc: "Get a brutally honest 0-100 score with TAM analysis, competition mapping, and revenue feasibility in seconds.",
+                color: "#FF6803",
+              },
+              {
+                icon: Cpu,
+                title: "AI Code Generation",
+                desc: "One-click MVP generation. Complete codebase with stunning landing page, components, and configs — ready to ship.",
+                color: "#4D96FF",
+              },
+              {
+                icon: Shield,
+                title: "Risk Analysis",
+                desc: "Failure risks, competitor strengths & weaknesses, and a founder checklist so you never miss a critical step.",
+                color: "#6BCB77",
+              },
+              {
+                icon: BarChart3,
+                title: "Deep Metrics",
+                desc: "Scalability score, user acquisition difficulty, MVP build time, India market fit — all data-backed insights.",
+                color: "#C084FC",
+              },
+              {
+                icon: Rocket,
+                title: "MVP in Minutes",
+                desc: "Download a complete ZIP with preview.html, pages, layouts, and config. Extract, customize, and deploy.",
+                color: "#FF6B6B",
+              },
+              {
+                icon: Globe,
+                title: "India-First",
+                desc: "All pricing in ₹, Indian competitor analysis, UPI references, tier-wise city insights. Built for the Indian founder.",
+                color: "#FFD93D",
+              },
+            ].map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                className="group relative bg-white/60 backdrop-blur-sm p-8 rounded-[1.5rem] border border-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+              >
+                {/* Hover glow */}
+                <div
+                  className="absolute inset-0 bg-gradient-to-br from-transparent to-transparent group-hover:from-[color:var(--glow)]/[0.04] group-hover:to-transparent transition-all duration-500 rounded-[1.5rem]"
+                  style={{ "--glow": feature.color } as React.CSSProperties}
+                />
+                <div className="relative z-10">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 shadow-md transition-transform group-hover:scale-110 duration-300"
+                    style={{ backgroundColor: feature.color }}
+                  >
+                    <feature.icon size={22} className="text-white" />
+                  </div>
+                  <h4 className="text-lg font-black uppercase tracking-tight mb-2 text-[#1A1A1A]">
+                    {feature.title}
+                  </h4>
+                  <p className="text-[#1A1A1A]/60 text-sm font-medium leading-relaxed">
+                    {feature.desc}
+                  </p>
+                </div>
+                {/* Corner accent */}
+                <motion.div
+                  className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full opacity-[0.06]"
+                  style={{ backgroundColor: feature.color }}
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{
+                    duration: 4 + i,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* 6. STATS / SOCIAL PROOF */}
+        <section className="px-6 md:px-16 mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-[#1A1A1A] rounded-[2rem] p-10 md:p-16 relative overflow-hidden"
+          >
+            {/* Animated accent circles in bg */}
+            <motion.div
+              animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-10 right-10 w-64 h-64 rounded-full bg-[#FF6803]"
+            />
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.02, 0.05, 0.02] }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2,
+              }}
+              className="absolute bottom-10 left-10 w-48 h-48 rounded-full bg-[#4D96FF]"
+            />
+
+            <div className="relative z-10">
+              <div className="text-center mb-12">
+                <span className="text-xs font-bold uppercase tracking-[0.3em] text-[#FF6803] mb-3 block">
+                  Traction
+                </span>
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">
+                  Numbers Don&apos;t Lie
+                </h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                  {
+                    value: "500+",
+                    label: "Ideas Validated",
+                    accent: "#FF6803",
+                  },
+                  { value: "200+", label: "MVPs Generated", accent: "#6BCB77" },
+                  {
+                    value: "20s",
+                    label: "Avg Analysis Time",
+                    accent: "#4D96FF",
+                  },
+                  { value: "99%", label: "Accuracy Rate", accent: "#C084FC" },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                    className="text-center p-6 rounded-2xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm hover:bg-white/[0.07] transition-all cursor-default"
+                  >
+                    <motion.p
+                      className="text-4xl md:text-5xl font-black tracking-tighter mb-2"
+                      style={{ color: stat.accent }}
+                      initial={{ scale: 0.5 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        delay: 0.2 + i * 0.1,
+                        type: "spring",
+                        stiffness: 200,
+                      }}
+                    >
+                      {stat.value}
+                    </motion.p>
+                    <p className="text-white/40 text-xs font-bold uppercase tracking-wider">
+                      {stat.label}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* 7. FAQ */}
+        <section id="faq" className="px-6 md:px-16 mb-20 scroll-mt-32">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <motion.span
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="text-xs font-bold uppercase tracking-[0.3em] text-[#FF6803] mb-3 block"
+              >
+                Got Questions?
+              </motion.span>
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-[#1A1A1A]"
+              >
+                FAQ
+              </motion.h2>
+            </div>
+            <div className="space-y-3">
+              {[
+                {
+                  q: "How does the AI validation work?",
+                  a: "You submit your startup idea with target audience, problem, revenue model, and competitors. Our AI analyzes it against real market data, calculates TAM, competition level, feasibility and gives you a brutally honest 0-100 viability score with detailed insights.",
+                },
+                {
+                  q: "What do I get when I build an MVP?",
+                  a: "A complete downloadable ZIP containing a stunning preview landing page (12 unique sections), Next.js project files, package.json, layouts, components, and configuration — all tailored to your specific idea and category.",
+                },
+                {
+                  q: "Is this really free to use?",
+                  a: "Yes! The free plan gives you 1 MVP build credit. You can validate unlimited ideas and chat with the AI strategist. Upgrade to Pro for 10 builds or Enterprise for unlimited.",
+                },
+                {
+                  q: "How accurate is the analysis?",
+                  a: "Our AI uses advanced models (LLaMA 3.3 70B) trained on startup data. It evaluates 8+ metrics including TAM, competition, revenue potential, India market fit, scalability, and user acquisition difficulty. It's designed to be honest, not encouraging.",
+                },
+                {
+                  q: "Can I customize the generated code?",
+                  a: "Absolutely. The generated code is yours to keep. Download the ZIP, open it in VS Code, and customize everything — the landing page, components, styles, and logic. Pro users get inline code editing in the browser.",
+                },
+              ].map((faq, i) => (
+                <FAQItem key={i} question={faq.q} answer={faq.a} index={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 8. PRICING */}
+        <section
+          id="pricing"
+          className="px-6 md:px-16 mb-24 scroll-mt-32 relative"
+        >
+          {/* Pricing bg accents */}
+          <motion.div
+            animate={{ rotate: 360, y: [0, -20, 0] }}
+            transition={{
+              rotate: { duration: 45, repeat: Infinity, ease: "linear" },
+              y: { duration: 7, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute -top-6 left-[8%] w-16 h-16 md:w-24 md:h-24 border-2 border-dashed border-[#FF6803]/25 rounded-xl pointer-events-none"
+          />
+          <motion.div
+            animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-[20%] right-[5%] w-32 h-32 md:w-48 md:h-48 bg-[#C084FC]/15 rounded-full blur-[60px] pointer-events-none"
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             <div className="bg-[#D1D1D1]/40 p-10 md:p-12 rounded-[2rem] border border-white/50 flex flex-col">
               <div className="bg-white/60 text-[#1A1A1A] text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full w-max mb-6 border border-white">
@@ -359,8 +953,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 6. KINETIC FOOTER */}
-        <footer className="w-full bg-[#D1D1D1]/20 border-t border-black/5 flex flex-col pt-12">
+        {/* 9. KINETIC FOOTER */}
+        <footer className="w-full bg-[#D1D1D1]/20 border-t border-black/5 flex flex-col pt-12 relative overflow-hidden">
+          {/* Footer floating accents */}
+          <motion.div
+            animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[20%] right-[15%] w-40 h-40 md:w-56 md:h-56 bg-[#FF6803]/10 rounded-full blur-[60px] pointer-events-none"
+          />
+          <motion.div
+            animate={{ rotate: -360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-[30%] left-[10%] w-12 h-12 md:w-20 md:h-20 border-2 border-[#1A1A1A]/15 rounded-full pointer-events-none"
+          />
           <div className="w-full overflow-hidden border-b border-black/5 pb-12 mb-12">
             <motion.div
               animate={{ x: ["0%", "-50%"] }}
