@@ -29,58 +29,32 @@ Generate 5-10 files. Include package.json, layout, page, and preview.html.
 
 The preview.html must be a COMPLETE standalone HTML file with ALL CSS inlined in <style> tags and ALL JS inlined in <script> tags. ZERO external dependencies. No CDN links.
 
-DESIGN STYLE — NEOBRUTALISM (2026):
-- Color palette: Use CSS variables. Primary accent: #FF6803 (orange). Dark: #1A1A1A. Light bg: #FFFBF5.
-- Borders: 2-3px solid #1A1A1A on ALL cards, buttons, inputs
-- Shadows: box-shadow: 4px 4px 0 #1A1A1A on cards. 6px 6px 0 #FF6803 on hover.
-- Typography: system-ui font. Bold (700-900 weight). Uppercase headings with letter-spacing: -0.02em.
-- Corners: border-radius: 14-20px
-- Hover: translateY(-4px) + shadow grows
-- Buttons: bg #FF6803, white text, 2px border #1A1A1A, box-shadow, uppercase, font-weight 800
-- Body bg: #FFFBF5 (warm cream). Cards: white bg.
+DESIGN STYLE — MODERN UI MIX (2026):
+Randomly mix or use one of these styles:
+- Bauhaus: bold colors (red, blue, yellow), stark black lines, geometric shapes.
+- Neumorphism: soft shadows, raised/inset elements, low contrast but high elegance.
+- Glassmorphism: backdrop-filter blur, translucent frosted glass panels over colorful gradients.
+- Neobrutalism: thick borders, solid offsets shadows, vibrant contrasting colors. 
+Mix them or use a singular strong aesthetic. The design should look incredibly fresh, unique, and highly professional. Include hover animations, subtle translate transforms, and creative layouts.
 
-REQUIRED 10 SECTIONS in preview.html:
-1. NAV — Fixed top. Logo text (app name, bold uppercase, 1.1rem). "Get Started" button right side. Border-bottom 3px.
-2. HERO — MUST BE VISUALLY STUNNING:
-   - Full viewport height, centered content
-   - Animated gradient background using @keyframes (shifting warm colors)
-   - A small pill/badge above headline: "🚀 #1 Platform in India" with border, rounded-full, small text
-   - App name as the ONLY headline text — just the brand name, nothing else, max 2 words
-   - 1 short subtitle below — MAX 6 WORDS (e.g. "Build. Launch. Scale. Faster.")
-   - 2 CTA buttons side by side (primary orange + secondary white, both with thick borders + shadows)
-   - Floating geometric shapes (circles, rotated squares) with @keyframes float, low opacity
-   - "Trusted by 10,000+ founders" text with small avatar circles
-   - DO NOT write long sentences in the hero. Keep it ultra-minimal.
-3. FEATURES — 4 feature cards in 2x2 grid. Each: emoji icon + bold title + 1 sentence. White cards, thick borders, shadow.
-4. HOW IT WORKS — 3 numbered steps. Each step: number in orange circle + title + 1 sentence. Clean centered layout.
-5. STATS — Dark bg (#1A1A1A). 3-4 big stat numbers in orange. Labels below. "50K+ Users" / "99.9% Uptime" / "4.9★ Rating" / "₹2Cr+ Processed".
-6. TESTIMONIALS — 3 quote cards. Big quotation mark. Real text. Indian names: Priya Sharma (Mumbai), Arjun Mehta (Bangalore), Sneha Patel (Delhi). Role + company.
-7. PRICING — 3 tier cards. FREE (₹0), PRO (₹999/mo, popular/highlighted), ENTERPRISE (₹4,999/mo). Feature checklists. "Popular" badge on Pro. ALL PRICES IN ₹.
-8. FAQ — 4 collapsible <details> items. Clean borders. + icon that rotates on open.
-9. CTA — Dark bg. Bold headline. Email input + "Sign Up Free" button. "Join 50,000+ founders" text.
-10. FOOTER — Dark bg. Copyright 2026. Privacy + Terms links.
+Ensure all text is large enough to be legible but not unnecessarily oversized. Use beautiful typography.
 
-TEXT RULES:
-- Use the APP NAME (provided in prompt) as brand name everywhere — nav, hero, CTA, footer. NEVER use the raw idea description as display text.
-- Hero headline: ONLY the app name. Nothing else. No tagline in the h1.
-- Hero subtitle: MAX 6 words. Short. Punchy. e.g. "Build. Launch. Scale." or "Your phone marketplace."
-- Section headlines: 3-5 words, punchy, uppercase
-- Card descriptions: 1 sentence, max 12 words
-- NO lorem ipsum. NO filler. NO "coming soon". Write REAL startup copy.
-- KEEP EVERYTHING SHORT. Less text = better design.
+REQUIRED 10-12 SECTIONS in preview.html (Create an engaging, long-scrolling landing page):
+1. NAV — Fixed top. Logo text. "Get Started" button.
+2. HERO — Visually stunning, animated gradient or floating shapes, App name, max 6-word subtitle, 2 CTA buttons.
+3. LOGO CLOUD — "Trusted by 10,000+ companies" with mock company text/shapes.
+4. PROBLEM — "The old way vs The new way" comparison.
+5. FEATURES — 4+ feature cards.
+6. HOW IT WORKS — 3-4 steps.
+7. STATS — 3-4 big stat numbers.
+8. SHOWCASE/PREVIEW — A mockup abstract UI showing the app "in action" using divs and gradients.
+9. TESTIMONIALS — 3 quote cards.
+10. PRICING — 3 tier cards.
+11. FAQ — 4-5 collapsible <details> items.
+12. CTA / FOOTER — Final push + links.
 
-CSS RULES (MUST FOLLOW):
-- Use :root { --primary: #FF6803; --dark: #1A1A1A; --light: #FFFBF5; --shadow: 4px 4px 0 #1A1A1A; }
-- nav: position fixed, top 0, z-index 100, border-bottom 3px solid var(--dark)
-- Hero: min-height 100vh, centered, animated gradient background using @keyframes
-- All cards: padding 2rem, border-radius 18px, border 2px solid var(--dark), box-shadow var(--shadow)
-- .fade-in class with IntersectionObserver for scroll animations
-- Responsive: @media (max-width: 640px) adjustments
-- Smooth scrolling: scroll-behavior: smooth
-- section padding: 5rem 2rem
-- max-width containers: 900px for grids, centered with margin auto
-
-DO NOT output anything except the JSON object.`;
+FORMATTING RULE: Ensure the HTML code inside the JSON is WELL-FORMATTED with proper indentation, line breaks, and whitespace so it is easily readable when the user inspects the code. Do NOT minify the HTML string in the JSON payload.
+\nDO NOT output anything except the JSON object.`;
 
 interface AnalysisData {
   idea: string;
@@ -95,70 +69,158 @@ interface AnalysisData {
 }
 
 function buildFallbackPreview(analysis: AnalysisData) {
-  const { appName, idea, target, problem, category, summary, strengths, recommendations, revenue } = analysis;
+  const {
+    appName,
+    idea,
+    target,
+    problem,
+    category,
+    summary,
+    strengths,
+    recommendations,
+    revenue,
+  } = analysis;
 
-  // Category-specific color themes
-  const themes: Record<string, { primary: string; gradient1: string; gradient2: string; gradient3: string; accent: string }> = {
-    "SaaS": { primary: "#6366F1", gradient1: "#EEF2FF", gradient2: "#E0E7FF", gradient3: "#C7D2FE", accent: "#4F46E5" },
-    "Fintech": { primary: "#059669", gradient1: "#ECFDF5", gradient2: "#D1FAE5", gradient3: "#A7F3D0", accent: "#047857" },
-    "Health": { primary: "#0D9488", gradient1: "#F0FDFA", gradient2: "#CCFBF1", gradient3: "#99F6E4", accent: "#0F766E" },
-    "EdTech": { primary: "#7C3AED", gradient1: "#F5F3FF", gradient2: "#EDE9FE", gradient3: "#DDD6FE", accent: "#6D28D9" },
-    "E-commerce": { primary: "#FF6803", gradient1: "#FFFBF5", gradient2: "#FFF0E0", gradient3: "#FFE8CC", accent: "#EA580C" },
-    "Social": { primary: "#EC4899", gradient1: "#FDF2F8", gradient2: "#FCE7F3", gradient3: "#FBCFE8", accent: "#DB2777" },
-    "AI/ML": { primary: "#2563EB", gradient1: "#EFF6FF", gradient2: "#DBEAFE", gradient3: "#BFDBFE", accent: "#1D4ED8" },
-    "Gaming": { primary: "#DC2626", gradient1: "#FEF2F2", gradient2: "#FEE2E2", gradient3: "#FECACA", accent: "#B91C1C" },
-    "Food": { primary: "#D97706", gradient1: "#FFFBEB", gradient2: "#FEF3C7", gradient3: "#FDE68A", accent: "#B45309" },
-    "Travel": { primary: "#0EA5E9", gradient1: "#F0F9FF", gradient2: "#E0F2FE", gradient3: "#BAE6FD", accent: "#0284C7" },
-    "Other": { primary: "#FF6803", gradient1: "#FFFBF5", gradient2: "#FFF0E0", gradient3: "#FFE8CC", accent: "#EA580C" },
+  // ── Category Color Themes ──
+  const themes: Record<
+    string,
+    {
+      primary: string;
+      gradient1: string;
+      gradient2: string;
+      gradient3: string;
+      accent: string;
+    }
+  > = {
+    SaaS: {
+      primary: "#6366F1",
+      gradient1: "#EEF2FF",
+      gradient2: "#E0E7FF",
+      gradient3: "#C7D2FE",
+      accent: "#4F46E5",
+    },
+    Fintech: {
+      primary: "#059669",
+      gradient1: "#ECFDF5",
+      gradient2: "#D1FAE5",
+      gradient3: "#A7F3D0",
+      accent: "#047857",
+    },
+    Health: {
+      primary: "#0D9488",
+      gradient1: "#F0FDFA",
+      gradient2: "#CCFBF1",
+      gradient3: "#99F6E4",
+      accent: "#0F766E",
+    },
+    EdTech: {
+      primary: "#7C3AED",
+      gradient1: "#F5F3FF",
+      gradient2: "#EDE9FE",
+      gradient3: "#DDD6FE",
+      accent: "#6D28D9",
+    },
+    "E-commerce": {
+      primary: "#FF6803",
+      gradient1: "#FFFBF5",
+      gradient2: "#FFF0E0",
+      gradient3: "#FFE8CC",
+      accent: "#EA580C",
+    },
+    Social: {
+      primary: "#EC4899",
+      gradient1: "#FDF2F8",
+      gradient2: "#FCE7F3",
+      gradient3: "#FBCFE8",
+      accent: "#DB2777",
+    },
+    "AI/ML": {
+      primary: "#2563EB",
+      gradient1: "#EFF6FF",
+      gradient2: "#DBEAFE",
+      gradient3: "#BFDBFE",
+      accent: "#1D4ED8",
+    },
+    Gaming: {
+      primary: "#DC2626",
+      gradient1: "#FEF2F2",
+      gradient2: "#FEE2E2",
+      gradient3: "#FECACA",
+      accent: "#B91C1C",
+    },
+    Food: {
+      primary: "#D97706",
+      gradient1: "#FFFBEB",
+      gradient2: "#FEF3C7",
+      gradient3: "#FDE68A",
+      accent: "#B45309",
+    },
+    Travel: {
+      primary: "#0EA5E9",
+      gradient1: "#F0F9FF",
+      gradient2: "#E0F2FE",
+      gradient3: "#BAE6FD",
+      accent: "#0284C7",
+    },
+    Other: {
+      primary: "#FF6803",
+      gradient1: "#FFFBF5",
+      gradient2: "#FFF0E0",
+      gradient3: "#FFE8CC",
+      accent: "#EA580C",
+    },
   };
 
   const theme = themes[category] || themes["Other"];
   const { primary, gradient1, gradient2, gradient3, accent } = theme;
 
-  // Category-specific emojis for features
+  // ── Category Emojis ──
   const categoryEmojis: Record<string, string[]> = {
-    "SaaS": ["\u2601\uFE0F", "\u{1F504}", "\u{1F4CA}", "\u{1F512}"],
-    "Fintech": ["\u{1F4B3}", "\u{1F4C8}", "\u{1F6E1}\uFE0F", "\u26A1"],
-    "Health": ["\u{1F3E5}", "\u{1F4CA}", "\u{1F48A}", "\u2764\uFE0F"],
-    "EdTech": ["\u{1F4DA}", "\u{1F3AF}", "\u{1F9E0}", "\u{1F4F1}"],
+    SaaS: ["\u2601\uFE0F", "\u{1F504}", "\u{1F4CA}", "\u{1F512}"],
+    Fintech: ["\u{1F4B3}", "\u{1F4C8}", "\u{1F6E1}\uFE0F", "\u26A1"],
+    Health: ["\u{1F3E5}", "\u{1F4CA}", "\u{1F48A}", "\u2764\uFE0F"],
+    EdTech: ["\u{1F4DA}", "\u{1F3AF}", "\u{1F9E0}", "\u{1F4F1}"],
     "E-commerce": ["\u{1F6D2}", "\u{1F4E6}", "\u{1F4B0}", "\u{1F680}"],
-    "Social": ["\u{1F4AC}", "\u{1F310}", "\u{1F465}", "\u2728"],
+    Social: ["\u{1F4AC}", "\u{1F310}", "\u{1F465}", "\u2728"],
     "AI/ML": ["\u{1F916}", "\u{1F9E0}", "\u26A1", "\u{1F52E}"],
-    "Gaming": ["\u{1F3AE}", "\u{1F3C6}", "\u{1F525}", "\u{1F680}"],
-    "Food": ["\u{1F37D}\uFE0F", "\u{1F4E6}", "\u{1F552}", "\u2B50"],
-    "Travel": ["\u2708\uFE0F", "\u{1F5FA}\uFE0F", "\u{1F3D6}\uFE0F", "\u{1F4B3}"],
-    "Other": ["\u26A1", "\u{1F6E1}\uFE0F", "\u{1F680}", "\u{1F4CA}"],
+    Gaming: ["\u{1F3AE}", "\u{1F3C6}", "\u{1F525}", "\u{1F680}"],
+    Food: ["\u{1F37D}\uFE0F", "\u{1F4E6}", "\u{1F552}", "\u2B50"],
+    Travel: ["\u2708\uFE0F", "\u{1F5FA}\uFE0F", "\u{1F3D6}\uFE0F", "\u{1F4B3}"],
+    Other: ["\u26A1", "\u{1F6E1}\uFE0F", "\u{1F680}", "\u{1F4CA}"],
   };
-
   const emojis = categoryEmojis[category] || categoryEmojis["Other"];
 
-  // Generate dynamic feature cards from strengths + idea
+  // ── Feature Cards from Strengths ──
   const featureNames: string[] = [];
   const featureDescs: string[] = [];
   const s = strengths || [];
   const r = recommendations || [];
-  // Combine strengths and recs for feature inspiration
   const sourceTexts = [...s, ...r].slice(0, 4);
   while (sourceTexts.length < 4) sourceTexts.push(summary);
   for (let i = 0; i < 4; i++) {
     const text = sourceTexts[i];
-    // Extract first 3-4 meaningful words as title
-    const words = text.split(/\s+/).filter((w: string) => w.length > 2).slice(0, 3);
+    const words = text
+      .split(/\s+/)
+      .filter((w: string) => w.length > 2)
+      .slice(0, 3);
     featureNames.push(words.join(" "));
-    // Truncate desc to ~10 words
-    featureDescs.push(text.split(/\s+/).slice(0, 10).join(" ") + (text.split(/\s+/).length > 10 ? "." : ""));
+    featureDescs.push(
+      text.split(/\s+/).slice(0, 10).join(" ") +
+        (text.split(/\s+/).length > 10 ? "." : ""),
+    );
   }
 
-  // Dynamic subtitle based on problem/idea
+  // ── Dynamic Subtitle ──
   const subtitleOptions = [
     `Solving ${problem.split(/\s+/).slice(0, 3).join(" ")}.`,
     `Built for ${target.split(/\s+/).slice(0, 3).join(" ")}.`,
     `${category}. Reimagined. For India.`,
     `The future of ${category.toLowerCase()}.`,
   ];
-  const subtitle = subtitleOptions[appName.charCodeAt(0) % subtitleOptions.length];
+  const subtitle =
+    subtitleOptions[appName.charCodeAt(0) % subtitleOptions.length];
 
-  // Dynamic badge text
+  // ── Dynamic Badge ──
   const badgeOptions = [
     `\u{1F680} <span>#1 ${category} Platform</span>`,
     `\u2B50 <span>Trusted by 10K+</span> founders`,
@@ -167,231 +229,1439 @@ function buildFallbackPreview(analysis: AnalysisData) {
   ];
   const badge = badgeOptions[appName.length % badgeOptions.length];
 
-  // Dynamic stats
+  // ── Stats Data ──
   const statSets: Record<string, { nums: string[]; labels: string[] }> = {
-    "SaaS": { nums: ["25K+", "99.9%", "4.8\u2605", "\u20B91.5Cr+"], labels: ["Active Teams", "Uptime SLA", "App Rating", "Revenue Saved"] },
-    "Fintech": { nums: ["\u20B950Cr+", "1M+", "0.1s", "4.9\u2605"], labels: ["Transactions", "Users", "Processing", "Trust Score"] },
-    "Health": { nums: ["500K+", "50K+", "98%", "24/7"], labels: ["Patients Helped", "Doctors", "Accuracy", "Support"] },
-    "EdTech": { nums: ["2M+", "10K+", "4.7\u2605", "95%"], labels: ["Students", "Courses", "Rating", "Completion"] },
-    "E-commerce": { nums: ["1M+", "\u20B930Cr+", "4.8\u2605", "30min"], labels: ["Products", "GMV", "Rating", "Delivery"] },
-    "Social": { nums: ["5M+", "100M+", "4.6\u2605", "<1s"], labels: ["Users", "Posts", "Rating", "Load Time"] },
-    "AI/ML": { nums: ["10M+", "99.5%", "50ms", "4.9\u2605"], labels: ["Predictions", "Accuracy", "Latency", "Rating"] },
-    "Gaming": { nums: ["3M+", "500K+", "4.8\u2605", "\u20B910Cr+"], labels: ["Players", "Daily Active", "Rating", "Prizes Won"] },
-    "Other": { nums: ["50K+", "99.9%", "4.9\u2605", "\u20B92Cr+"], labels: ["Users", "Uptime", "Rating", "Processed"] },
+    SaaS: {
+      nums: ["25K+", "99.9%", "4.8\u2605", "\u20B91.5Cr+"],
+      labels: ["Active Teams", "Uptime SLA", "App Rating", "Revenue Saved"],
+    },
+    Fintech: {
+      nums: ["\u20B950Cr+", "1M+", "0.1s", "4.9\u2605"],
+      labels: ["Transactions", "Users", "Processing", "Trust Score"],
+    },
+    Health: {
+      nums: ["500K+", "50K+", "98%", "24/7"],
+      labels: ["Patients Helped", "Doctors", "Accuracy", "Support"],
+    },
+    EdTech: {
+      nums: ["2M+", "10K+", "4.7\u2605", "95%"],
+      labels: ["Students", "Courses", "Rating", "Completion"],
+    },
+    "E-commerce": {
+      nums: ["1M+", "\u20B930Cr+", "4.8\u2605", "30min"],
+      labels: ["Products", "GMV", "Rating", "Delivery"],
+    },
+    Social: {
+      nums: ["5M+", "100M+", "4.6\u2605", "<1s"],
+      labels: ["Users", "Posts", "Rating", "Load Time"],
+    },
+    "AI/ML": {
+      nums: ["10M+", "99.5%", "50ms", "4.9\u2605"],
+      labels: ["Predictions", "Accuracy", "Latency", "Rating"],
+    },
+    Gaming: {
+      nums: ["3M+", "500K+", "4.8\u2605", "\u20B910Cr+"],
+      labels: ["Players", "Daily Active", "Rating", "Prizes Won"],
+    },
+    Other: {
+      nums: ["50K+", "99.9%", "4.9\u2605", "\u20B92Cr+"],
+      labels: ["Users", "Uptime", "Rating", "Processed"],
+    },
   };
   const stats = statSets[category] || statSets["Other"];
 
-  // Dynamic testimonials with varying Indian names
+  // ── Testimonials ──
   const testimonialSets = [
     [
-      { text: `${appName} completely changed how we approach ${category.toLowerCase()}. Saved us months of work and lakhs in cost.`, name: "Priya Sharma", role: "Founder, TechVentures Mumbai" },
-      { text: `Best ${category.toLowerCase()} tool I've found. The UX is incredible and the results speak for themselves.`, name: "Arjun Mehta", role: "CTO, DataSync Bangalore" },
-      { text: `We went from concept to launch in weeks using ${appName}. Our investors were impressed.`, name: "Sneha Patel", role: "CEO, GrowthPilot Delhi" },
+      {
+        text: `${appName} completely changed how we approach ${category.toLowerCase()}. Saved us months of work and lakhs in cost.`,
+        name: "Priya Sharma",
+        role: "Founder, TechVentures Mumbai",
+      },
+      {
+        text: `Best ${category.toLowerCase()} tool I've found. The UX is incredible and the results speak for themselves.`,
+        name: "Arjun Mehta",
+        role: "CTO, DataSync Bangalore",
+      },
+      {
+        text: `We went from concept to launch in weeks using ${appName}. Our investors were impressed.`,
+        name: "Sneha Patel",
+        role: "CEO, GrowthPilot Delhi",
+      },
     ],
     [
-      { text: `${appName} is exactly what the Indian ${category.toLowerCase()} ecosystem needed. 10x productivity boost.`, name: "Rahul Verma", role: "VP Engineering, NovaTech Pune" },
-      { text: `Switched from 3 different tools to just ${appName}. Everything in one place, brilliantly designed.`, name: "Ananya Krishnan", role: "Product Lead, FinFirst Chennai" },
-      { text: `The ROI was visible from day one. ${appName} paid for itself within the first month.`, name: "Vikram Singh", role: "Co-founder, ScaleUp Gurugram" },
+      {
+        text: `${appName} is exactly what the Indian ${category.toLowerCase()} ecosystem needed. 10x productivity boost.`,
+        name: "Rahul Verma",
+        role: "VP Engineering, NovaTech Pune",
+      },
+      {
+        text: `Switched from 3 different tools to just ${appName}. Everything in one place, brilliantly designed.`,
+        name: "Ananya Krishnan",
+        role: "Product Lead, FinFirst Chennai",
+      },
+      {
+        text: `The ROI was visible from day one. ${appName} paid for itself within the first month.`,
+        name: "Vikram Singh",
+        role: "Co-founder, ScaleUp Gurugram",
+      },
     ],
     [
-      { text: `Our team's efficiency doubled after adopting ${appName}. Can't imagine going back.`, name: "Meera Joshi", role: "Director, CloudNine Hyderabad" },
-      { text: `${appName} understands the Indian market like no other. The localization is perfect.`, name: "Karthik Rajan", role: "Head of Growth, PixelCraft Bangalore" },
-      { text: `From a skeptic to an evangelist — ${appName} won me over with its simplicity and power.`, name: "Deepika Nair", role: "CTO, BrightMinds Kochi" },
+      {
+        text: `Our team's efficiency doubled after adopting ${appName}. Can't imagine going back.`,
+        name: "Meera Joshi",
+        role: "Director, CloudNine Hyderabad",
+      },
+      {
+        text: `${appName} understands the Indian market like no other. The localization is perfect.`,
+        name: "Karthik Rajan",
+        role: "Head of Growth, PixelCraft Bangalore",
+      },
+      {
+        text: `From a skeptic to an evangelist — ${appName} won me over with its simplicity and power.`,
+        name: "Deepika Nair",
+        role: "CTO, BrightMinds Kochi",
+      },
     ],
   ];
-  const testimonials = testimonialSets[appName.charCodeAt(0) % testimonialSets.length];
+  const testimonials =
+    testimonialSets[appName.charCodeAt(0) % testimonialSets.length];
 
-  // Dynamic How It Works
+  // ── How It Works Steps ──
   const howSteps: Record<string, { titles: string[]; descs: string[] }> = {
-    "SaaS": { titles: ["Sign Up", "Connect", "Automate"], descs: ["Create your workspace in 30 seconds.", "Integrate with your existing tools seamlessly.", "Set up workflows and watch productivity soar."] },
-    "Fintech": { titles: ["Verify", "Link", "Transact"], descs: ["Complete KYC in under 2 minutes.", "Connect your bank accounts securely.", "Start sending and receiving money instantly."] },
-    "Health": { titles: ["Register", "Consult", "Track"], descs: ["Create your health profile quickly.", "Connect with certified doctors online.", "Monitor your health metrics in real-time."] },
-    "EdTech": { titles: ["Enroll", "Learn", "Certify"], descs: ["Pick from 10,000+ courses.", "Learn at your own pace with AI tutoring.", "Earn industry-recognized certificates."] },
-    "E-commerce": { titles: ["Browse", "Order", "Receive"], descs: ["Discover products curated for you.", "Checkout in 2 taps with UPI.", "Get doorstep delivery across India."] },
-    "Other": { titles: ["Sign Up", "Setup", "Launch"], descs: ["Create your account in seconds.", "Configure everything with guided onboarding.", "Go live and see results from day one."] },
+    SaaS: {
+      titles: ["Sign Up", "Connect", "Automate"],
+      descs: [
+        "Create your workspace in 30 seconds.",
+        "Integrate with your existing tools seamlessly.",
+        "Set up workflows and watch productivity soar.",
+      ],
+    },
+    Fintech: {
+      titles: ["Verify", "Link", "Transact"],
+      descs: [
+        "Complete KYC in under 2 minutes.",
+        "Connect your bank accounts securely.",
+        "Start sending and receiving money instantly.",
+      ],
+    },
+    Health: {
+      titles: ["Register", "Consult", "Track"],
+      descs: [
+        "Create your health profile quickly.",
+        "Connect with certified doctors online.",
+        "Monitor your health metrics in real-time.",
+      ],
+    },
+    EdTech: {
+      titles: ["Enroll", "Learn", "Certify"],
+      descs: [
+        "Pick from 10,000+ courses.",
+        "Learn at your own pace with AI tutoring.",
+        "Earn industry-recognized certificates.",
+      ],
+    },
+    "E-commerce": {
+      titles: ["Browse", "Order", "Receive"],
+      descs: [
+        "Discover products curated for you.",
+        "Checkout in 2 taps with UPI.",
+        "Get doorstep delivery across India.",
+      ],
+    },
+    Other: {
+      titles: ["Sign Up", "Setup", "Launch"],
+      descs: [
+        "Create your account in seconds.",
+        "Configure everything with guided onboarding.",
+        "Go live and see results from day one.",
+      ],
+    },
   };
   const steps = howSteps[category] || howSteps["Other"];
 
-  // Dynamic FAQ
+  // ── FAQ Items ──
   const faqItems = [
-    { q: `What makes ${appName} different?`, a: summary.split(/\s+/).slice(0, 25).join(" ") + "." },
-    { q: `Is ${appName} available across India?`, a: `Yes! ${appName} works nationwide with support for UPI, all major banks, and localized experiences for every state.` },
-    { q: "Can I upgrade or downgrade anytime?", a: "Absolutely. Switch plans whenever you want. Changes are instant with prorated billing." },
-    { q: "Is my data secure?", a: "We use bank-grade encryption, comply with Indian data protection laws, and your data never leaves our secure servers." },
+    {
+      q: `What makes ${appName} different?`,
+      a: summary.split(/\s+/).slice(0, 25).join(" ") + ".",
+    },
+    {
+      q: `Is ${appName} available across India?`,
+      a: `Yes! ${appName} works nationwide with support for UPI, all major banks, and localized experiences.`,
+    },
+    {
+      q: "Can I upgrade or downgrade anytime?",
+      a: "Absolutely. Switch plans whenever you want with instant prorated billing.",
+    },
+    {
+      q: "Is my data secure?",
+      a: "Bank-grade encryption, Indian data protection compliance, SOC 2 certified infrastructure.",
+    },
+    {
+      q: `How do I get started with ${appName}?`,
+      a: "Sign up free in 30 seconds. No credit card required. Start building immediately.",
+    },
   ];
 
-  // Dynamic pricing names based on category
+  // ── Pricing ──
   const pricingNames: Record<string, string[]> = {
-    "SaaS": ["Starter", "Growth", "Enterprise"],
-    "Fintech": ["Basic", "Business", "Enterprise"],
-    "EdTech": ["Student", "Professional", "Institution"],
+    SaaS: ["Starter", "Growth", "Enterprise"],
+    Fintech: ["Basic", "Business", "Enterprise"],
+    EdTech: ["Student", "Professional", "Institution"],
     "E-commerce": ["Seller", "Business", "Enterprise"],
-    "Other": ["Starter", "Pro", "Enterprise"],
+    Other: ["Starter", "Pro", "Enterprise"],
   };
   const plans = pricingNames[category] || pricingNames["Other"];
-
-  // Revenue-aware pricing
   const priceValues = revenue?.toLowerCase().includes("free")
     ? ["\u20B90", "\u20B9499", "\u20B92,499"]
     : ["\u20B90", "\u20B9999", "\u20B94,999"];
 
-  // Unique hero shapes per category (different sizes & positions)
-  const shapeVariant = appName.length % 3;
+  // ── Variant Seed ──
+  const sv = appName.length % 3;
+  const cv = appName.charCodeAt(0) % 3;
 
-  // Dynamic CTA
+  // ── Logo Cloud Brands ──
+  const logoBrands: Record<string, string[]> = {
+    SaaS: ["Zoho", "Freshworks", "Razorpay", "Swiggy", "Flipkart"],
+    Fintech: ["PhonePe", "Paytm", "CRED", "Zerodha", "BharatPe"],
+    Health: ["Practo", "PharmEasy", "1mg", "Cult.fit", "MediBuddy"],
+    EdTech: ["BYJU'S", "Unacademy", "Vedantu", "upGrad", "Toppr"],
+    "E-commerce": ["Myntra", "Meesho", "Nykaa", "BigBasket", "Dunzo"],
+    Social: ["ShareChat", "Koo", "Moj", "Chingari", "Josh"],
+    "AI/ML": ["Ola", "Fractal", "Mad Street Den", "Haptik", "Yellow.ai"],
+    Gaming: ["MPL", "Dream11", "Games24x7", "Nazara", "WinZO"],
+    Food: ["Zomato", "Swiggy", "EatFit", "FreshMenu", "Box8"],
+    Travel: ["MakeMyTrip", "OYO", "Yatra", "ixigo", "Cleartrip"],
+    Other: ["Razorpay", "Freshworks", "Zoho", "Flipkart", "Ola"],
+  };
+  const logos = logoBrands[category] || logoBrands["Other"];
+
+  // ── Problem Old vs New ──
+  const problemPairs: Record<string, { old: string[]; new_: string[] }> = {
+    SaaS: {
+      old: [
+        "Manual spreadsheets",
+        "5+ disconnected tools",
+        "Hours of meetings",
+      ],
+      new_: [
+        "One-click automation",
+        "Single unified platform",
+        "AI-powered insights",
+      ],
+    },
+    Fintech: {
+      old: ["Paper-based KYC", "3-day settlements", "Hidden charges"],
+      new_: ["Instant eKYC", "Real-time transfers", "100% transparent fees"],
+    },
+    Health: {
+      old: ["Long hospital queues", "Lost paper records", "Delayed diagnoses"],
+      new_: [
+        "Instant video consult",
+        "Digital health records",
+        "AI-assisted screening",
+      ],
+    },
+    EdTech: {
+      old: [
+        "One-size-fits-all learning",
+        "Expensive coaching",
+        "Outdated content",
+      ],
+      new_: [
+        "Personalized AI tutoring",
+        "Affordable pricing",
+        "Industry-fresh curriculum",
+      ],
+    },
+    "E-commerce": {
+      old: ["Limited local reach", "Cash-only payments", "Slow deliveries"],
+      new_: [
+        "Pan-India visibility",
+        "UPI + all payment modes",
+        "Same-day delivery",
+      ],
+    },
+    Other: {
+      old: [
+        "Slow manual processes",
+        "Scattered across tools",
+        "No real analytics",
+      ],
+      new_: [
+        "Instant automation",
+        "All-in-one dashboard",
+        "Real-time intelligence",
+      ],
+    },
+  };
+  const pp = problemPairs[category] || problemPairs["Other"];
+
+  // ── CTA Text ──
   const ctaTexts = [
     `Start building with ${appName} today.`,
     `Join thousands already using ${appName}.`,
     `Your ${category.toLowerCase()} journey starts here.`,
   ];
-  const ctaText = ctaTexts[appName.charCodeAt(0) % ctaTexts.length];
+  const ctaText = ctaTexts[cv];
 
-  // Avatar colors from theme
+  // ── Avatar Colors ──
   const avatarColors = [primary, accent, "#22C55E", "#1A1A1A"];
 
-  return `<!DOCTYPE html>
+  // ═══════════════════════════════════════
+  //  BUILD THE HTML — Properly Formatted
+  // ═══════════════════════════════════════
+
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${appName}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--primary:${primary};--accent:${accent};--light:${gradient1};--dark:#1A1A1A;--shadow:4px 4px 0 #1A1A1A;--g1:${gradient1};--g2:${gradient2};--g3:${gradient3}}
-body{font-family:system-ui,-apple-system,sans-serif;color:var(--dark);scroll-behavior:smooth;background:var(--light)}
-nav{position:fixed;top:0;width:100%;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:var(--light);border-bottom:3px solid var(--dark);z-index:100}
-nav .logo{font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;color:var(--dark)}
-nav .logo span{color:var(--primary)}
-nav .cta{padding:0.5rem 1.5rem;background:var(--primary);color:#fff;border:2px solid var(--dark);border-radius:12px;font-weight:800;font-size:0.8rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;box-shadow:var(--shadow);text-transform:uppercase;letter-spacing:0.05em}
-nav .cta:hover{transform:translateY(-2px);box-shadow:6px 6px 0 var(--dark)}
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(${135 + shapeVariant * 30}deg,var(--g1),var(--g2),var(--g3),var(--g1));background-size:400% 400%;animation:heroGradient ${7 + shapeVariant * 2}s ease infinite;position:relative;overflow:hidden}
-@keyframes heroGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.hero .shape{position:absolute;border:3px solid var(--primary);opacity:0.08;animation:float 6s ease-in-out infinite}
-.hero .shape-1{width:${150 + shapeVariant * 40}px;height:${150 + shapeVariant * 40}px;border-radius:50%;top:${8 + shapeVariant * 5}%;right:${6 + shapeVariant * 4}%}
-.hero .shape-2{width:${80 + shapeVariant * 30}px;height:${80 + shapeVariant * 30}px;border-radius:18px;transform:rotate(${45 + shapeVariant * 15}deg);bottom:${12 + shapeVariant * 6}%;left:${5 + shapeVariant * 3}%;animation-delay:1.5s}
-.hero .shape-3{width:${50 + shapeVariant * 20}px;height:${50 + shapeVariant * 20}px;border-radius:50%;top:${25 + shapeVariant * 8}%;left:${10 + shapeVariant * 5}%;background:var(--primary);opacity:0.05;animation-delay:3s}
-.hero .shape-4{width:${100 + shapeVariant * 25}px;height:${100 + shapeVariant * 25}px;border-radius:24px;transform:rotate(${12 + shapeVariant * 10}deg);bottom:${18 + shapeVariant * 4}%;right:${10 + shapeVariant * 5}%;border-color:var(--accent);opacity:0.05;animation-delay:2s}
-.hero .badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1.2rem;border-radius:99px;background:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1.5rem;color:var(--dark)}
-.hero .badge span{color:var(--primary)}
-.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.05;max-width:700px;text-transform:uppercase;letter-spacing:-0.03em;background:linear-gradient(135deg,var(--dark) 30%,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
-.hero h1::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:50%;height:5px;border-radius:5px;background:linear-gradient(90deg,transparent,var(--primary),transparent)}
-.hero .glow{position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,${primary}1a 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:pulseGlow 4s ease-in-out infinite}
-@keyframes pulseGlow{0%,100%{opacity:0.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}}
-.hero .mockup{margin-top:2.5rem;width:min(90%,480px);background:#fff;border:3px solid var(--dark);border-radius:16px;box-shadow:8px 8px 0 var(--dark);overflow:hidden;animation:floatMockup 4s ease-in-out infinite}
-@keyframes floatMockup{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.hero .mockup-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--dark);border-bottom:2px solid var(--dark)}
-.hero .mockup-bar span{width:10px;height:10px;border-radius:50%}
-.hero .mockup-bar span:nth-child(1){background:#FF5F57}
-.hero .mockup-bar span:nth-child(2){background:#FEBC2E}
-.hero .mockup-bar span:nth-child(3){background:#28C840}
-.hero .mockup-body{padding:1rem;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hero .mockup-body .mock-card{background:var(--g1);border:2px solid var(--dark);border-radius:10px;padding:12px;text-align:left}
-.hero .mockup-body .mock-card .mock-val{font-size:1.1rem;font-weight:900;color:var(--primary)}
-.hero .mockup-body .mock-card .mock-label{font-size:0.55rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-top:2px}
-.hero p{margin-top:1rem;font-size:1rem;color:#64748b;max-width:500px;line-height:1.6}
-.hero .btns{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
-.hero .btns a{padding:0.875rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s,box-shadow 0.2s;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;border:2px solid var(--dark)}
-.hero .btns .primary{background:var(--primary);color:#fff;box-shadow:var(--shadow)}
-.hero .btns .secondary{background:#fff;color:var(--dark);box-shadow:var(--shadow)}
-.hero .btns a:hover{transform:translateY(-3px);box-shadow:6px 6px 0 var(--dark)}
-.hero .trust{margin-top:2rem;display:flex;align-items:center;gap:0.75rem;font-size:0.75rem;color:#94a3b8;font-weight:700}
-.hero .trust .avatars{display:flex}
-.hero .trust .avatars span{width:28px;height:28px;border-radius:50%;border:2px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff}
-.hero .trust .avatars span:first-child{margin-left:0}
-section{padding:5rem 2rem}
-.section-tag{display:inline-block;padding:0.3rem 1rem;border-radius:99px;background:${primary}15;color:var(--primary);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;border:1.5px solid ${primary}30}
-.features{background:#fff;border-top:3px solid var(--dark);border-bottom:3px solid var(--dark)}
-.sh2{text-align:center;font-size:1.8rem;font-weight:900;margin-bottom:2.5rem;text-transform:uppercase;letter-spacing:-0.02em}
-.features .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
-.features .card{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s,box-shadow 0.2s}
-.features .card:hover{transform:translateY(-4px);box-shadow:6px 6px 0 var(--primary)}
-.features .card .icon{font-size:1.8rem;margin-bottom:0.75rem;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:${primary}12;border:2px solid ${primary}25}
-.features .card h3{font-size:0.95rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
-.features .card p{color:#64748b;line-height:1.5;font-size:0.85rem}
-.how-it-works{background:var(--light)}
-.how-it-works .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;max-width:900px;margin:0 auto}
-.how-it-works .step{text-align:center;padding:2rem 1.5rem;border-radius:18px;background:#fff;border:2px solid var(--dark);box-shadow:var(--shadow);transition:transform 0.2s;position:relative}
-.how-it-works .step:hover{transform:translateY(-4px)}
-.how-it-works .step .num{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem;margin-bottom:1rem;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark)}
-.how-it-works .step h3{font-size:0.95rem;font-weight:800;margin-bottom:0.5rem;text-transform:uppercase}
-.how-it-works .step p{color:#64748b;font-size:0.8rem;line-height:1.5}
-.how-it-works .step:not(:last-child)::after{content:'\\2192';position:absolute;right:-20px;top:50%;transform:translateY(-50%);font-size:1.5rem;color:var(--primary);font-weight:900}
-.stats{background:var(--dark);color:#fff;text-align:center}
-.stats h2{color:#fff}
-.stats .row{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
-.stats .stat .num{font-size:2.5rem;font-weight:900;color:var(--primary)}
-.stats .stat .label{margin-top:0.25rem;color:#94a3b8;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em}
-.testimonials{background:#fff;border-top:3px solid var(--dark)}
-.testimonials .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:900px;margin:0 auto}
-.testimonials .quote{padding:2rem;border-radius:18px;background:var(--light);border:2px solid var(--dark);box-shadow:var(--shadow);position:relative}
-.testimonials .quote::before{content:'\\201C';font-size:3rem;color:var(--primary);opacity:0.3;position:absolute;top:10px;left:16px;font-family:Georgia,serif}
-.testimonials .quote p{font-size:0.85rem;color:#475569;line-height:1.6;margin-bottom:1rem;padding-top:1rem}
-.testimonials .quote .author{font-size:0.8rem;font-weight:800;color:var(--dark);text-transform:uppercase}
-.testimonials .quote .role{font-size:0.7rem;color:#94a3b8;font-weight:600}
-.testimonials .stars{color:var(--primary);font-size:0.75rem;margin-bottom:0.5rem}
-.pricing{background:var(--light)}
-.pricing .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;max-width:850px;margin:0 auto}
-.pricing .plan{padding:2rem;border-radius:18px;border:2px solid var(--dark);text-align:center;transition:transform 0.2s;box-shadow:var(--shadow);background:#fff}
-.pricing .plan:hover{transform:translateY(-4px)}
-.pricing .plan.popular{border-color:var(--primary);box-shadow:6px 6px 0 var(--primary);position:relative;transform:scale(1.03)}
-.pricing .plan.popular::before{content:"Popular";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.2rem 1rem;border-radius:99px;font-size:0.7rem;font-weight:800;border:2px solid var(--dark);text-transform:uppercase}
-.pricing .plan .price{font-size:2.5rem;font-weight:900;margin:0.75rem 0;color:var(--dark)}
-.pricing .plan .price span{font-size:0.85rem;color:#94a3b8}
-.pricing .plan ul{list-style:none;margin:1.5rem 0;text-align:left}
-.pricing .plan li{padding:0.4rem 0;color:#475569;font-size:0.85rem}
-.pricing .plan li::before{content:"\\2713 ";color:var(--primary);font-weight:700}
-.pricing .plan .btn{display:inline-block;padding:0.75rem 2rem;border-radius:14px;font-weight:800;text-decoration:none;transition:transform 0.2s;background:var(--primary);color:#fff;border:2px solid var(--dark);box-shadow:3px 3px 0 var(--dark);font-size:0.8rem;text-transform:uppercase}
-.pricing .plan .btn:hover{transform:translateY(-2px);box-shadow:5px 5px 0 var(--dark)}
-.faq{background:#fff;border-top:3px solid var(--dark)}
-.faq .items{max-width:700px;margin:0 auto}
-.faq .item{border:2px solid var(--dark);border-radius:14px;margin-bottom:0.75rem;overflow:hidden;box-shadow:2px 2px 0 var(--dark)}
-.faq .item summary{padding:1rem 1.5rem;font-weight:800;font-size:0.9rem;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;background:var(--light);text-transform:uppercase;letter-spacing:0.02em}
-.faq .item summary::after{content:'+';font-size:1.2rem;font-weight:900;color:var(--primary);transition:transform 0.2s}
-.faq .item[open] summary::after{transform:rotate(45deg)}
-.faq .item .answer{padding:0 1.5rem 1rem;font-size:0.85rem;color:#64748b;line-height:1.6}
-.cta-section{background:var(--dark);color:#fff;text-align:center;padding:5rem 2rem;border-top:3px solid var(--primary)}
-.cta-section h2{font-size:1.8rem;font-weight:900;margin-bottom:0.75rem;text-transform:uppercase;color:#fff}
-.cta-section p{font-size:0.95rem;opacity:0.7;margin-bottom:2rem}
-.cta-section form{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
-.cta-section input{padding:0.75rem 1.5rem;border-radius:14px;border:2px solid #333;font-size:0.9rem;width:280px;max-width:100%;background:#222;color:#fff}
-.cta-section button{padding:0.75rem 2rem;border-radius:14px;background:var(--primary);color:#fff;font-weight:800;border:2px solid var(--primary);cursor:pointer;transition:transform 0.2s;font-size:0.85rem;text-transform:uppercase}
-.cta-section button:hover{transform:scale(1.05)}
-footer{background:var(--dark);color:#94a3b8;text-align:center;padding:2.5rem 2rem;font-size:0.8rem;border-top:1px solid #333}
-footer a{color:var(--primary);text-decoration:none;font-weight:700}
-.fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
-.fade-in.visible{opacity:1;transform:translateY(0)}
-@keyframes float{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-20px) rotate(var(--r,0deg))}}
-@media(max-width:768px){.how-it-works .step::after{display:none}}
-@media(max-width:640px){.hero h1{font-size:2rem}.hero .mockup{width:95%}.stats .row{gap:2rem}.pricing .plan.popular{transform:scale(1)}.how-it-works .steps{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${appName}</title>
+  <style>
+    /* ── Reset & Variables ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --p: ${primary};
+      --ac: ${accent};
+      --light: ${gradient1};
+      --dark: #1A1A1A;
+      --g1: ${gradient1};
+      --g2: ${gradient2};
+      --g3: ${gradient3};
+      --glass: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.25);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --neu-bg: #e8e8e8;
+      --neu-light: #ffffff;
+      --neu-dark: #bebebe;
+      --neu-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
+      --neu-inset: inset 4px 4px 8px var(--neu-dark), inset -4px -4px 8px var(--neu-light);
+      --brutal-shadow: 4px 4px 0 var(--dark);
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--dark);
+      scroll-behavior: smooth;
+      background: var(--light);
+      overflow-x: hidden;
+    }
+
+    /* ── 1. NAV — Glassmorphism ── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 0.8rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 100;
+    }
+    nav .logo {
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+    nav .logo span { color: var(--p); }
+    nav .nav-btn {
+      padding: 0.5rem 1.4rem;
+      background: var(--p);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 15px ${primary}40;
+    }
+    nav .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px ${primary}60; }
+
+    /* ── 2. HERO — Glassmorphism + Bauhaus Shapes ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 2rem 4rem;
+      background: linear-gradient(${135 + sv * 45}deg, var(--g1), var(--g2), var(--g3));
+      background-size: 300% 300%;
+      animation: grad-shift ${8 + sv * 3}s ease infinite;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes grad-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Bauhaus geometric shapes */
+    .hero .geo {
+      position: absolute;
+      opacity: 0.07;
+      animation: float 8s ease-in-out infinite;
+    }
+    .hero .geo-1 {
+      width: ${120 + sv * 40}px;
+      height: ${120 + sv * 40}px;
+      background: var(--p);
+      border-radius: 50%;
+      top: 12%;
+      right: 8%;
+    }
+    .hero .geo-2 {
+      width: ${70 + sv * 25}px;
+      height: ${70 + sv * 25}px;
+      background: ${accent};
+      transform: rotate(${45 + sv * 15}deg);
+      bottom: 15%;
+      left: 6%;
+      animation-delay: 2s;
+    }
+    .hero .geo-3 {
+      width: 0;
+      height: 0;
+      border-left: ${40 + sv * 15}px solid transparent;
+      border-right: ${40 + sv * 15}px solid transparent;
+      border-bottom: ${70 + sv * 20}px solid var(--p);
+      top: 30%;
+      left: 12%;
+      animation-delay: 4s;
+    }
+    .hero .geo-4 {
+      width: ${90 + sv * 20}px;
+      height: ${90 + sv * 20}px;
+      border: 4px solid var(--p);
+      border-radius: 50%;
+      bottom: 20%;
+      right: 12%;
+      animation-delay: 1s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+      50% { transform: translateY(-20px) rotate(var(--r, 0deg)); }
+    }
+    /* Glass badge */
+    .hero .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1.2rem;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--glass-shadow);
+    }
+    .hero .badge span { color: var(--p); }
+    .hero h1 {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, var(--dark) 40%, var(--p));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      margin-top: 1rem;
+      font-size: 1.05rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .hero .hero-btns {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .hero .hero-btns a {
+      padding: 0.8rem 1.8rem;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: all 0.3s;
+    }
+    .hero .btn-primary {
+      background: var(--p);
+      color: #fff;
+      box-shadow: 0 4px 20px ${primary}35;
+    }
+    .hero .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px ${primary}50; }
+    .hero .btn-secondary {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      color: var(--dark);
+      border: 1px solid var(--glass-border);
+    }
+    .hero .btn-secondary:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.9); }
+    .hero .trust {
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+    .hero .avatars { display: flex; }
+    .hero .avatars span {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      margin-left: -7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .hero .avatars span:first-child { margin-left: 0; }
+
+    /* ── Shared ── */
+    section { padding: 5rem 2rem; }
+    .section-tag {
+      display: inline-block;
+      padding: 0.25rem 0.9rem;
+      border-radius: 8px;
+      background: ${primary}12;
+      color: var(--p);
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+    }
+    .sh2 {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+    .sh-sub {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-bottom: 2.5rem;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── 3. LOGO CLOUD — Bauhaus Bold ── */
+    .logos {
+      background: var(--dark);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .logos p {
+      color: #94a3b8;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1.5rem;
+    }
+    .logos .logo-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .logos .logo-item {
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #fff;
+      opacity: 0.4;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 0;
+      border-bottom: 3px solid var(--p);
+      transition: opacity 0.3s;
+    }
+    .logos .logo-item:hover { opacity: 0.8; }
+
+    /* ── 4. PROBLEM — Neumorphism ── */
+    .problem {
+      background: #e8e8e8;
+      padding: 5rem 2rem;
+    }
+    .problem .compare {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    .problem .side {
+      padding: 2rem;
+      border-radius: 20px;
+      background: #e8e8e8;
+    }
+    .problem .old-way {
+      box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+    }
+    .problem .new-way {
+      box-shadow: 6px 6px 12px #bebebe, -6px -6px 12px #ffffff;
+    }
+    .problem .side h3 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+    .problem .old-way h3 { color: #94a3b8; }
+    .problem .new-way h3 { color: var(--p); }
+    .problem .side ul { list-style: none; }
+    .problem .side li {
+      padding: 0.5rem 0;
+      font-size: 0.8rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .problem .old-way li::before { content: "\\2717"; color: #ef4444; font-weight: 700; }
+    .problem .new-way li::before { content: "\\2713"; color: var(--p); font-weight: 700; }
+    .problem .vs {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--p);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.7rem;
+      box-shadow: 0 4px 15px ${primary}40;
+    }
+
+    /* ── 5. FEATURES — Glassmorphism Cards ── */
+    .features {
+      background: linear-gradient(135deg, var(--g2) 0%, var(--g3) 100%);
+      position: relative;
+    }
+    .features .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .features .card {
+      padding: 1.75rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: var(--glass-shadow);
+      transition: all 0.3s;
+    }
+    .features .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+    .features .card .icon {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .features .card h3 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+    .features .card p { color: #64748b; font-size: 0.8rem; line-height: 1.5; }
+
+    /* ── 6. HOW IT WORKS — Bauhaus Geometric ── */
+    .how-it-works { background: var(--light); }
+    .how-it-works .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      max-width: 850px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .how-it-works .step {
+      text-align: center;
+      padding: 2rem 1.25rem;
+      position: relative;
+      background: #fff;
+      border-radius: 0;
+      border: 3px solid var(--dark);
+      transition: all 0.3s;
+    }
+    .how-it-works .step:nth-child(1) { border-radius: 20px 4px 20px 4px; }
+    .how-it-works .step:nth-child(2) { border-radius: 4px 20px 4px 20px; }
+    .how-it-works .step:nth-child(3) { border-radius: 20px 4px 20px 4px; }
+    .how-it-works .step:hover { transform: translateY(-4px); box-shadow: 6px 6px 0 var(--p); }
+    .how-it-works .step .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: var(--p);
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .how-it-works .step:nth-child(1) .num { border-radius: 50%; }
+    .how-it-works .step:nth-child(2) .num { border-radius: 4px; }
+    .how-it-works .step:nth-child(3) .num { border-radius: 50% 50% 50% 4px; }
+    .how-it-works .step h3 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+    .how-it-works .step p { color: #64748b; font-size: 0.78rem; line-height: 1.5; }
+
+    /* ── 7. STATS — Neumorphism Dark ── */
+    .stats {
+      background: #1e1e2e;
+      text-align: center;
+      padding: 4.5rem 2rem;
+    }
+    .stats .row {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .stats .stat {
+      padding: 1.75rem 2rem;
+      border-radius: 18px;
+      background: #1e1e2e;
+      box-shadow: 6px 6px 14px #151525, -6px -6px 14px #272737;
+      min-width: 150px;
+      transition: all 0.3s;
+    }
+    .stats .stat:hover { transform: translateY(-4px); }
+    .stats .stat .num {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--p);
+    }
+    .stats .stat .label {
+      margin-top: 0.3rem;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── 8. SHOWCASE — Glass Panel Mockup ── */
+    .showcase {
+      background: linear-gradient(160deg, var(--g1), var(--g3));
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+    .showcase .mockup-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      animation: slow-float 5s ease-in-out infinite;
+    }
+    @keyframes slow-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .showcase .mock-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+    }
+    .showcase .mock-bar span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .showcase .mock-bar span:nth-child(1) { background: #FF5F57; }
+    .showcase .mock-bar span:nth-child(2) { background: #FEBC2E; }
+    .showcase .mock-bar span:nth-child(3) { background: #28C840; }
+    .showcase .mock-body {
+      padding: 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .showcase .mock-card {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: left;
+    }
+    .showcase .mock-card .val {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--p);
+    }
+    .showcase .mock-card .lbl {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ── 9. TESTIMONIALS — Neobrutalism ── */
+    .testimonials { background: var(--light); }
+    .testimonials .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+    .testimonials .quote {
+      padding: 1.75rem;
+      border-radius: 16px;
+      background: #fff;
+      border: 3px solid var(--dark);
+      box-shadow: 5px 5px 0 var(--dark);
+      position: relative;
+      transition: all 0.2s;
+    }
+    .testimonials .quote:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0 var(--p);
+    }
+    .testimonials .quote::before {
+      content: '\\201C';
+      font-size: 2.5rem;
+      color: var(--p);
+      opacity: 0.25;
+      position: absolute;
+      top: 8px;
+      left: 14px;
+      font-family: Georgia, serif;
+    }
+    .testimonials .stars {
+      color: var(--p);
+      font-size: 0.7rem;
+      margin-bottom: 0.4rem;
+    }
+    .testimonials .quote p {
+      font-size: 0.8rem;
+      color: #475569;
+      line-height: 1.55;
+      margin-bottom: 0.75rem;
+      padding-top: 0.5rem;
+    }
+    .testimonials .author {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .testimonials .role {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    /* ── 10. PRICING — Glass + Neu Mix ── */
+    .pricing { background: linear-gradient(135deg, var(--g1), var(--g2)); }
+    .pricing .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .pricing .plan {
+      padding: 2rem 1.5rem;
+      border-radius: 18px;
+      text-align: center;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: var(--glass-shadow);
+    }
+    .pricing .plan:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
+    .pricing .plan.pop {
+      background: var(--p);
+      color: #fff;
+      border: 3px solid var(--dark);
+      box-shadow: 6px 6px 0 var(--dark);
+      transform: scale(1.04);
+      position: relative;
+    }
+    .pricing .plan.pop::before {
+      content: "Popular";
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: #fff;
+      padding: 0.15rem 0.9rem;
+      border-radius: 99px;
+      font-size: 0.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .pricing .plan h3 { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; }
+    .pricing .plan .price {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin: 0.5rem 0;
+    }
+    .pricing .plan .price span { font-size: 0.8rem; opacity: 0.7; }
+    .pricing .plan ul { list-style: none; margin: 1.25rem 0; text-align: left; }
+    .pricing .plan li { padding: 0.35rem 0; font-size: 0.78rem; }
+    .pricing .plan li::before { content: "\\2713 "; color: var(--p); font-weight: 700; }
+    .pricing .plan.pop li::before { color: #fff; }
+    .pricing .plan.pop .price { color: #fff; }
+    .pricing .plan .pbtn {
+      display: inline-block;
+      padding: 0.65rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      background: var(--p);
+      color: #fff;
+      box-shadow: 0 4px 12px ${primary}30;
+    }
+    .pricing .plan .pbtn:hover { transform: translateY(-2px); }
+    .pricing .plan.pop .pbtn { background: #fff; color: var(--dark); box-shadow: var(--brutal-shadow); }
+
+    /* ── 11. FAQ — Bauhaus Accent ── */
+    .faq { background: var(--light); }
+    .faq .items { max-width: 650px; margin: 0 auto; }
+    .faq .item {
+      border: 3px solid var(--dark);
+      margin-bottom: 0.6rem;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .faq .item:nth-child(odd) { border-radius: 14px 4px 14px 4px; }
+    .faq .item:nth-child(even) { border-radius: 4px 14px 4px 14px; }
+    .faq .item:hover { box-shadow: 4px 4px 0 var(--p); }
+    .faq .item summary {
+      padding: 0.9rem 1.25rem;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .faq .item summary::after {
+      content: '+';
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--p);
+      transition: transform 0.3s;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--p);
+      border-radius: 50%;
+    }
+    .faq .item[open] summary::after { transform: rotate(45deg); }
+    .faq .item .answer {
+      padding: 0 1.25rem 1rem;
+      font-size: 0.8rem;
+      color: #64748b;
+      line-height: 1.6;
+      border-top: 2px dashed ${primary}25;
+    }
+
+    /* ── 12. CTA — Glassmorphism over dark ── */
+    .cta-section {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      text-align: center;
+      padding: 5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: var(--p);
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      top: -50px;
+      right: -50px;
+    }
+    .cta-section .cta-glass {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .cta-section h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .cta-section .cta-sub { font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.75rem; }
+    .cta-section form {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-section input {
+      padding: 0.7rem 1.25rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.85rem;
+      width: 250px;
+      max-width: 100%;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      outline: none;
+    }
+    .cta-section input::placeholder { color: #64748b; }
+    .cta-section button {
+      padding: 0.7rem 1.8rem;
+      border-radius: 10px;
+      background: var(--p);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px ${primary}40;
+    }
+    .cta-section button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px ${primary}60; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #0f172a;
+      color: #64748b;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer a { color: var(--p); text-decoration: none; font-weight: 600; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .problem .compare { grid-template-columns: 1fr; }
+      .problem .vs { margin: 0 auto; }
+      .how-it-works .steps { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 2.2rem; }
+      .stats .row { gap: 1rem; }
+      .pricing .plan.pop { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
-<nav><div class="logo"><span>${appName.charAt(0)}</span>${appName.slice(1)}</div><button class="cta" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button></nav>
 
-<section class="hero"><div class="shape shape-1"></div><div class="shape shape-2"></div><div class="shape shape-3"></div><div class="shape shape-4"></div><div class="glow"></div><div class="badge">${badge}</div><h1>${appName}</h1><p>${subtitle}</p><div class="btns"><a href="#features" class="primary">Get Started Free</a><a href="#pricing" class="secondary">View Pricing</a></div><div class="trust"><div class="avatars"><span style="background:${avatarColors[0]}">P</span><span style="background:${avatarColors[1]}">A</span><span style="background:${avatarColors[2]}">S</span><span style="background:${avatarColors[3]}">R</span></div>Trusted by 10,000+ founders</div><div class="mockup"><div class="mockup-bar"><span></span><span></span><span></span></div><div class="mockup-body"><div class="mock-card"><div class="mock-val">${stats.nums[0]}</div><div class="mock-label">${stats.labels[0]}</div></div><div class="mock-card"><div class="mock-val">${stats.nums[1]}</div><div class="mock-label">${stats.labels[1]}</div></div><div class="mock-card"><div class="mock-val">${stats.nums[2]}</div><div class="mock-label">${stats.labels[2]}</div></div><div class="mock-card"><div class="mock-val">${stats.nums[3]}</div><div class="mock-label">${stats.labels[3]}</div></div></div></div></section>
+  <!-- 1. NAV — Glassmorphism -->
+  <nav>
+    <div class="logo"><span>${appName.charAt(0)}</span>${appName.slice(1)}</div>
+    <button class="nav-btn" onclick="document.querySelector('.cta-section').scrollIntoView({behavior:'smooth'})">Get Started</button>
+  </nav>
 
-<section class="features" id="features"><div style="text-align:center"><span class="section-tag">Features</span></div><h2 class="sh2">Why Choose ${appName}</h2><div class="grid"><div class="card fade-in"><div class="icon">${emojis[0]}</div><h3>${featureNames[0]}</h3><p>${featureDescs[0]}</p></div><div class="card fade-in"><div class="icon">${emojis[1]}</div><h3>${featureNames[1]}</h3><p>${featureDescs[1]}</p></div><div class="card fade-in"><div class="icon">${emojis[2]}</div><h3>${featureNames[2]}</h3><p>${featureDescs[2]}</p></div><div class="card fade-in"><div class="icon">${emojis[3]}</div><h3>${featureNames[3]}</h3><p>${featureDescs[3]}</p></div></div></section>
+  <!-- 2. HERO — Glassmorphism + Bauhaus Shapes -->
+  <section class="hero">
+    <div class="geo geo-1"></div>
+    <div class="geo geo-2"></div>
+    <div class="geo geo-3"></div>
+    <div class="geo geo-4"></div>
+    <div class="badge">${badge}</div>
+    <h1>${appName}</h1>
+    <p class="subtitle">${subtitle}</p>
+    <div class="hero-btns">
+      <a href="#features" class="btn-primary">Get Started Free</a>
+      <a href="#pricing" class="btn-secondary">View Pricing</a>
+    </div>
+    <div class="trust">
+      <div class="avatars">
+        <span style="background:${avatarColors[0]}">P</span>
+        <span style="background:${avatarColors[1]}">A</span>
+        <span style="background:${avatarColors[2]}">S</span>
+        <span style="background:${avatarColors[3]}">R</span>
+      </div>
+      Trusted by 10,000+ founders
+    </div>
+  </section>
 
-<section class="how-it-works" id="how-it-works"><div style="text-align:center"><span class="section-tag">How It Works</span></div><h2 class="sh2">Three Simple Steps</h2><div class="steps"><div class="step fade-in"><div class="num">1</div><h3>${steps.titles[0]}</h3><p>${steps.descs[0]}</p></div><div class="step fade-in"><div class="num">2</div><h3>${steps.titles[1]}</h3><p>${steps.descs[1]}</p></div><div class="step fade-in"><div class="num">3</div><h3>${steps.titles[2]}</h3><p>${steps.descs[2]}</p></div></div></section>
+  <!-- 3. LOGO CLOUD — Bauhaus Bold -->
+  <section class="logos">
+    <p>Trusted by leading companies across India</p>
+    <div class="logo-row">
+      <div class="logo-item fade-in">${logos[0]}</div>
+      <div class="logo-item fade-in">${logos[1]}</div>
+      <div class="logo-item fade-in">${logos[2]}</div>
+      <div class="logo-item fade-in">${logos[3]}</div>
+      <div class="logo-item fade-in">${logos[4]}</div>
+    </div>
+  </section>
 
-<section class="stats"><div style="text-align:center"><span class="section-tag" style="background:rgba(255,255,255,0.1);color:var(--primary);border-color:rgba(255,255,255,0.15)">By The Numbers</span></div><h2 class="sh2" style="color:#fff">Trusted Across India</h2><div class="row"><div class="stat fade-in"><div class="num">${stats.nums[0]}</div><div class="label">${stats.labels[0]}</div></div><div class="stat fade-in"><div class="num">${stats.nums[1]}</div><div class="label">${stats.labels[1]}</div></div><div class="stat fade-in"><div class="num">${stats.nums[2]}</div><div class="label">${stats.labels[2]}</div></div></div></section>
+  <!-- 4. PROBLEM — Neumorphism -->
+  <section class="problem">
+    <div style="text-align:center">
+      <span class="section-tag" style="background:#d4d4d4;color:var(--dark);border:none">The Problem</span>
+    </div>
+    <h2 class="sh2">Old Way vs ${appName}</h2>
+    <p class="sh-sub">Stop struggling. Start scaling.</p>
+    <div class="compare">
+      <div class="side old-way fade-in">
+        <h3>❌ The Old Way</h3>
+        <ul>
+          <li>${pp.old[0]}</li>
+          <li>${pp.old[1]}</li>
+          <li>${pp.old[2]}</li>
+        </ul>
+      </div>
+      <div class="vs">VS</div>
+      <div class="side new-way fade-in">
+        <h3>✅ The ${appName} Way</h3>
+        <ul>
+          <li>${pp.new_[0]}</li>
+          <li>${pp.new_[1]}</li>
+          <li>${pp.new_[2]}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-<section class="testimonials"><div style="text-align:center"><span class="section-tag">Testimonials</span></div><h2 class="sh2">Loved by Founders</h2><div class="grid"><div class="quote fade-in"><div class="stars">\u2605\u2605\u2605\u2605\u2605</div><p>${testimonials[0].text}</p><div class="author">${testimonials[0].name}</div><div class="role">${testimonials[0].role}</div></div><div class="quote fade-in"><div class="stars">\u2605\u2605\u2605\u2605\u2605</div><p>${testimonials[1].text}</p><div class="author">${testimonials[1].name}</div><div class="role">${testimonials[1].role}</div></div><div class="quote fade-in"><div class="stars">\u2605\u2605\u2605\u2605\u2605</div><p>${testimonials[2].text}</p><div class="author">${testimonials[2].name}</div><div class="role">${testimonials[2].role}</div></div></div></section>
+  <!-- 5. FEATURES — Glassmorphism Cards -->
+  <section class="features" id="features">
+    <div style="text-align:center">
+      <span class="section-tag">Features</span>
+    </div>
+    <h2 class="sh2">Why Choose ${appName}</h2>
+    <p class="sh-sub">Everything you need, nothing you don't.</p>
+    <div class="grid">
+      <div class="card fade-in">
+        <div class="icon">${emojis[0]}</div>
+        <h3>${featureNames[0]}</h3>
+        <p>${featureDescs[0]}</p>
+      </div>
+      <div class="card fade-in">
+        <div class="icon">${emojis[1]}</div>
+        <h3>${featureNames[1]}</h3>
+        <p>${featureDescs[1]}</p>
+      </div>
+      <div class="card fade-in">
+        <div class="icon">${emojis[2]}</div>
+        <h3>${featureNames[2]}</h3>
+        <p>${featureDescs[2]}</p>
+      </div>
+      <div class="card fade-in">
+        <div class="icon">${emojis[3]}</div>
+        <h3>${featureNames[3]}</h3>
+        <p>${featureDescs[3]}</p>
+      </div>
+    </div>
+  </section>
 
-<section class="pricing" id="pricing"><div style="text-align:center"><span class="section-tag">Pricing</span></div><h2 class="sh2">Simple, Transparent Pricing</h2><div class="grid"><div class="plan fade-in"><h3>${plans[0]}</h3><div class="price">${priceValues[0]}</div><ul><li>Up to 3 projects</li><li>Basic analytics</li><li>Community support</li></ul><a href="#" class="btn">Get Started</a></div><div class="plan popular fade-in"><h3>${plans[1]}</h3><div class="price">${priceValues[1]}<span>/mo</span></div><ul><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li><li>Custom integrations</li></ul><a href="#" class="btn">Upgrade</a></div><div class="plan fade-in"><h3>${plans[2]}</h3><div class="price">${priceValues[2]}<span>/mo</span></div><ul><li>Everything in ${plans[1]}</li><li>Dedicated manager</li><li>SLA guarantee</li><li>Custom deployment</li></ul><a href="#" class="btn">Contact Us</a></div></div></section>
+  <!-- 6. HOW IT WORKS — Bauhaus Geometric -->
+  <section class="how-it-works" id="how-it-works">
+    <div style="text-align:center">
+      <span class="section-tag">How It Works</span>
+    </div>
+    <h2 class="sh2">Three Simple Steps</h2>
+    <p class="sh-sub">Get started in minutes, not months.</p>
+    <div class="steps">
+      <div class="step fade-in">
+        <div class="num">1</div>
+        <h3>${steps.titles[0]}</h3>
+        <p>${steps.descs[0]}</p>
+      </div>
+      <div class="step fade-in">
+        <div class="num">2</div>
+        <h3>${steps.titles[1]}</h3>
+        <p>${steps.descs[1]}</p>
+      </div>
+      <div class="step fade-in">
+        <div class="num">3</div>
+        <h3>${steps.titles[2]}</h3>
+        <p>${steps.descs[2]}</p>
+      </div>
+    </div>
+  </section>
 
-<section class="faq" id="faq"><div style="text-align:center"><span class="section-tag">FAQ</span></div><h2 class="sh2">Got Questions?</h2><div class="items"><details class="item"><summary>${faqItems[0].q}</summary><div class="answer">${faqItems[0].a}</div></details><details class="item"><summary>${faqItems[1].q}</summary><div class="answer">${faqItems[1].a}</div></details><details class="item"><summary>${faqItems[2].q}</summary><div class="answer">${faqItems[2].a}</div></details><details class="item"><summary>${faqItems[3].q}</summary><div class="answer">${faqItems[3].a}</div></details></div></section>
+  <!-- 7. STATS — Neumorphism Dark -->
+  <section class="stats">
+    <div style="text-align:center">
+      <span class="section-tag" style="background:rgba(255,255,255,0.06);color:var(--p)">By The Numbers</span>
+    </div>
+    <h2 class="sh2" style="color:#fff">Trusted Across India</h2>
+    <p class="sh-sub" style="color:#64748b">Numbers that speak for themselves.</p>
+    <div class="row">
+      <div class="stat fade-in">
+        <div class="num">${stats.nums[0]}</div>
+        <div class="label">${stats.labels[0]}</div>
+      </div>
+      <div class="stat fade-in">
+        <div class="num">${stats.nums[1]}</div>
+        <div class="label">${stats.labels[1]}</div>
+      </div>
+      <div class="stat fade-in">
+        <div class="num">${stats.nums[2]}</div>
+        <div class="label">${stats.labels[2]}</div>
+      </div>
+      <div class="stat fade-in">
+        <div class="num">${stats.nums[3]}</div>
+        <div class="label">${stats.labels[3]}</div>
+      </div>
+    </div>
+  </section>
 
-<section class="cta-section"><h2>Ready to Get Started?</h2><p>${ctaText}</p><form onsubmit="event.preventDefault()"><input type="email" placeholder="Enter your email" required><button type="submit">Sign Up Free</button></form></section>
+  <!-- 8. SHOWCASE — Glassmorphism Mockup -->
+  <section class="showcase">
+    <div style="text-align:center">
+      <span class="section-tag">Preview</span>
+    </div>
+    <h2 class="sh2">${appName} In Action</h2>
+    <p class="sh-sub">Beautiful, intuitive, powerful.</p>
+    <div class="mockup-wrap fade-in">
+      <div class="mock-bar">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-card">
+          <div class="val">${stats.nums[0]}</div>
+          <div class="lbl">${stats.labels[0]}</div>
+        </div>
+        <div class="mock-card">
+          <div class="val">${stats.nums[1]}</div>
+          <div class="lbl">${stats.labels[1]}</div>
+        </div>
+        <div class="mock-card">
+          <div class="val">${stats.nums[2]}</div>
+          <div class="lbl">${stats.labels[2]}</div>
+        </div>
+        <div class="mock-card">
+          <div class="val">${stats.nums[3]}</div>
+          <div class="lbl">${stats.labels[3]}</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<footer><p>&copy; 2026 ${appName}. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p></footer>
-<script>
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
-document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
-document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h&&h.startsWith('#')&&h.length>1){var el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}}});
-</script>
+  <!-- 9. TESTIMONIALS — Neobrutalism -->
+  <section class="testimonials">
+    <div style="text-align:center">
+      <span class="section-tag">Testimonials</span>
+    </div>
+    <h2 class="sh2">Loved by Founders</h2>
+    <p class="sh-sub">Real stories from real builders.</p>
+    <div class="grid">
+      <div class="quote fade-in">
+        <div class="stars">★★★★★</div>
+        <p>${testimonials[0].text}</p>
+        <div class="author">${testimonials[0].name}</div>
+        <div class="role">${testimonials[0].role}</div>
+      </div>
+      <div class="quote fade-in">
+        <div class="stars">★★★★★</div>
+        <p>${testimonials[1].text}</p>
+        <div class="author">${testimonials[1].name}</div>
+        <div class="role">${testimonials[1].role}</div>
+      </div>
+      <div class="quote fade-in">
+        <div class="stars">★★★★★</div>
+        <p>${testimonials[2].text}</p>
+        <div class="author">${testimonials[2].name}</div>
+        <div class="role">${testimonials[2].role}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. PRICING — Glass + Neu Mix -->
+  <section class="pricing" id="pricing">
+    <div style="text-align:center">
+      <span class="section-tag">Pricing</span>
+    </div>
+    <h2 class="sh2">Simple, Transparent Pricing</h2>
+    <p class="sh-sub">Start free. Scale as you grow.</p>
+    <div class="grid">
+      <div class="plan fade-in">
+        <h3>${plans[0]}</h3>
+        <div class="price">${priceValues[0]}</div>
+        <ul>
+          <li>Up to 3 projects</li>
+          <li>Basic analytics</li>
+          <li>Community support</li>
+        </ul>
+        <a href="#" class="pbtn">Get Started</a>
+      </div>
+      <div class="plan pop fade-in">
+        <h3>${plans[1]}</h3>
+        <div class="price">${priceValues[1]}<span>/mo</span></div>
+        <ul>
+          <li>Unlimited projects</li>
+          <li>Advanced analytics</li>
+          <li>Priority support</li>
+          <li>Custom integrations</li>
+        </ul>
+        <a href="#" class="pbtn">Upgrade</a>
+      </div>
+      <div class="plan fade-in">
+        <h3>${plans[2]}</h3>
+        <div class="price">${priceValues[2]}<span>/mo</span></div>
+        <ul>
+          <li>Everything in ${plans[1]}</li>
+          <li>Dedicated manager</li>
+          <li>SLA guarantee</li>
+          <li>Custom deployment</li>
+        </ul>
+        <a href="#" class="pbtn">Contact Us</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. FAQ — Bauhaus Accent -->
+  <section class="faq" id="faq">
+    <div style="text-align:center">
+      <span class="section-tag">FAQ</span>
+    </div>
+    <h2 class="sh2">Got Questions?</h2>
+    <p class="sh-sub">Answers to common questions.</p>
+    <div class="items">
+      <details class="item">
+        <summary>${faqItems[0].q}</summary>
+        <div class="answer">${faqItems[0].a}</div>
+      </details>
+      <details class="item">
+        <summary>${faqItems[1].q}</summary>
+        <div class="answer">${faqItems[1].a}</div>
+      </details>
+      <details class="item">
+        <summary>${faqItems[2].q}</summary>
+        <div class="answer">${faqItems[2].a}</div>
+      </details>
+      <details class="item">
+        <summary>${faqItems[3].q}</summary>
+        <div class="answer">${faqItems[3].a}</div>
+      </details>
+      <details class="item">
+        <summary>${faqItems[4].q}</summary>
+        <div class="answer">${faqItems[4].a}</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 12. CTA — Glassmorphism over Dark -->
+  <section class="cta-section">
+    <div class="cta-glass">
+      <h2>Ready to Get Started?</h2>
+      <p class="cta-sub">${ctaText}</p>
+      <form onsubmit="event.preventDefault()">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Sign Up Free</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 ${appName}. All rights reserved. &nbsp;|&nbsp; <a href="#">Privacy</a> &nbsp;|&nbsp; <a href="#">Terms</a></p>
+  </footer>
+
+  <script>
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(function(el) { obs.observe(el); });
+    document.addEventListener('click', function(e) {
+      var a = e.target.closest('a');
+      if (a) {
+        e.preventDefault();
+        var h = a.getAttribute('href');
+        if (h && h.startsWith('#') && h.length > 1) {
+          var el = document.querySelector(h);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  </script>
 </body>
 </html>`;
+
+  return html;
 }
 
 export async function POST(req: Request) {
@@ -452,18 +1722,114 @@ export async function POST(req: Request) {
 
     // Ensure appName is set and persisted
     if (!analysis.appName) {
-      const skip = new Set(["a","an","the","for","to","of","in","on","and","or","is","it","that","with","as","by","this","from","at","my","your","our","just","very","really","also","about","based","using","use","new","get","app","platform","tool","system","service","website","software","build","create","make","like","want","need","can","will","would","should","could","online","digital","smart","ai","store","shop","marketplace","ecommerce","sell","buy","selling","buying","market","help","helps","people","users","manage","simple","easy","best","good","great"]);
-      const w = analysis.idea.split(/\s+/).filter((w: string) => !skip.has(w.toLowerCase()) && w.length > 2);
-      const suffixes = ["ly","ify","io","Hub","Sync","Flow","Nest","Base","Mint","Wave","Pulse","Spark","Cart","Verse","Stack"];
+      const skip = new Set([
+        "a",
+        "an",
+        "the",
+        "for",
+        "to",
+        "of",
+        "in",
+        "on",
+        "and",
+        "or",
+        "is",
+        "it",
+        "that",
+        "with",
+        "as",
+        "by",
+        "this",
+        "from",
+        "at",
+        "my",
+        "your",
+        "our",
+        "just",
+        "very",
+        "really",
+        "also",
+        "about",
+        "based",
+        "using",
+        "use",
+        "new",
+        "get",
+        "app",
+        "platform",
+        "tool",
+        "system",
+        "service",
+        "website",
+        "software",
+        "build",
+        "create",
+        "make",
+        "like",
+        "want",
+        "need",
+        "can",
+        "will",
+        "would",
+        "should",
+        "could",
+        "online",
+        "digital",
+        "smart",
+        "ai",
+        "store",
+        "shop",
+        "marketplace",
+        "ecommerce",
+        "sell",
+        "buy",
+        "selling",
+        "buying",
+        "market",
+        "help",
+        "helps",
+        "people",
+        "users",
+        "manage",
+        "simple",
+        "easy",
+        "best",
+        "good",
+        "great",
+      ]);
+      const w = analysis.idea
+        .split(/\s+/)
+        .filter((w: string) => !skip.has(w.toLowerCase()) && w.length > 2);
+      const suffixes = [
+        "ly",
+        "ify",
+        "io",
+        "Hub",
+        "Sync",
+        "Flow",
+        "Nest",
+        "Base",
+        "Mint",
+        "Wave",
+        "Pulse",
+        "Spark",
+        "Cart",
+        "Verse",
+        "Stack",
+      ];
       if (w.length >= 1) {
         const cw = w[w.length - 1];
-        const s = cw.endsWith('s') && cw.length > 3 ? cw.slice(0, -1) : cw;
+        const s = cw.endsWith("s") && cw.length > 3 ? cw.slice(0, -1) : cw;
         const core = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-        analysis.appName = core + suffixes[core.charCodeAt(0) % suffixes.length];
+        analysis.appName =
+          core + suffixes[core.charCodeAt(0) % suffixes.length];
       } else {
         analysis.appName = "LaunchPad";
       }
-      await Analysis.updateOne({ _id: analysisId }, { $set: { appName: analysis.appName } });
+      await Analysis.updateOne(
+        { _id: analysisId },
+        { $set: { appName: analysis.appName } },
+      );
     }
     const appName = analysis.appName;
 
@@ -527,19 +1893,35 @@ CRITICAL INSTRUCTIONS:
         throw new Error("No files generated");
       }
       // Sanitize file contents — fix double-escaped newlines from AI
-      generatedFiles = generatedFiles.map((f: { path: string; content: string; lang: string }) => ({
-        ...f,
-        content: typeof f.content === 'string'
-          ? f.content.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '')
-          : f.content,
-      }));
+      generatedFiles = generatedFiles.map(
+        (f: { path: string; content: string; lang: string }) => ({
+          ...f,
+          content:
+            typeof f.content === "string"
+              ? f.content
+                  .replace(/\\n/g, "\n")
+                  .replace(/\\t/g, "\t")
+                  .replace(/\\r/g, "")
+              : f.content,
+        }),
+      );
       // ALWAYS use our handcrafted preview.html — AI-generated previews are unreliable
       generatedFiles = generatedFiles.filter(
         (f: { path: string }) => f.path !== "preview.html",
       );
       generatedFiles.push({
         path: "preview.html",
-        content: buildFallbackPreview({ idea: analysis.idea, appName, target: analysis.target, problem: analysis.problem, category: analysis.category || "Other", summary: analysis.summary, strengths: analysis.strengths || [], recommendations: analysis.recommendations || [], revenue: analysis.revenue }),
+        content: buildFallbackPreview({
+          idea: analysis.idea,
+          appName,
+          target: analysis.target,
+          problem: analysis.problem,
+          category: analysis.category || "Other",
+          summary: analysis.summary,
+          strengths: analysis.strengths || [],
+          recommendations: analysis.recommendations || [],
+          revenue: analysis.revenue,
+        }),
         lang: "html",
       });
     } catch {
@@ -584,7 +1966,17 @@ CRITICAL INSTRUCTIONS:
         },
         {
           path: "preview.html",
-          content: buildFallbackPreview({ idea: analysis.idea, appName, target: analysis.target, problem: analysis.problem, category: analysis.category || "Other", summary: analysis.summary, strengths: analysis.strengths || [], recommendations: analysis.recommendations || [], revenue: analysis.revenue }),
+          content: buildFallbackPreview({
+            idea: analysis.idea,
+            appName,
+            target: analysis.target,
+            problem: analysis.problem,
+            category: analysis.category || "Other",
+            summary: analysis.summary,
+            strengths: analysis.strengths || [],
+            recommendations: analysis.recommendations || [],
+            revenue: analysis.revenue,
+          }),
           lang: "html",
         },
       ];
@@ -598,7 +1990,15 @@ CRITICAL INSTRUCTIONS:
       }),
     );
 
-    const techStack = ["Next.js 14", "TypeScript", "Tailwind CSS", "React 18", "HTML", "CSS", "JavaScript"];
+    const techStack = [
+      "Next.js 14",
+      "TypeScript",
+      "Tailwind CSS",
+      "React 18",
+      "HTML",
+      "CSS",
+      "JavaScript",
+    ];
 
     const build = await Build.create({
       userId,
