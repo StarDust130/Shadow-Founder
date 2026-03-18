@@ -24,6 +24,7 @@
 
 ---
 
+
 ## 🤔 What is Shadow Founder?
 
 Shadow Founder is an **AI-powered startup validation & MVP generation platform** built for the Indian startup ecosystem. It acts as your brutally honest co-founder that:
