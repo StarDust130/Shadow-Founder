@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useSpring,
+  useReducedMotion,
+} from "framer-motion";
 import {
   ArrowUpRight,
   ArrowUp,
@@ -83,6 +89,9 @@ export default function LandingPage() {
   const { isSignedIn } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isCompactDevice, setIsCompactDevice] = useState(false);
+  const backToTopSentinelRef = useRef<HTMLDivElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   // Scroll progress bar
   const { scrollYProgress } = useScroll();
@@ -93,11 +102,26 @@ export default function LandingPage() {
   });
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 500);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const checkDevice = () => setIsCompactDevice(window.innerWidth < 1024);
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
+  }, []);
+
+  useEffect(() => {
+    const sentinel = backToTopSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowBackToTop(!entry.isIntersecting),
+      {
+        threshold: 0,
+        rootMargin: "0px 0px -500px 0px",
+      },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   const scrollToTop = () => {
@@ -113,12 +137,20 @@ export default function LandingPage() {
 
   return (
     // Outer Canvas
-    <div className="min-h-screen bg-[#D1D1D1] p-4 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center scroll-smooth">
-      {/* SCROLL PROGRESS BAR */}
-      <motion.div
-        style={{ scaleX }}
-        className="fixed top-0 left-0 right-0 h-[3px] bg-linear-to-r from-[#FF6803] via-[#FF8C42] to-[#FF6803] origin-left z-[100]"
+    <div className="relative min-h-screen bg-[#D1D1D1] p-4 md:p-6 lg:p-8 font-sans selection:bg-[#FF6803] selection:text-white flex flex-col items-center scroll-smooth">
+      <div
+        ref={backToTopSentinelRef}
+        aria-hidden="true"
+        className="absolute top-130 left-0 h-px w-px opacity-0 pointer-events-none"
       />
+
+      {/* SCROLL PROGRESS BAR */}
+      {!shouldReduceMotion && !isCompactDevice ? (
+        <motion.div
+          style={{ scaleX }}
+          className="fixed top-0 left-0 right-0 h-0.75 bg-linear-to-r from-[#FF6803] via-[#FF8C42] to-[#FF6803] origin-left z-100"
+        />
+      ) : null}
 
       {/* BACK TO TOP BUTTON */}
       <AnimatePresence>
@@ -129,7 +161,7 @@ export default function LandingPage() {
             exit={{ opacity: 0, scale: 0.5, y: 20 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[99] w-12 h-12 md:w-14 md:h-14 bg-[#1A1A1A] hover:bg-[#FF6803] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_8px_25px_rgba(255,104,3,0.4)] hover:-translate-y-1 transition-all cursor-pointer group"
+            className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-99 w-12 h-12 md:w-14 md:h-14 bg-[#1A1A1A] hover:bg-[#FF6803] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_8px_25px_rgba(255,104,3,0.4)] hover:-translate-y-1 transition-all cursor-pointer group"
             aria-label="Back to top"
           >
             <ArrowUp size={20} className="group-hover:animate-bounce" />
@@ -138,7 +170,7 @@ export default function LandingPage() {
       </AnimatePresence>
 
       {/* GLOBAL ANIMATED BACKGROUND ELEMENTS */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden hidden lg:block">
         {/* Floating gradient orbs */}
         <motion.div
           animate={{
@@ -242,7 +274,7 @@ export default function LandingPage() {
       {/* INNER FRAME - The Main App Window */}
       <div className="relative z-10 w-full max-w-[1800px] bg-[#E3E3E3] rounded-[2rem] md:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col border border-white/50">
         {/* INNER ANIMATED BG ELEMENTS */}
-        <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-1 overflow-hidden hidden lg:block">
           {/* Slow-moving gradient blobs inside the frame */}
           <motion.div
             animate={{
