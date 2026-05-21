@@ -99,7 +99,7 @@ export default function DashboardLayout({
     allNavItems.find((item) => pathname.startsWith(item.href))?.label || "Hub";
 
   return (
-    <div className="min-h-screen bg-[#E5E4E2] font-sans selection:bg-[#FF6803] selection:text-white">
+    <div className="min-h-screen bg-[#E5E4E2] font-sans text-[#111111] selection:bg-[#FF6803] selection:text-white">
       {/* ═══ DESKTOP FLOATING DOCK ═══ */}
       <AnimatePresence>
         {!isMobile && (
