@@ -66,7 +66,7 @@ export default function DashboardLayout({
       }
     };
     fetchBuilds();
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     const fetchCredits = async () => {
@@ -81,7 +81,7 @@ export default function DashboardLayout({
       }
     };
     fetchCredits();
-  }, [pathname]);
+  }, []);
 
   const allNavItems = latestBuild
     ? [
@@ -280,7 +280,6 @@ export default function DashboardLayout({
           <Link
             href="https://youtu.be/EH9yR6T4ePI?si=jeK1Y21FULNEZQNG&t=62"
             target="_blank"
-            
           >
             <div className="hidden cursor-pointer sm:flex items-center gap-2 bg-white/60 backdrop-blur-sm border  border-[#1A1A1A]/6 rounded-full px-3.5 py-1.5 shadow-sm">
               😎
